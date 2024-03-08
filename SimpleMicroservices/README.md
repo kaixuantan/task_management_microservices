@@ -107,6 +107,7 @@ Base url: https://personal-rc7vnnm9.outsystemscloud.com
 - Task
   - `Task table`
   - [PK] taskId (bigint) (auto increment)
+  - name (varchar)
   - [FK] createdById (bigint)
   - [FK] subGroupId (bigint)
   - createdTime (datetime)
