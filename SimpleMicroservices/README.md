@@ -38,46 +38,81 @@ Base url: https://personal-rc7vnnm9.outsystemscloud.com
 
 ## Endpoints
 - User (https://personal-rc7vnnm9.outsystemscloud.com/UserAPI_REST/rest/v1/)
-  - [GET] 		Get all users		/user
-  - [GET]		Get a user		/user/{userId}
-  - [POST] 		Add user			/user
-  - [PUT] 		Update user		/user/{userId}
-  - [DELETE] 	Delete user		/user/{userId}
+  - [GET] 		Get all users		
+    - /user
+  - [GET]		Get a user		
+    - /user/{userId}
+  - [POST] 		Add user			
+    - /user
+  - [PUT] 		Update user		
+    - /user/{userId}
+  - [DELETE] 	Delete user		
+    - /user/{userId}
 - Group (https://personal-rc7vnnm9.outsystemscloud.com/GroupAPI_REST/rest/v1/)
-  - [GET] 		Get all groups			/group
-  - [GET]		Get a group			/group/{groupId}
-  - [GET]		Get user's groups		/group/usergroup/{userId}
-  - [POST] 		Add group			/group
-  - [PUT] 		Update group			/group/{groupId}
-  - [PUT]		Assign users to group	/group/assign/{groupId}
-  - [DELETE] 	Delete group			/group/{groupId}
+  - [GET] 		Get all groups			
+    - /group
+  - [GET]		Get a group			
+    - /group/{groupId}
+  - [GET]		Get user's groups		
+    - /group/usergroup/{userId}
+  - [POST] 		Add group			
+    - /group
+  - [PUT] 		Update group			
+    - /group/{groupId}
+  - [PUT]		Assign users to group	
+    - /group/assign/{groupId}
+  - [DELETE] 	Delete group			
+    - /group/{groupId}
 - SubGroup (https://personal-rc7vnnm9.outsystemscloud.com/SubGroupAPI_REST/rest/v1/)
-  - [GET] 		Get all subgroups			/subgroup
-  - [GET]		Get a subgroup			/subgroup/{subGroupId}
-  - [GET]		Get user's subgroups		/subgroup/usersubgroup/{userId}
-  - [GET]		Get group's subgroups		/subgroup/groupsubgroup/{groupId}
-  - [POST] 		Add subgroup				/subgroup
-  - [PUT] 		Update subgroup			/subgroup/{subGroupId}
-  - [PUT]		Self-Enrol user to subgroup	/subgroup/enrol/{subGroupId}/{userId}
-  - [DELETE] 	Delete subgroup			/subgroup/{subGroupId}
+  - [GET] 		Get all subgroups			
+    - /subgroup
+  - [GET]		Get a subgroup			
+    - /subgroup/{subGroupId}
+  - [GET]		Get user's subgroups		
+    - /subgroup/usersubgroup/{userId}
+  - [GET]		Get group's subgroups		
+    - /subgroup/groupsubgroup/{groupId}
+  - [POST] 		Add subgroup				
+    - /subgroup
+  - [PUT] 		Update subgroup			
+    - /subgroup/{subGroupId}
+  - [PUT]		Self-Enrol user to subgroup	
+    - /subgroup/enrol/{subGroupId}/{userId}
+  - [DELETE] 	Delete subgroup			
+    - /subgroup/{subGroupId}
 - Task (https://personal-rc7vnnm9.outsystemscloud.com/TaskAPI_REST/rest/v1/)
-  - [GET] 		Get all tasks			/task
-  - [GET]		Get all tasks in subgroup /task/subgroup/{subGroupId}
-  - [POST] 		Add task				/task
-  - [PUT] 		Update task			/task/{taskId}
-  - [DELETE] 	Delete task			/task/{taskId}
+  - [GET] 		Get all tasks			
+    - /task
+  - [GET]		Get all tasks in subgroup 
+    - /task/subgroup/{subGroupId}
+  - [POST] 		Add task				
+    - /task
+  - [PUT] 		Update task			
+    - /task/{taskId}
+  - [DELETE] 	Delete task			
+    - /task/{taskId}
 - Log (https://personal-rc7vnnm9.outsystemscloud.com/LogAPI_REST/rest/v1/)
-  - [GET] 		Get all tasks			/task
-  - [GET]		Get all tasks in subgroup /task/{subGroupId}
-  - [POST] 		Add task				/task
-  - [PUT] 		Update task			/task/{taskId}
-  - [DELETE] 	Delete task			/task/{taskId}
+  - [GET] 		Get all tasks			
+    - /task
+  - [GET]		Get all tasks in subgroup 
+    - /task/{subGroupId}
+  - [POST] 		Add task				
+    - /task
+  - [PUT] 		Update task			
+    - /task/{taskId}
+  - [DELETE] 	Delete task			
+    - /task/{taskId}
 - Document (https://personal-rc7vnnm9.outsystemscloud.com/DocAPI_REST/rest/v1/)
-  - [GET] 		Get document				/doc/{docId}
-  - [GET]		Get all document in subgroup /doc/{subGroupId}
-  - [POST] 		Add document		        	/doc/{type}
-  - [PUT] 		Update document	        	/doc/{docId}
-  - [DELETE] 	Delete document 			/doc/{taskId}
+  - [GET] 		Get document				
+    - /doc/{docId}
+  - [GET]		Get all document in subgroup 
+    - /doc/{subGroupId}
+  - [POST] 		Add document		        	
+    - /doc/{type}
+  - [PUT] 		Update document	        	
+    - /doc/{docId}
+  - [DELETE] 	Delete document 			
+    - /doc/{taskId}
 
 ## Database schema
 - User
