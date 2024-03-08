@@ -161,5 +161,4 @@ Base url: https://personal-rc7vnnm9.outsystemscloud.com
   - `Document table`
   - [PK] DocId (bigint) (auto increment)
   - [FK] subGroupId (bigint)
-  - filename (varchar)
-  - type (varchar)
+  - document (binary data)
