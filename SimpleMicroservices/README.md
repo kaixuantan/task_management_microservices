@@ -1,0 +1,129 @@
+# API Documentation
+Base url: https://personal-rc7vnnm9.outsystemscloud.com
+
+## List of simple miroservices
+- User          /UserAPI_REST/rest/v1
+- Group         /GroupAPI_REST/rest/v1
+- SubGroup      /SubGroupAPI_REST/rest/v1
+- Task          /TaskAPI_REST/rest/v1
+- Log           /LogAPI_REST/rest/v1
+- Document      /DocAPI_REST/rest/v1
+
+## Authentication
+- Each simple microservice API has its own authentication headers to be included
+  - User
+    - `Headers`
+    - "X-User-AppId" = [userAppId]
+    - "X-User-Key" = [userAPIKey]
+  - Group
+    - `Headers`
+    - "X-Group-AppId" = [groupAppId]
+    - "X-Group-Key" = [groupAPIKey]
+  - SubGroup
+    - `Headers`
+    - "X-SubGroup-AppId" = [subGroupAppId]
+    - "X-SubGroup-Key" = [subGroupAPIKey]
+  - Task
+    - `Headers`
+    - "X-Task-AppId" = [taskAppId]
+    - "X-Task-Key" = [taskAPIKey]
+  - Log
+    - `Headers`
+    - "X-Log-AppId" = [logAppId]
+    - "X-Log-Key" = [logAPIKey]
+  - Document
+    - `Headers`
+    - "X-Doc-AppId" = [docAppId]
+    - "X-Doc-Key" = [docAPIKey]
+
+## Endpoints
+- User (https://personal-rc7vnnm9.outsystemscloud.com/UserAPI_REST/rest/v1/)
+  - [GET] 		Get all users		/user
+  - [GET]		Get a user		/user/{userId}
+  - [POST] 		Add user			/user
+  - [PUT] 		Update user		/user/{userId}
+  - [DELETE] 	Delete user		/user/{userId}
+- Group (https://personal-rc7vnnm9.outsystemscloud.com/GroupAPI_REST/rest/v1/)
+  - [GET] 		Get all groups			/group
+  - [GET]		Get a group			/group/{groupId}
+  - [GET]		Get user's groups		/group/usergroup/{userId}
+  - [POST] 		Add group			/group
+  - [PUT] 		Update group			/group/{groupId}
+  - [PUT]		Assign users to group	/group/assign/{groupId}
+  - [DELETE] 	Delete group			/group/{groupId}
+- SubGroup (https://personal-rc7vnnm9.outsystemscloud.com/SubGroupAPI_REST/rest/v1/)
+  - [GET] 		Get all subgroups			/subgroup
+  - [GET]		Get a subgroup			/subgroup/{subGroupId}
+  - [GET]		Get user's subgroups		/subgroup/usersubgroup/{userId}
+  - [GET]		Get group's subgroups		/subgroup/groupsubgroup/{groupId}
+  - [POST] 		Add subgroup				/subgroup
+  - [PUT] 		Update subgroup			/subgroup/{subGroupId}
+  - [PUT]		Self-Enrol user to subgroup	/subgroup/enrol/{subGroupId}/{userId}
+  - [DELETE] 	Delete subgroup			/subgroup/{subGroupId}
+- Task (https://personal-rc7vnnm9.outsystemscloud.com/TaskAPI_REST/rest/v1/)
+  - [GET] 		Get all tasks			/task
+  - [GET]		Get all tasks in subgroup /task/{subGroupId}
+  - [POST] 		Add task				/task
+  - [PUT] 		Update task			/task/{taskId}
+  - [DELETE] 	Delete task			/task/{taskId}
+- Log (https://personal-rc7vnnm9.outsystemscloud.com/LogAPI_REST/rest/v1/)
+  - [GET] 		Get all tasks			/task
+  - [GET]		Get all tasks in subgroup /task/{subGroupId}
+  - [POST] 		Add task				/task
+  - [PUT] 		Update task			/task/{taskId}
+  - [DELETE] 	Delete task			/task/{taskId}
+- Document (https://personal-rc7vnnm9.outsystemscloud.com/DocAPI_REST/rest/v1/)
+  - [GET] 		Get document				/doc/{docId}
+  - [GET]		Get all document in subgroup /doc/{subGroupId}
+  - [POST] 		Add document		        	/doc/{type}
+  - [PUT] 		Update document	        	/doc/{docId}
+  - [DELETE] 	Delete document 			/doc/{taskId}
+
+## Database schema
+- User
+  - `User table`
+  - [PK] userId (bigint) (auto increment)
+  - username (varchar)
+  - email (varchar)
+  - phone (varchar)
+  - password (varchar)
+  - role (varchar)
+- Group
+  - `Group table`
+  - [PK] groupId (bigint) (auto increment)
+  - name (varchar)
+  - `GroupUser table`
+  - [FK] groupId (bigint)
+  - [FK] userId (bigint)
+- SubGroup
+  - `SubGroup table`
+  - [PK] subGroupId (bigint) (auto increment)
+  - [FK] groupId (bigint)
+  - name (varchar)
+  - size (int)
+  - `SubGroupUser table`
+  - [FK] subGroupId (bigint)
+  - [FK] userId (bigint)
+- Task
+  - `Task table`
+  - [PK] taskId (bigint) (auto increment)
+  - [FK] createdById (bigint)
+  - [FK] subGroupId (bigint)
+  - createdTime (datetime)
+  - [FK] assignedToId (bigint)
+  - lastUpdatedTime (datetime)
+  - [FK] lastUpdatedById (bigint)
+  - status (varchar)
+- Log
+  - `Log table`
+  - [PK] LogId (bigint) (auto increment)
+  - [FK] userId (bigint)
+  - type (varchar)
+  - description (varchar)
+  - timestamp (datetime)
+- Document
+  - `Document table`
+  - [PK] DocId (bigint) (auto increment)
+  - [FK] subGroupId (bigint)
+  - filename (varchar)
+  - type (varchar)
