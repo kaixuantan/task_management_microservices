@@ -62,7 +62,7 @@ Base url: https://personal-rc7vnnm9.outsystemscloud.com
   - [DELETE] 	Delete subgroup			/subgroup/{subGroupId}
 - Task (https://personal-rc7vnnm9.outsystemscloud.com/TaskAPI_REST/rest/v1/)
   - [GET] 		Get all tasks			/task
-  - [GET]		Get all tasks in subgroup /task/{subGroupId}
+  - [GET]		Get all tasks in subgroup /task/subgroup/{subGroupId}
   - [POST] 		Add task				/task
   - [PUT] 		Update task			/task/{taskId}
   - [DELETE] 	Delete task			/task/{taskId}
