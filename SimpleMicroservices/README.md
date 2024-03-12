@@ -94,6 +94,8 @@ Base url: https://personal-rc7vnnm9.outsystemscloud.com
     - /task
   - [PUT] 		Update task			
     - /task/{taskId}
+  - [PUT]		Assign task to user		
+    - /task/assign
   - [DELETE] 	Delete task			
     - /task/{taskId}
 - Log (https://personal-rc7vnnm9.outsystemscloud.com/LogAPI_REST/rest/v1/)
