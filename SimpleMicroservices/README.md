@@ -101,6 +101,12 @@ Base url: https://personal-rc7vnnm9.outsystemscloud.com
     - /task
   - [GET]		Get all tasks in subgroup 
     - /task/{subGroupId}
+  - [GET]		Get logs by type		
+    - /log/{type}
+  - [GET]		Get logs by taskId		
+    - /log/taskId/{taskId}
+  - [GET]		Get logs by subGroupId	
+    - /log/subgroupId/{subGroupId}
   - [POST] 		Add task				
     - /task
   - [PUT] 		Update task			
