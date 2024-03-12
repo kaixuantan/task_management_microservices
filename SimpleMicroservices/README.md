@@ -139,22 +139,31 @@ Base url: https://personal-rc7vnnm9.outsystemscloud.com
   - phone (varchar)
   - password (varchar)
   - role (varchar)
+  - picture (binary data)
 - Group
   - `Group table`
   - [PK] groupId (bigint) (auto increment)
   - name (varchar)
+  - description (varchar)
+  - picture (binary data)
+  - size (integer)
+  - createdDateTime (datetime)
   - `GroupUser table`
   - [FK] groupId (bigint)
   - [FK] userId (bigint)
+  - username (varchar)
 - SubGroup
   - `SubGroup table`
   - [PK] subGroupId (bigint) (auto increment)
   - [FK] groupId (bigint)
   - name (varchar)
+  - description (varchar)
+  - picture (binary data)
   - size (int)
   - `SubGroupUser table`
   - [FK] subGroupId (bigint)
   - [FK] userId (bigint)
+  - username (varchar)
 - Task
   - `Task table`
   - [PK] taskId (bigint) (auto increment)
@@ -171,6 +180,8 @@ Base url: https://personal-rc7vnnm9.outsystemscloud.com
   - [PK] LogId (bigint) (auto increment)
   - [FK] userId (bigint)
   - type (varchar)
+  - [FK] taskId (bigint)
+  - [FK] subGroupId (bigint)
   - description (varchar)
   - timestamp (datetime)
 - Document
