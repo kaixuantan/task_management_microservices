@@ -27,10 +27,6 @@ const lineData = reactive({
         },
     ],
 });
-const items = ref([
-    { label: "Add New", icon: "pi pi-fw pi-plus" },
-    { label: "Remove", icon: "pi pi-fw pi-minus" },
-]);
 
 
 const activities = ref(
@@ -258,8 +254,9 @@ watch(
                     </div>
                 </div>
 
-                <div class="col-12">
+                <div class="col-12 flex justify-content-between">
                     <h2 class="mb-0 font-semibold">My Tasks</h2>
+                    <Button label="Add task" icon="pi pi-plus" rounded />
                 </div>
                 <div class="col-12">
                     <TabView>
