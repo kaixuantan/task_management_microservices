@@ -187,7 +187,7 @@ watch(
                                 >
                             </div>
                             <div
-                                class="flex align-items-center justify-content-center surface-100 border-round"
+                                class="flex align-items-center justify-content-center bg-orange-100 border-round"
                                 style="width: 2.5rem; height: 2.5rem"
                             >
                                 <i class="pi pi-chart-bar text-500 text-xl"></i>
@@ -212,7 +212,7 @@ watch(
                                 >
                             </div>
                             <div
-                                class="flex align-items-center justify-content-center surface-100 border-round"
+                                class="flex align-items-center justify-content-center bg-purple-100 border-round"
                                 style="width: 2.5rem; height: 2.5rem"
                             >
                                 <i class="pi pi-plus text-500 text-xl"></i>
@@ -237,7 +237,7 @@ watch(
                                 >
                             </div>
                             <div
-                                class="flex align-items-center justify-content-center surface-100 border-round"
+                                class="flex align-items-center justify-content-center bg-blue-100 border-round"
                                 style="width: 2.5rem; height: 2.5rem"
                             >
                                 <i
@@ -256,7 +256,7 @@ watch(
 
                 <div class="col-12 flex justify-content-between">
                     <h2 class="mb-0 font-semibold">My Tasks</h2>
-                    <Button label="Add task" icon="pi pi-plus" rounded />
+                    <Button label="Add task" icon="pi pi-plus" rounded raised />
                 </div>
                 <div class="col-12">
                     <TabView>
