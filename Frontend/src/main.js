@@ -15,7 +15,7 @@ import BlockUI from 'primevue/blockui';
 import Button from 'primevue/button';
 import ButtonGroup from 'primevue/buttongroup';
 import Breadcrumb from 'primevue/breadcrumb';
-import Calendar from 'primevue/calendar';
+import Calendar1 from 'primevue/calendar';
 import Card from 'primevue/card';
 import Chart from 'primevue/chart';
 import CascadeSelect from 'primevue/cascadeselect';
@@ -109,6 +109,9 @@ import VirtualScroller from 'primevue/virtualscroller';
 
 import BlockViewer from '@/components/BlockViewer.vue';
 
+import { setupCalendar, Calendar, DatePicker } from 'v-calendar';
+import 'v-calendar/style.css';
+
 import '@/assets/styles.scss';
 
 const app = createApp(App);
@@ -118,6 +121,8 @@ app.use(PrimeVue, { ripple: true });
 app.use(ToastService);
 app.use(DialogService);
 app.use(ConfirmationService);
+app.use(setupCalendar, {})
+
 
 app.directive('tooltip', Tooltip);
 app.directive('badge', BadgeDirective);
@@ -136,7 +141,7 @@ app.component('BlockUI', BlockUI);
 app.component('Breadcrumb', Breadcrumb);
 app.component('Button', Button);
 app.component('ButtonGroup', ButtonGroup);
-app.component('Calendar', Calendar);
+app.component('Calendar', Calendar1);
 app.component('Card', Card);
 app.component('Chart', Chart);
 app.component('Carousel', Carousel);
@@ -221,5 +226,7 @@ app.component('TreeSelect', TreeSelect);
 app.component('TreeTable', TreeTable);
 app.component('TriStateCheckbox', TriStateCheckbox);
 app.component('VirtualScroller', VirtualScroller);
+app.component('VCalendar', Calendar)
+app.component('VDatePicker', DatePicker)
 
 app.mount('#app');

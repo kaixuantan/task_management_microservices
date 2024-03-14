@@ -9,10 +9,12 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@popperjs/core": "^2.11.8",
     "chart.js": "^4.4.2",
     "primeflex": "^3.3.1",
     "primeicons": "^6.0.1",
     "primevue": "^3.49.1",
+    "v-calendar": "^3.1.2",
     "vue": "^3.4.21",
     "vue-router": "^4.3.0"
   },
