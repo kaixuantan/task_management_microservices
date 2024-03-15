@@ -203,8 +203,8 @@ export default {
                 "https://personal-rc7vnnm9.outsystemscloud.com/SubGroupAPI_REST/rest/v1/subgroup",
                 {
                     headers: {
-                        "X-SubGroup-AppId": process.env.X_SubGroup_AppId,
-                        "X-SubGroup-Key": process.env.X_SubGroup_Key,
+                        "X-SubGroup-AppId": env.X_SubGroup_AppId,
+                        "X-SubGroup-Key": env.X_SubGroup_Key,
                         // any other headers you need to set
                     },
                 }
