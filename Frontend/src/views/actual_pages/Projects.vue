@@ -1,9 +1,9 @@
 <script setup>
 import { onMounted, reactive, ref, watch } from "vue";
 import { useLayout } from "@/layout/composables/layout";
+import axios from "axios";
 
 const { isDarkTheme } = useLayout();
-
 
 const activities = ref(
     [
@@ -33,23 +33,6 @@ const activities = ref(
         },
     ].reverse()
 );
-const projects = ref([
-    {
-        name: "Project Meelo",
-        description: "create real estate landing page",
-        icon: "pi pi-apple",
-    },
-    {
-        name: "Project Kivu",
-        description: "complete leadership assignment",
-        icon: "pi pi-bitcoin",
-    },
-    {
-        name: "Project Hapara",
-        description: "design a new logo for the company",
-        icon: "pi pi-bolt",
-    },
-]);
 
 const lineOptions = ref(null);
 const applyLightTheme = () => {
@@ -105,19 +88,23 @@ watch(
         <div class="xl:col-4" v-for="n in 3">
             <Card style="overflow: hidden" class="shadow-2">
                 <template #header>
-                    <div class="p-4 flex justify-content-between align-items-center">
+                    <div
+                        class="p-4 flex justify-content-between align-items-center"
+                    >
                         <div class="flex gap-2 align-items-center">
                             <Avatar
-                            :label="communities[n].charAt(0)"
-                            class="mr-2"
-                            size="large"
-                            shape="circle"
-                            :style="{
-                                backgroundColor: colors[n % colors.length],
-                            }"
+                                :label="communities[n].charAt(0)"
+                                class="mr-2"
+                                size="large"
+                                shape="circle"
+                                :style="{
+                                    backgroundColor: colors[n % colors.length],
+                                }"
                             />
                             <div>
-                                <h5 class="mb-1 font-semibold">Project Meelo</h5>
+                                <h5 class="mb-1 font-semibold">
+                                    Project Meelo
+                                </h5>
                             </div>
                         </div>
                         <Button text rounded>
@@ -127,29 +114,47 @@ watch(
                     <img
                         alt="user header"
                         src="https://espanol.verizon.com/learning/_next/static/images/87c8be7b206ab401b295fd1d21620b79.jpg"
-                        style="width: 100%; height: 100%; object-fit: contain;"
+                        style="width: 100%; height: 100%; object-fit: contain"
                     />
                 </template>
                 <template #title>Members: </template>
                 <template #content>
-                    <p class="m-0">
-                        Project description 
-                    </p>
+                    <p class="m-0">Project description</p>
                 </template>
                 <template #footer>
-                    <div class="flex mt-1 justify-content-between" v-if="!enrolled">
+                    <div
+                        class="flex mt-1 justify-content-between"
+                        v-if="!enrolled"
+                    >
                         <AvatarGroup>
-                            <Avatar image="/images/avatars/panda.png" size="large" shape="circle" />
-                            <Avatar image="/images/avatars/fox.png" size="large" shape="circle" />
-                            <Avatar image="/images/avatars/woman.png" size="large" shape="circle" />
+                            <Avatar
+                                image="/images/avatars/panda.png"
+                                size="large"
+                                shape="circle"
+                            />
+                            <Avatar
+                                image="/images/avatars/fox.png"
+                                size="large"
+                                shape="circle"
+                            />
+                            <Avatar
+                                image="/images/avatars/woman.png"
+                                size="large"
+                                shape="circle"
+                            />
                             <Avatar label="+2" shape="circle" size="large" />
                         </AvatarGroup>
-                        <Button label="Enroll" rounded />
+                        <Button label="Enroll" />
                     </div>
 
                     <div class="flex gap-3 mt-1" v-else>
-                        <Button label="Leave" severity="secondary" outlined rounded class="w-full" />
-                        <Button label="View" class="w-full" rounded />
+                        <Button
+                            label="Leave"
+                            severity="secondary"
+                            outlined
+                            class="w-full"
+                        />
+                        <Button label="View" class="w-full" />
                     </div>
                 </template>
             </Card>
@@ -188,8 +193,27 @@ export default {
                 "#f9e9e2",
                 "#f2e9d8",
             ],
-            enrolled: true,
+            projects: [],
+            enrolled: false,
         };
+    },
+    async created() {
+        try {
+            const response = await axios.get(
+                "https://personal-rc7vnnm9.outsystemscloud.com/SubGroupAPI_REST/rest/v1/subgroup",
+                {
+                    headers: {
+                        "X-SubGroup-AppId": process.env.X_SubGroup_AppId,
+                        "X-SubGroup-Key": process.env.X_SubGroup_Key,
+                        // any other headers you need to set
+                    },
+                }
+            );
+            this.projects = response.data.SubGroup;
+            console.log(this.projects);
+        } catch (error) {
+            console.error(error);
+        }
     },
 };
 </script>

@@ -121,7 +121,7 @@ watch(
                                 <p class="m-0 text-500">Organisation</p>
                             </div>
                         </div>
-                        <Button text rounded>
+                        <Button text>
                             <i class="pi pi-pencil text-500 text-xl"></i>
                         </Button>
                     </div>
@@ -140,7 +140,7 @@ watch(
                 </template>
                 <template #footer>
                     <div class="flex mt-1 justify-content-end">
-                        <Button label="View" rounded />
+                        <Button label="View" />
                     </div>
                 </template>
             </Card>
