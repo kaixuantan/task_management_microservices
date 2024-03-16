@@ -19,6 +19,12 @@ const router = createRouter({
                     component: () => import('@/views/actual_pages/Community.vue')
                 },
                 {
+                    path: '/create_community',
+                    name: 'create community',
+                    component: () => import('@/views/actual_pages/Create_Community.vue')
+                },
+                
+                {
                     path: '/projects',
                     name: 'projects',
                     component: () => import('@/views/actual_pages/Projects.vue')

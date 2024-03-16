@@ -2,16 +2,62 @@
 import { useLayout } from '@/layout/composables/layout';
 import { ref, computed } from 'vue';
 import AppConfig from '@/layout/AppConfig.vue';
+import axios from 'axios';
+import { useRouter } from 'vue-router';
 
+const router = useRouter(); 
 const { layoutConfig } = useLayout();
-const email = ref('');
+const username = ref('');
 const password = ref('');
 const checked = ref(false);
 
+const baseURL = 'https://personal-rc7vnnm9.outsystemscloud.com';
+const userAppId = env.X_User_AppId 
+const userAppKey = env.X_User_Key
+
+const handleSubmit = async () => {
+  try {
+    // Validate the form
+    if (!username.value || !password.value) {
+      alert('Please fill in all fields');
+      return;
+    }
+
+    // Make the API call
+    const userData={
+  "username": username.value,
+  "password": password.value,
+}
+    console.log('Called Login API')
+    console.log(username.value)
+    const response = await axios.post(`${baseURL}/UserAPI_REST/rest/v1/login`, userData, { headers });
+
+    
+    // Handle the response
+    if(response.data.Result.Success === false){
+        alert(response.data.Result.ErrorMessage)
+    }
+    else{
+    router.push('/'); // Redirect to the login page
+    }
+
+  } catch (error) {
+    // Handle errors
+    console.error('Error adding user:', error);
+    console.log(response.data.Result.ErrorMessage)
+  }
+}
+
+
+const headers = {
+  'Content-Type': 'application/json',
+  'X-User-AppId': userAppId,
+  'X-User-Key': userAppKey}
 
 </script>
 
 <template>
+    <form @submit.prevent="handleSubmit">
     <div class="surface-ground flex align-items-center justify-content-center min-h-screen min-w-screen overflow-hidden">
         <div class="flex flex-column align-items-center justify-content-center">
             <div style="border-radius: 56px; padding: 0.3rem; background: linear-gradient(180deg, var(--primary-color) 10%, rgba(33, 150, 243, 0) 30%)">
@@ -23,12 +69,11 @@ const checked = ref(false);
                     </div>
 
                     <div>
-                        <label for="email1" class="block text-900 text-xl font-medium mb-2">Email</label>
-                        <InputText id="email1" type="text" placeholder="Email address" class="w-full md:w-30rem mb-5" style="padding: 1rem" v-model="email" />
+                        <label for="username" class="block text-900 text-xl font-medium mb-2">Username</label>
+                        <InputText id="username" type="text" placeholder="Enter Username" class="w-full md:w-30rem mb-5" style="padding: 1rem" v-model="username" />
 
-                        <label for="password1" class="block text-900 font-medium text-xl mb-2">Password</label>
-                        <Password id="password1" v-model="password" placeholder="Password" :toggleMask="true" class="w-full mb-3" inputClass="w-full" :inputStyle="{ padding: '1rem' }"></Password>
-
+                        <label for="password" class="block text-900 font-medium text-xl mb-2">Password</label>
+                        <input type="password" id="password" v-model="password" placeholder="Enter Password" class="w-full mb-3" style="padding: 1rem;">
                         <div class="flex align-items-center justify-content-between mb-5 gap-5">
                             <div class="flex align-items-center">
                                 New User?&nbsp 
@@ -36,12 +81,13 @@ const checked = ref(false);
                             </div>
                             <a class="font-medium no-underline ml-2 text-right cursor-pointer" style="color: var(--primary-color)">Forgot password?</a>
                         </div>
-                        <Button label="Sign In" class="w-full p-3 text-xl"></Button>
+                        <Button label="Sign In" class="w-full p-3 text-xl" type="submit"></Button>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+    </form>
     <AppConfig simple />
 </template>
 

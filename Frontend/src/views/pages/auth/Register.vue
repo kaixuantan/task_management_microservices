@@ -3,8 +3,10 @@ import { useLayout } from '@/layout/composables/layout';
 import { ref, computed } from 'vue';
 import AppConfig from '@/layout/AppConfig.vue';
 import axios from 'axios';
+import { useRouter } from 'vue-router';
 
 
+const router = useRouter(); // Define the router object
 const { layoutConfig } = useLayout();
 const email = ref('');
 const username = ref('');
@@ -33,7 +35,7 @@ const handleSubmit = async () => {
       alert('Passwords do not match');
       return;
     }
-    
+
     // Make the API call
     const userData={
   "username": username.value,
@@ -49,11 +51,14 @@ const handleSubmit = async () => {
     
     // Handle the response
     console.log('User added:', response.data);
+    alert('Account has been created successfully. Please login.'); // Show alert message
+    router.push('./login'); // Redirect to the login page
     return response.data;
+    
   } catch (error) {
     // Handle errors
     console.error('Error adding user:', error);
-    throw error;
+    alert(error.response.data.ErrorMessage); // Show alert message
   }
 };
 
