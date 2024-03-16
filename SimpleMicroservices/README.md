@@ -43,6 +43,8 @@ Base url: https://personal-rc7vnnm9.outsystemscloud.com
 
 ## Endpoints
 - User (https://personal-rc7vnnm9.outsystemscloud.com/UserAPI_REST/rest/v1/)
+  - [POST]    Login
+    - /login
   - [GET] 		Get all users		
     - /user
   - [GET]		Get a user		
