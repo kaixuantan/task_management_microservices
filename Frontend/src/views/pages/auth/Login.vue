@@ -5,6 +5,7 @@ import AppConfig from '@/layout/AppConfig.vue';
 import axios from 'axios';
 import { useRouter } from 'vue-router';
 
+
 const router = useRouter(); 
 const { layoutConfig } = useLayout();
 const username = ref('');
@@ -37,8 +38,11 @@ const handleSubmit = async () => {
     if(response.data.Result.Success === false){
         alert(response.data.Result.ErrorMessage)
     }
+
     else{
-    router.push('/'); // Redirect to the login page
+    const user_id=response.data.UserId;
+    sessionStorage.setItem('yourKey', env.JWT_SECRET);
+    router.push('/'); 
     }
 
   } catch (error) {

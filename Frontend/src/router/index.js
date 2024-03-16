@@ -1,5 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router';
 import AppLayout from '@/layout/AppLayout.vue';
+import { isAuthenticated } from './auth'; 
 
 const router = createRouter({
     history: createWebHistory(),
@@ -196,6 +197,26 @@ const router = createRouter({
             component: () => import('@/views/pages/auth/Error.vue')
         }
     ]
-});
+}); 
+router.beforeEach((to, from, next) => {
+    // Check if the user is authenticated
+    const authenticated = isAuthenticated();
+  
+    // Allow access to login and register routes without authentication
+    if (to.name === 'login' || to.name === 'register') {
+      next();
+      return;
+    }
+  
+    // Redirect to login page if not authenticated
+    if (!authenticated) {
+      next({ name: 'login' });
+      return;
+    }
+  
+    // Allow access to the requested route if authenticated
+    next();
+  });
+
 
 export default router;
