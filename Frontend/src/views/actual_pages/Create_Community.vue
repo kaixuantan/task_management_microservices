@@ -87,9 +87,11 @@ const saveCommunity = () => {
     }
 };
 
-const editCommunity = (community) => {
-    community.value = { ...community };
+const editCommunity = (communitydata) => {
+    subgroups.value = subgroups.value.filter(c => c.id !== communitydata);
+    communities.value = communities.value.filter(c => c.id !== communitydata);
     communityDialog.value = true;
+    community.value = { ...communitydata };
 };
 
 const confirmDeleteCommunity = (community) => {
@@ -191,7 +193,7 @@ const createId = () => {
         <!--CODE FORSUBGROUP POPUP-->
         <div class="col-12 md:col-6">
             <div class="card">
-                <Button label="New Subgroup" icon="pi pi-plus" class="mr-2" severity="success" @click="openNew" />
+                <Button label="New Subgroup" icon="pi pi-plus" class="mr-2 mb-4" severity="success" @click="openNew" />
                 <div class="card">
                     <h5>Existing Subgroups</h5>
                     <DataTable :value="subgroups" :key="subgroupsKey">
