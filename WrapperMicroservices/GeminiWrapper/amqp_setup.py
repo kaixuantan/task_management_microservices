@@ -11,10 +11,19 @@ load_dotenv()
 
 # Instead of hardcoding the values, we can also get them from the environ as shown below
 hostname = os.getenv('HOSTNAME') #localhost
-port = os.getenv('PORT')         #5672 
-exchangename = os.getenv('EXCHANGE_NAME') 
+port = os.getenv('PORT') #5672
+exchangename = os.getenv('EXCHANGE_NAME') #esd_exchange
 exchangetype = os.getenv('EXCHANGE_TYPE') #topic
-ideas_q = os.getenv('QUEUE_NAME')
+
+queue_names = [
+    os.getenv('QUEUE_NAME_1'),
+    os.getenv('QUEUE_NAME_2')
+]
+
+routing_keys = [
+    os.getenv('ROUTING_KEY_1'),
+    os.getenv('ROUTING_KEY_2')
+]
 
 #to create a connection to the broker
 def create_connection(max_retries=12, retry_interval=5):
@@ -53,27 +62,28 @@ def create_connection(max_retries=12, retry_interval=5):
 def create_channel(connection):
     print('amqp_setup:create_channel')
     channel = connection.channel()
-    # Set up the exchange if the exchange doesn't exist
-    print('amqp_setup:create exchange')
-    channel.exchange_declare(exchange=exchangename, exchange_type=exchangetype, durable=True) # 'durable' makes the exchange survive broker restarts
     return channel
 
-#function to create queues
-def create_queues(channel, ideas_q):
-    print('amqp_setup:create queue')
-    create_idea_request_queue(channel,ideas_q)
+def create_exchange(channel, exchange_name, exchange_type):
+    print(f'amqp_setup:create exchange {exchange_name}')
+    channel.exchange_declare(exchange=exchange_name, exchange_type=exchange_type, durable=True)
 
-# function to create Activity_Log queue  
-def create_idea_request_queue(channel,ideas_q):
-    print('amqp_setup:create_idea_request_queue')
-    channel.queue_declare(queue=ideas_q, durable=True) # 'durable' makes the queue survive broker restarts
-    channel.queue_bind(exchange=exchangename, queue=ideas_q, routing_key='idea.*')
-        # bind the queue to the exchange via the key
-        # 'routing_key=#' => any routing_key would be matched
-    
-if __name__ == "__main__":  # execute this program only if it is run as a script (not by 'import')   
+def create_queues(channel, exchange_name, queue_names, routing_keys):
+    for queue_name, routing_key in zip(queue_names, routing_keys):
+        print(f'amqp_setup:create queue {queue_name}')
+        channel.queue_declare(queue=queue_name, durable=True)
+        channel.queue_bind(exchange=exchange_name, queue=queue_name, routing_key=routing_key)
+
+if __name__ == "__main__":
     connection = create_connection()
     channel = create_channel(connection)
-    create_queues(channel, ideas_q)
+
+    create_exchange(channel, exchangename, exchangetype)
+    create_queues(channel, exchangename, queue_names, routing_keys)
+
+    print("Exchange and queues created successfully.")
+
+    # Close the connection when done
+    connection.close()
     
     
