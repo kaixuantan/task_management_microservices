@@ -1,9 +1,13 @@
 <script setup>
 import { onMounted, reactive, ref, watch } from "vue";
 import { useLayout } from "@/layout/composables/layout";
+import { useRouter } from 'vue-router';
 
+const router = useRouter(); 
 const { isDarkTheme } = useLayout();
-
+const redirectToCreateCommunity = () => {
+    router.push({ name: 'create community' });
+}
 
 const activities = ref(
     [
@@ -99,7 +103,7 @@ watch(
     <div class="grid">
         <div class="col-12 flex justify-content-between">
             <h2 class="mb-0 font-semibold">Communities</h2>
-            <Button label="Create" icon="pi pi-plus" rounded raised />
+            <Button label="Create" icon="pi pi-plus" rounded raised @click="redirectToCreateCommunity"/>
         </div>
         <!-- 3 cards at the top of the screen -->
         <div class="xl:col-4" v-for="n in 3">
