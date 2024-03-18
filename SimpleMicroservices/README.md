@@ -185,6 +185,7 @@ Base url: https://personal-rc7vnnm9.outsystemscloud.com
   - [FK] createdById (bigint)
   - createdByUsername (varchar)
   - [FK] subGroupId (bigint)
+  - subGroupName (varchar)
   - createdDateTime (datetime)
   - [FK] assignorUserId (bigint)
   - assignorUsername (varchar)
