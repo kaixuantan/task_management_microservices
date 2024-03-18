@@ -105,22 +105,22 @@ Base url: https://personal-rc7vnnm9.outsystemscloud.com
   - [DELETE] 	Delete task			
     - /task/{taskId}
 - Log (https://personal-rc7vnnm9.outsystemscloud.com/LogAPI_REST/rest/v1/)
-  - [GET] 		Get all tasks			
-    - /task
-  - [GET]		Get all tasks in subgroup 
-    - /task/{subGroupId}
+  - [GET] 		Get all logs			
+    - /log
+  - [GET]		Get a log 
+    - /log/{logId}
   - [GET]		Get logs by type		
     - /log/{type}
   - [GET]		Get logs by taskId		
     - /log/taskId/{taskId}
   - [GET]		Get logs by subGroupId	
     - /log/subgroupId/{subGroupId}
-  - [POST] 		Add task				
-    - /task
-  - [PUT] 		Update task			
-    - /task/{taskId}
-  - [DELETE] 	Delete task			
-    - /task/{taskId}
+  - [POST] 		Add log				
+    - /log
+  - [PUT] 		Update log			
+    - /log/{logId}
+  - [DELETE] 	Delete log			
+    - /log/{logId}
 - Document (https://personal-rc7vnnm9.outsystemscloud.com/DocAPI_REST/rest/v1/)
   - [GET] 		Get document				
     - /doc/{docId}
