@@ -24,6 +24,11 @@ const router = createRouter({
                     name: 'create community',
                     component: () => import('@/views/actual_pages/Create_Community.vue')
                 },
+                {
+                    path: '/create_task',
+                    name: 'create task',
+                    component: () => import('@/views/actual_pages/Create_Task.vue')
+                },
                 
                 {
                     path: '/projects',

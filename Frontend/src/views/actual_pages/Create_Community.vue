@@ -160,7 +160,7 @@ const createId = () => {
         <Textarea style="margin-top: 7px;" id="desc" placeholder="Your Message" :autoResize="true" rows="3"
             cols="100" />
     </div>
-    x
+    
     <div class="flex">
         <div class="col-12 md:col-6">
             <div class="card">
