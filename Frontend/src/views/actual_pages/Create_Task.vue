@@ -112,7 +112,7 @@ const handleSubmit = async () => {
         <Textarea style="margin-top: 7px;" id="desc" placeholder="Your Message" :autoResize="true" rows="3"cols="100" v-model="task_desc" />
     </div>
     <div class="flex">
-        <div class="col-12 md:col-6">
+        <div class="col-12 md:col-6 px-0">
             <div class="card">
                 <h5>Assign Members</h5>
                 <MultiSelect v-model="multiselectValue" :options="multiselectValues" optionLabel="name"
