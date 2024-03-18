@@ -48,6 +48,42 @@ const headers = {
   'X-User-Key': userAppKey}
 
 assignedBy.value = sessionStorage.getItem('username');
+
+const handleSubmit = async () => {
+    try {
+        // Validate the form
+        if (!taskname.value || !task_desc.value || !multiselectValue.value || !date1.value) {
+            alert('Please fill in all fields');
+            return;
+        }
+
+        // Make the API call
+        const taskData={
+            "taskname": taskname.value,
+            "task_desc": task_desc.value,
+            "assignedBy": assignedBy.value,
+            "assignedTo": multiselectValue.value,
+            "dueDate": date1.value,
+        }
+        console.log('Called Task API')
+        console.log(taskname.value)
+        console.log(assignedBy.value)
+        console.log(multiselectValue.value)
+        console.log(date1.value)
+        const response = await axios.post(`${baseURL}/TaskAPI_REST/rest/v1/task`, taskData, { headers });
+
+        
+        // Handle the response
+        console.log('Task added:', response.data);
+        alert('Task has been created successfully.'); // Show alert message
+        router.push('/'); // Redirect to the home page
+        return response.data;
+        
+    } catch (error) {
+        // Handle errors
+        console.error('Error adding task:', error);
+    }
+}
 //END OF API CALL
 
 </script>
