@@ -27,15 +27,6 @@ connection = pika.BlockingConnection(pika.ConnectionParameters
                                       heartbeat=3600, blocked_connection_timeout=3600))
 channel = connection.channel()
 
-# Declare the exchange
-channel.exchange_declare(exchange=rabbitmq_exchange, exchange_type=rabbitmq_exchange_type, durable=True)
-
-# Declare the queue
-channel.queue_declare(queue=rabbitmq_queue, durable=True)
-
-# Bind the queue to the exchange
-channel.queue_bind(queue=rabbitmq_queue, exchange=rabbitmq_exchange, routing_key=rabbitmq_routing_key)
-
 # Define the message
 message = {
     "recipient": test_email,
@@ -47,7 +38,10 @@ message = {
 channel.basic_publish(
     exchange=rabbitmq_exchange,
     routing_key=rabbitmq_routing_key,
-    body=json.dumps(message)
+    body=json.dumps(message),
+    properties=pika.BasicProperties(
+        delivery_mode=2, # make message persistent
+    )
 )
 
 print(f"Message sent to the exchange '{rabbitmq_exchange}' with routing key '{rabbitmq_routing_key}'.")
