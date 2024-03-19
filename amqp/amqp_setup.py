@@ -17,12 +17,14 @@ exchangetype = os.getenv('EXCHANGE_TYPE') #topic
 
 queue_names = [
     os.getenv('QUEUE_NAME_1'),
-    os.getenv('QUEUE_NAME_2')
+    os.getenv('QUEUE_NAME_2'),
+    os.getenv('QUEUE_NAME_3')
 ]
 
 routing_keys = [
     os.getenv('ROUTING_KEY_1'),
-    os.getenv('ROUTING_KEY_2')
+    os.getenv('ROUTING_KEY_2'),
+    os.getenv('ROUTING_KEY_3')
 ]
 
 #to create a connection to the broker
