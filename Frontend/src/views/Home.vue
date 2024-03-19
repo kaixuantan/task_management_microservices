@@ -85,19 +85,13 @@ onMounted(() => {
     productService.getProductsSmall().then((data) => (products.value = data));
 });
 
-const attributes = ref([
+const calAttributes = ref([
     {
         highlight: true,
         dates: new Date(),
     },
 ]);
 
-const formatCurrency = (value) => {
-    return value.toLocaleString("en-US", {
-        style: "currency",
-        currency: "USD",
-    });
-};
 const applyLightTheme = () => {
     lineOptions.value = {
         plugins: {
@@ -127,36 +121,6 @@ const applyLightTheme = () => {
         },
     };
 };
-
-// const applyDarkTheme = () => {
-//     lineOptions.value = {
-//         plugins: {
-//             legend: {
-//                 labels: {
-//                     color: '#ebedef'
-//                 }
-//             }
-//         },
-//         scales: {
-//             x: {
-//                 ticks: {
-//                     color: '#ebedef'
-//                 },
-//                 grid: {
-//                     color: 'rgba(160, 167, 181, .3)'
-//                 }
-//             },
-//             y: {
-//                 ticks: {
-//                     color: '#ebedef'
-//                 },
-//                 grid: {
-//                     color: 'rgba(160, 167, 181, .3)'
-//                 }
-//             }
-//         }
-//     };
-// };
 
 watch(
     isDarkTheme,
@@ -193,12 +157,9 @@ watch(
                                 <i class="pi pi-chart-bar text-500 text-xl"></i>
                             </div>
                         </div>
-                        <span class="text-900 font-semibold text-xl block mb-2"
+                        <span class="text-900 font-bold text-xl block mb-2"
                             >24
                         </span>
-                        <span class="text-800 font-medium"
-                            >+12% From Yesterday</span
-                        >
                     </div>
                 </div>
                 <div class="col-12 lg:col-6 xl:col-4">
@@ -218,12 +179,9 @@ watch(
                                 <i class="pi pi-plus text-500 text-xl"></i>
                             </div>
                         </div>
-                        <span class="text-900 font-semibold text-xl block mb-2"
+                        <span class="text-900 font-bold text-xl block mb-2"
                             >24
                         </span>
-                        <span class="text-800 font-medium"
-                            >+12% From Yesterday</span
-                        >
                     </div>
                 </div>
                 <div class="col-12 lg:col-6 xl:col-4">
@@ -245,12 +203,9 @@ watch(
                                 ></i>
                             </div>
                         </div>
-                        <span class="text-900 font-semibold text-xl block mb-2"
+                        <span class="text-900 font-bold text-xl block mb-2"
                             >24
                         </span>
-                        <span class="text-800 font-medium"
-                            >+12% From Yesterday</span
-                        >
                     </div>
                 </div>
 
@@ -271,15 +226,6 @@ watch(
                                         </div>    
                                     </div>
                                 </div>
-                                <div>
-                                    <AvatarGroup>
-                                        <Avatar image="/images/avatars/panda.png" size="large" shape="circle" />
-                                        <Avatar image="/images/avatars/fox.png" size="large" shape="circle" />
-                                        <Avatar image="/images/avatars/woman.png" size="large" shape="circle" />
-                                        <Avatar label="+2" shape="circle" size="large" />
-                                    </AvatarGroup>
-                                </div>
-
                             </div>
                         </TabPanel>
                         <TabPanel header="New Assigned">
@@ -317,7 +263,7 @@ watch(
         <div class="col-4">
             <Panel>
                 <h5>Communities</h5>
-                <div class="flex-auto">
+                <div class="flex-auto" v-if="sideMenuActive">
                     <Avatar
                         v-for="(community, index) in communities.slice(0, 5)"
                         :key="index"
@@ -336,19 +282,39 @@ watch(
                         shape="circle"
                     />
                 </div>
+                <div v-else>
+                    <Avatar
+                        v-for="(community, index) in communities.slice(0, 7)"
+                        :key="index"
+                        :label="community.charAt(0)"
+                        class="mr-2"
+                        size="large"
+                        shape="circle"
+                        :style="{
+                            backgroundColor: colors[index % colors.length],
+                        }"
+                    />
+                    <Avatar
+                        :label="`+${communities.length - 7}`"
+                        class="mr-2"
+                        size="large"
+                        shape="circle"
+                    />
+                </div>
                 <Divider />
                 <div>
                     <h5>Calendar</h5>
-                    <VCalendar
+                    <!-- <VCalendar
                         view="weekly"
                         title-position="left"
                         expanded
                         :attributes="attributes"
-                    />
+                    /> -->
+                    <VCalendar :attributes="calAttributes" expanded />
                 </div>
 
-                <Divider />
-                <div>
+                <!-- <Divider /> -->
+                <!-- <div>
                     <div
                         class="flex justify-content-between align-items-center mb-2"
                     >
@@ -374,13 +340,6 @@ watch(
                                     {{ slotProps.item.date }}
                                 </template>
                                 <template #content>
-                                    <!-- <img
-                                        v-if="slotProps.item.image"
-                                        :src="`https://primefaces.org/cdn/primevue/images/product/${slotProps.item.image}`"
-                                        :alt="slotProps.item.name"
-                                        width="200"
-                                        class="shadow-1"
-                                    /> -->
                                     <div class="">
                                         <div class="mb-1">
                                         <span
@@ -401,13 +360,15 @@ watch(
                             </Card>
                         </template>
                     </Timeline>
-                </div>
+                </div> -->
             </Panel>
         </div>
     </div>
 </template>
 
 <script>
+const { layoutState,layoutConfig } = useLayout();
+
 export default {
     data() {
         return {
@@ -440,6 +401,11 @@ export default {
             ],
         };
     },
+    computed: {
+        sideMenuActive() {
+            return !(layoutState.staticMenuDesktopInactive.value && layoutConfig.menuMode.value === 'static')
+        },
+    }
 };
 </script>
 
