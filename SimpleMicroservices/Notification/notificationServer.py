@@ -24,7 +24,7 @@ connection = pika.BlockingConnection(pika.ConnectionParameters
 channel = connection.channel()
 
 # Declare the queue
-channel.queue_declare(queue=rabbitmq_queue)
+channel.queue_declare(queue=rabbitmq_queue, durable=True)
 
 def send_email(recipient, subject, body):
     """
