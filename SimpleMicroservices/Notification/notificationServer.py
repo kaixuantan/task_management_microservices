@@ -48,15 +48,12 @@ def create_connection(max_retries=12, retry_interval=5):
             time.sleep(retry_interval)
 
     if connection is None:
-        raise Exception("amqp_setup: Unable to establish a connection to RabbitMQ after multiple attempts.")
+        raise Exception("notificationServer: Unable to establish a connection to RabbitMQ after multiple attempts.")
 
     return connection
 
 connection = create_connection()
 channel = connection.channel()
-
-# Declare the queue
-channel.queue_declare(queue=rabbitmq_queue, durable=True)
 
 def send_email(recipient, subject, body):
     """
