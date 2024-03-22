@@ -28,7 +28,6 @@ const lineData = reactive({
     ],
 });
 
-
 const activities = ref(
     [
         {
@@ -38,7 +37,6 @@ const activities = ref(
             task_desc: "fix the bug on the homepage",
             project: "Project Meelo",
             image: "/images/avatars/panda.png",
-
         },
         {
             status: "John Tan",
@@ -58,25 +56,23 @@ const activities = ref(
         },
     ].reverse()
 );
-const projects = ref(
-    [
-        {
-            name: "Project Meelo",
-            description: "create real estate landing page",
-            icon: "pi pi-apple"
-        },
-        {
-            name: "Project Kivu",
-            description: "complete leadership assignment",
-            icon: "pi pi-bitcoin"
-        },
-        {
-            name: "Project Hapara",
-            description: "design a new logo for the company",
-            icon: "pi pi-bolt"
-        },
-    ]
-)
+const projects = ref([
+    {
+        name: "Project Meelo",
+        description: "create real estate landing page",
+        icon: "pi pi-apple",
+    },
+    {
+        name: "Project Kivu",
+        description: "complete leadership assignment",
+        icon: "pi pi-bitcoin",
+    },
+    {
+        name: "Project Hapara",
+        description: "design a new logo for the company",
+        icon: "pi pi-bolt",
+    },
+]);
 
 const lineOptions = ref(null);
 const productService = new ProductService();
@@ -216,14 +212,23 @@ watch(
                 <div class="col-12">
                     <TabView>
                         <TabPanel header="In progress">
-                            <div v-for="project in projects" class="card shadow-1 flex align-items-center justify-content-between">
+                            <div
+                                v-for="project in projects"
+                                class="card shadow-1 flex align-items-center justify-content-between"
+                            >
                                 <div class="flex">
-                                    <Avatar :icon="project.icon" class="mr-3" size="xlarge" />
+                                    <Avatar
+                                        :icon="project.icon"
+                                        class="mr-3"
+                                        size="xlarge"
+                                    />
                                     <div class="flex align-items-center">
                                         <div>
-                                            <h5 class="mb-0 font-semibold">{{ project.name }}</h5>
+                                            <h5 class="mb-0 font-semibold">
+                                                {{ project.name }}
+                                            </h5>
                                             <p>{{ project.description }}</p>
-                                        </div>    
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -267,7 +272,7 @@ watch(
                     <Avatar
                         v-for="(community, index) in communities.slice(0, 5)"
                         :key="index"
-                        :label="community.charAt(0)"
+                        :label="community.name.charAt(0).toUpperCase()"
                         class="mr-2"
                         size="large"
                         shape="circle"
@@ -368,25 +373,12 @@ watch(
 
 <script>
 const { layoutState,layoutConfig } = useLayout();
+import axios from 'axios';
 
 export default {
     data() {
         return {
-            communities: [
-                "ESD",
-                "ITSA",
-                "MATH",
-                "PHYSICS",
-                "CHEMISTRY",
-                "BIOLOGY",
-                "GEOGRAPHY",
-                "HISTORY",
-                "ENGLISH",
-                "FRENCH",
-                "SPANISH",
-                "GERMAN",
-                "ART",
-            ],
+            communities: [],
             colors: [
                 "#ece9fc",
                 "#dee9fc",
@@ -399,13 +391,39 @@ export default {
                 "#f9e9e2",
                 "#f2e9d8",
             ],
+            userId: null,
         };
     },
     computed: {
         sideMenuActive() {
             return !(layoutState.staticMenuDesktopInactive.value && layoutConfig.menuMode.value === 'static')
         },
-    }
+    },
+    async created() {
+        this.userId = sessionStorage.getItem('userid')
+        console.log(this.userId);
+        try {
+            let response = await axios.get(`${env.BASE_URL}/GroupAPI_REST/rest/v1/group/usergroup/${this.userId}`, {
+            headers: {
+                'X-Group-AppId': env.X_Group_AppId,
+                'X-Group-Key': env.X_Group_Key
+            }
+            })
+            if (response.data.Result.Success === false) {
+                console.error("Error fetching user groups")
+            }
+            else {
+                this.communities = response.data.UserGroup.groups
+            }
+        }
+        catch (error) {
+            console.error(error);
+        }
+
+        
+
+    },
+
 };
 </script>
 
