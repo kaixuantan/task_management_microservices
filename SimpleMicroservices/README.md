@@ -84,7 +84,7 @@ Base url: https://personal-rc7vnnm9.outsystemscloud.com
   - [PUT] 		Update subgroup			
     - /subgroup/{subGroupId}
   - [PUT]		Self-Enrol user to subgroup	
-    - /subgroup/enrol/{subGroupId}/{userId}
+    - /subgroup/enrol/{subGroupId}
   - [DELETE] 	Delete subgroup			
     - /subgroup/{subGroupId}
 - Task (https://personal-rc7vnnm9.outsystemscloud.com/TaskAPI_REST/rest/v1/)
