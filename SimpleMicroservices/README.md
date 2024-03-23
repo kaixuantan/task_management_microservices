@@ -194,6 +194,8 @@ Base url: https://personal-rc7vnnm9.outsystemscloud.com
   - description (varchar)
   - picture (binary data)
   - size (integer)
+  - createdById (bigint)
+  - createdByUsername (varchar)
   - createdDateTime (datetime)
   - `GroupUser table`
   - [FK] groupId (bigint)
