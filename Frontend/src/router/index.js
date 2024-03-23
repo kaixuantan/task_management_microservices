@@ -29,7 +29,18 @@ const router = createRouter({
                     name: 'create task',
                     component: () => import('@/views/actual_pages/Create_Task.vue')
                 },
-                
+                {
+                    path: '/project',
+                    name: 'project',
+                    component: () => import('@/views/actual_pages/Single_project.vue'),
+                    beforeEnter: (to, from, next) => {
+                        if (!to.query.subGroupId) {
+                          next(from.path); // Redirect back to the previous page
+                        } else {
+                          next();
+                        }
+                    }
+                },
                 {
                     path: '/projects',
                     name: 'projects',
@@ -207,7 +218,7 @@ const router = createRouter({
             path: '/auth/error',
             name: 'error',
             component: () => import('@/views/pages/auth/Error.vue')
-        }
+        },
     ]
 }); 
 router.beforeEach((to, from, next) => {

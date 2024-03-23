@@ -24,11 +24,18 @@ import AppMenuItem from "./AppMenuItem.vue";
 
 <script>
 import AppMenuItem from "./AppMenuItem.vue";
+import sharedMixin from "@/sharedMixin";
 
 export default {
+    mixins: [sharedMixin],
     data() {
         return {
-            model: [
+            first_user_project: null,
+        }
+    },
+    computed: {
+        model() {
+            return [
                 {
                     label: "Pages",
                     items: [
@@ -41,7 +48,8 @@ export default {
                         {
                             label: "Projects",
                             icon: "pi pi-fw pi-book",
-                            to: "/projects",
+                            to: "/project",
+                            query: { subGroupId: this.first_user_project },
                         },
                     ],
                 },
@@ -314,8 +322,17 @@ export default {
                         },
                     ],
                 },
-            ],
-        };
+            ]
+        },
     },
+    async created() {
+        await this.fetchUserProjects();
+        if (this.user_projects && this.user_projects.length > 0) {
+            this.first_user_project = this.user_projects[0].subGroupId;
+        } else {
+            console.log('No user projects found');
+        }
+        
+    }
 }
 </script>

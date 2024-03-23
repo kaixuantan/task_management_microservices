@@ -16,6 +16,7 @@ export default {
                 "#f9e9e2",
                 "#f2e9d8",
             ],
+            user_projects: JSON.parse(sessionStorage.getItem('projects')) || []
         }
     },
     computed: {
@@ -43,6 +44,32 @@ export default {
                         let communities = response.data.UserGroup.groups;
                         sessionStorage.setItem('communities', JSON.stringify(communities));
                         this.communities = JSON.parse(sessionStorage.getItem('communities'));
+                    }
+                } catch (error) {
+                    console.error(error);
+                }
+            }
+        },
+        async fetchUserProjects() {
+            if (!sessionStorage.getItem('projects')) {
+                try {
+                    console.log("fetching user projects");
+                    let response = await axios.get(
+                        `${env.BASE_URL}/SubGroupAPI_REST/rest/v1/subgroup/usersubgroup/${this.userId}`,
+                        {
+                            headers: {
+                                "X-SubGroup-AppId": env.X_SubGroup_AppId,
+                                "X-SubGroup-Key": env.X_SubGroup_Key,
+                            },
+                        }
+                    );
+                    if (response.data.Result.Success !== true) {
+                        console.error("Error fetching user projects");
+                    } else {
+                        let projects = response.data.UserSubGroup.subGroups;
+                        sessionStorage.setItem('projects', JSON.stringify(projects));
+                        this.user_projects = JSON.parse(sessionStorage.getItem('projects'));
+                        console.log("projects updated");
                     }
                 } catch (error) {
                     console.error(error);
