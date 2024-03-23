@@ -6,27 +6,6 @@ import { useLayout } from "@/layout/composables/layout";
 const { isDarkTheme } = useLayout();
 
 const products = ref(null);
-const lineData = reactive({
-    labels: ["January", "February", "March", "April", "May", "June", "July"],
-    datasets: [
-        {
-            label: "First Dataset",
-            data: [65, 59, 80, 81, 56, 55, 40],
-            fill: false,
-            backgroundColor: "#2f4860",
-            borderColor: "#2f4860",
-            tension: 0.4,
-        },
-        {
-            label: "Second Dataset",
-            data: [28, 48, 40, 19, 86, 27, 90],
-            fill: false,
-            backgroundColor: "#00bb7e",
-            borderColor: "#00bb7e",
-            tension: 0.4,
-        },
-    ],
-});
 
 const activities = ref(
     [
@@ -207,7 +186,7 @@ watch(
 
                 <div class="col-12 flex justify-content-between">
                     <h2 class="mb-0 font-semibold">My Tasks</h2>
-                    <Button label="Add task" icon="pi pi-plus" rounded raised />
+                    <Button label="Add task" icon="pi pi-plus" rounded raised @click="redirectToCreateTask"/>
                 </div>
                 <div class="col-12">
                     <TabView>
@@ -234,18 +213,26 @@ watch(
                             </div>
                         </TabPanel>
                         <TabPanel header="New Assigned">
-                            <p class="m-0">
-                                Sed ut perspiciatis unde omnis iste natus error
-                                sit voluptatem accusantium doloremque
-                                laudantium, totam rem aperiam, eaque ipsa quae
-                                ab illo inventore veritatis et quasi architecto
-                                beatae vitae dicta sunt explicabo. Nemo enim
-                                ipsam voluptatem quia voluptas sit aspernatur
-                                aut odit aut fugit, sed quia consequuntur magni
-                                dolores eos qui ratione voluptatem sequi
-                                nesciunt. Consectetur, adipisci velit, sed quia
-                                non numquam eius modi.
-                            </p>
+                            <div
+                                v-for="task in tasks_new.slice(0,3)"
+                                class="card shadow-1 flex align-items-center justify-content-between"
+                            >
+                                <div class="flex">
+                                    <Avatar
+                                        :label="task.name.charAt(0).toUpperCase()"
+                                        class="mr-3"
+                                        size="xlarge"
+                                    />
+                                    <div class="flex align-items-center">
+                                        <div>
+                                            <h5 class="mb-0 font-semibold">
+                                                {{ task.name }}
+                                            </h5>
+                                            <p>{{ task.subGroupName }}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </TabPanel>
                         <TabPanel header="Completed">
                             <p class="m-0">
@@ -372,13 +359,14 @@ watch(
 </template>
 
 <script>
-const { layoutState,layoutConfig } = useLayout();
-import axios from 'axios';
+const { layoutState, layoutConfig } = useLayout();
+import axios from "axios";
+import sharedMixin from "@/sharedMixin";
 
 export default {
+    mixins: [sharedMixin],
     data() {
         return {
-            communities: [],
             colors: [
                 "#ece9fc",
                 "#dee9fc",
@@ -391,39 +379,48 @@ export default {
                 "#f9e9e2",
                 "#f2e9d8",
             ],
-            userId: null,
+            tasks_in_progress: [],
+            tasks_new: [],
+            tasks_completed: [],
         };
+    },
+    methods: {
+        sortTasksByStatus(tasks) {
+            tasks.forEach(task => {
+                switch(task.status) {
+                case 'In Progress':
+                    this.tasks_in_progress.push(task);
+                    break;
+                case 'New':
+                    this.tasks_new.push(task);
+                    break;
+                case 'Completed':
+                    this.tasks_completed.push(task);
+                    break;
+                default:
+                    console.log(`Unknown status: ${task.status}`);
+                }
+            });
+        },
+        redirectToCreateTask() {
+            this.$router.push("/create-task");
+        },
     },
     computed: {
         sideMenuActive() {
-            return !(layoutState.staticMenuDesktopInactive.value && layoutConfig.menuMode.value === 'static')
+            return !(
+                layoutState.staticMenuDesktopInactive.value &&
+                layoutConfig.menuMode.value === "static"
+            );
         },
     },
     async created() {
-        this.userId = sessionStorage.getItem('userid')
-        console.log(this.userId);
-        try {
-            let response = await axios.get(`${env.BASE_URL}/GroupAPI_REST/rest/v1/group/usergroup/${this.userId}`, {
-            headers: {
-                'X-Group-AppId': env.X_Group_AppId,
-                'X-Group-Key': env.X_Group_Key
-            }
-            })
-            if (response.data.Result.Success === false) {
-                console.error("Error fetching user groups")
-            }
-            else {
-                this.communities = response.data.UserGroup.groups
-            }
-        }
-        catch (error) {
-            console.error(error);
-        }
-
-        
-
+        await this.fetchUserTasks();
+        this.sortTasksByStatus(this.tasks);
+        // console.log(this.tasks_in_progress);
+        // console.log(this.tasks_new);
+        // console.log(this.tasks_completed);
     },
-
 };
 </script>
 

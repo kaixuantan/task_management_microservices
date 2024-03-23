@@ -5,35 +5,6 @@ import axios from "axios";
 
 const { isDarkTheme } = useLayout();
 
-const activities = ref(
-    [
-        {
-            status: "Ben Simmons",
-            date: "15/10/2020 10:30",
-            task_id: "121",
-            task_desc: "fix the bug on the homepage",
-            project: "Project Meelo",
-            image: "/images/avatars/panda.png",
-        },
-        {
-            status: "John Tan",
-            date: "15/10/2020 14:00",
-            task_id: "2",
-            task_desc: "added paragraph",
-            project: "Project Kivu",
-            image: "/images/avatars/fox.png",
-        },
-        {
-            status: "Paul Lynette",
-            date: "15/10/2020 16:15",
-            task_id: "10",
-            task_desc: "deleted old design",
-            project: "Project Hapara",
-            image: "/images/avatars/woman.png",
-        },
-    ].reverse()
-);
-
 const lineOptions = ref(null);
 const applyLightTheme = () => {
     lineOptions.value = {
@@ -82,10 +53,37 @@ watch(
     <div class="grid">
         <div class="col-12 flex justify-content-between">
             <h2 class="mb-0 font-semibold">Projects</h2>
-            <Button label="Add" icon="pi pi-plus" rounded raised />
+            <div class="flex gap-3">
+                <Dropdown
+                    v-model="selected_community"
+                    :options="communities"
+                    optionLabel="name"
+                    placeholder="Selected community"
+                    class="w-full md:w-14rem"
+                />
+                <Button label="Add" icon="pi pi-plus" rounded raised />
+            </div>
         </div>
         <!-- 3 cards at the top of the screen -->
-        <div class="xl:col-4" v-for="n in 3">
+        <div class="xl:col-4" v-for="n in 3" v-if="loading">
+            <div class="border-round border-1 surface-border p-4 surface-card shadow-1">
+                <div class="flex mb-3 gap-3">
+                    <Skeleton shape="circle" size="4rem" class="mr-2"></Skeleton>
+                    <div class="flex align-items-center">
+                        <Skeleton width="10rem" height="1.5rem" class="mb-2"></Skeleton>
+                    </div>
+                </div>
+                <Skeleton width="100%" height="20rem" class="mb-3"></Skeleton>
+                <div>
+                    <Skeleton width="50%" height="1.5rem"></Skeleton>
+                </div>
+                <div class="flex justify-content-end mt-3">
+                    <Skeleton width="4rem" height="2rem"></Skeleton>
+                </div>
+            </div>
+        </div>
+
+        <div class="xl:col-4" v-for="(project, idx) in projects" v-else>
             <Card style="overflow: hidden" class="shadow-2">
                 <template #header>
                     <div
@@ -93,17 +91,18 @@ watch(
                     >
                         <div class="flex gap-2 align-items-center">
                             <Avatar
-                                :label="communities[n].charAt(0)"
+                                :label="project.name.charAt(0).toUpperCase()"
                                 class="mr-2"
                                 size="large"
                                 shape="circle"
                                 :style="{
-                                    backgroundColor: colors[n % colors.length],
+                                    backgroundColor:
+                                        colors[idx % colors.length],
                                 }"
                             />
                             <div>
                                 <h5 class="mb-1 font-semibold">
-                                    Project Meelo
+                                    {{ project.name }}
                                 </h5>
                             </div>
                         </div>
@@ -117,9 +116,11 @@ watch(
                         style="width: 100%; height: 100%; object-fit: contain"
                     />
                 </template>
-                <template #title>Members: </template>
+                <template #title>Members: {{ project.size }}</template>
                 <template #content>
-                    <p class="m-0">Project description</p>
+                    <p class="m-0">
+                        {{ project.description }}Project description
+                    </p>
                 </template>
                 <template #footer>
                     <div
@@ -163,57 +164,61 @@ watch(
 </template>
 
 <script>
+import sharedMixin from "@/sharedMixin";
+
 export default {
+    mixins: [sharedMixin],
     data() {
         return {
-            communities: [
-                "ESD",
-                "ITSA",
-                "MATH",
-                "PHYSICS",
-                "CHEMISTRY",
-                "BIOLOGY",
-                "GEOGRAPHY",
-                "HISTORY",
-                "ENGLISH",
-                "FRENCH",
-                "SPANISH",
-                "GERMAN",
-                "ART",
-            ],
-            colors: [
-                "#ece9fc",
-                "#dee9fc",
-                "#d8e2ef",
-                "#e8e9fc",
-                "#f2e9fc",
-                "#f9e9fc",
-                "#fce9f2",
-                "#fce9e8",
-                "#f9e9e2",
-                "#f2e9d8",
-            ],
             projects: [],
+            selected_community: null,
             enrolled: false,
+            loading: true,
         };
     },
-    async created() {
-        try {
-            const response = await axios.get(
-                "https://personal-rc7vnnm9.outsystemscloud.com/SubGroupAPI_REST/rest/v1/subgroup",
-                {
-                    headers: {
-                        "X-SubGroup-AppId": env.X_SubGroup_AppId,
-                        "X-SubGroup-Key": env.X_SubGroup_Key,
-                        // any other headers you need to set
-                    },
+    methods: {
+        async fetchUserProjects(groupId) {
+            try {
+                const response = await axios.get(
+                    `${env.BASE_URL}/SubGroupAPI_REST/rest/v1/subgroup/groupsubgroup/${groupId}`,
+                    {
+                        headers: {
+                            "X-SubGroup-AppId": env.X_SubGroup_AppId,
+                            "X-SubGroup-Key": env.X_SubGroup_Key,
+                        },
+                    }
+                );
+                this.projects = response.data.GroupSubGroup.subGroups;
+                // console.log(this.projects);
+            } catch (error) {
+                console.error(error);
+            }
+        },
+    },
+    watch: {
+        "$route.query.groupId": {
+            immediate: true,
+            async handler(newVal) {
+                this.loading = true;
+                await this.fetchUserProjects(this.$route.query.groupId);
+                for (const community of this.communities) {
+                    if (community.groupId == newVal) {
+                        this.selected_community = community;
+                        break;
+                    }
                 }
-            );
-            this.projects = response.data.SubGroup;
-            console.log(this.projects);
-        } catch (error) {
-            console.error(error);
-        }
+                this.loading = false;
+                console.log(this.selected_community);
+            },
+        },
+        selected_community: {
+            immediate: true,
+            handler(newVal) {
+                if (newVal) {
+                this.$router.push({ query: { groupId: newVal.groupId } });
+                }
+            },
+        },
     },
 };
 </script>

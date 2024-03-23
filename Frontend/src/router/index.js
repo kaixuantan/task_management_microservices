@@ -20,12 +20,12 @@ const router = createRouter({
                     component: () => import('@/views/actual_pages/Community.vue')
                 },
                 {
-                    path: '/create_community',
+                    path: '/create-community',
                     name: 'create community',
                     component: () => import('@/views/actual_pages/Create_Community.vue')
                 },
                 {
-                    path: '/create_task',
+                    path: '/create-task',
                     name: 'create task',
                     component: () => import('@/views/actual_pages/Create_Task.vue')
                 },
@@ -33,7 +33,14 @@ const router = createRouter({
                 {
                     path: '/projects',
                     name: 'projects',
-                    component: () => import('@/views/actual_pages/Projects.vue')
+                    component: () => import('@/views/actual_pages/Projects.vue'),
+                    beforeEnter: (to, from, next) => {
+                        if (!to.query.groupId) {
+                          next(from.path); // Redirect back to the previous page
+                        } else {
+                          next();
+                        }
+                    }
                 },
                 {
                     path: '/dashboard',
