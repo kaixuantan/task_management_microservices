@@ -1,15 +1,26 @@
 services:
   # Simple Microservices
+  rabbitmq:
+    image: rabbitmq:3-management
+    hostname: esd-rabbit-project
+    container_name: rabbitmq-mgmt
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+  
   amqp:
     build: ./SimpleMicroservices/amqp
     ports:
       - "8000:8000"
+    depends_on:
+      - rabbitmq
   
   log:
     build: ./SimpleMicroservices/log
     ports:
       - "8001:8001"
     depends_on:
+      - rabbitmq
       - amqp
 
   notification:
@@ -17,6 +28,7 @@ services:
     ports:
       - "8002:8002"
     depends_on:
+      - rabbitmq
       - amqp
       - log
 
@@ -26,6 +38,7 @@ services:
     ports:
       - "8003:8003"
     depends_on:
+      - rabbitmq
       - amqp
       - log
       - notification
@@ -35,6 +48,7 @@ services:
     ports:
       - "8004:8004"
     depends_on:
+      - rabbitmq
       - amqp
       - log
       - notification
@@ -44,6 +58,7 @@ services:
     ports:
       - "8005:8005"
     depends_on:
+      - rabbitmq
       - amqp
       - log
       - notification
@@ -53,6 +68,7 @@ services:
     ports:
       - "8006:8006"
     depends_on:
+      - rabbitmq
       - amqp
       - log
     
@@ -62,6 +78,7 @@ services:
     ports:
       - "8007:8007"
     depends_on:
+      - rabbitmq
       - amqp
       - log
 
@@ -71,6 +88,7 @@ services:
     ports:
       - "8080:8080"
     depends_on:
+      - rabbitmq
       - amqp
       - log
       - notification
