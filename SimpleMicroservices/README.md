@@ -1,3 +1,34 @@
+# Prerequites (for testing manually)
+- ensure docker desktop software is running on your computer
+- run "docker run -d --hostname esd-rabbit --name rabbitmq-mgmt -p 5672:5672 -p 15672:15672" command
+- run "python amqp_setup.py" command (amqp_setup.py is in the amqp folder from root, cd into the folder first before running the command)
+- run "python notificationServer.py" command (notificationServer.py is in the Notification folder, cd into the folder first before running the command)
+- run "python logServer.py" command (logServer.py is in the Log folder, cd into the folder first before running the command)
+
+## Log server
+- consumes messages from the `log_queue` queue with `log.*` routing key and calls the [POST] Add log route to insert into db
+- `message format`
+```json
+{
+  "userId": <userId>,
+  "subGroupId": <subGroupId>,
+  "taskId": <taskId>,
+  "type": <type>,
+  "description": <description>
+}
+```
+
+## Notification server
+- consumes messages from the `email_queue` queue with `email.*` routing key and sends email
+- `message format`
+```json
+{
+  "recipient": <email>,
+  "subject": <email_subject>,
+  "body": <email_message>
+}
+```
+
 # API Documentation
 Base url: https://personal-rc7vnnm9.outsystemscloud.com
 
