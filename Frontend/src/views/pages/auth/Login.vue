@@ -44,6 +44,7 @@ const handleSubmit = async () => {
     sessionStorage.setItem('userid', user_id);
     sessionStorage.setItem('username', username.value);
     sessionStorage.setItem('yourKey', env.JWT_SECRET);
+    console.log(user_id);
     router.push('/'); 
     }
 

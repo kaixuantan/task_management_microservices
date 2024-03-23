@@ -76,16 +76,8 @@ const isOutsideClicked = (event) => {
         </button>
 
         <div class="layout-topbar-menu" :class="topbarMenuClasses">
-            <button @click="onTopBarMenuButton()" class="p-link layout-topbar-button">
-                <i class="pi pi-calendar"></i>
-                <span>Calendar</span>
-            </button>
-            <button @click="onTopBarMenuButton()" class="p-link layout-topbar-button">
-                <i class="pi pi-user"></i>
-                <span>Profile</span>
-            </button>
-            <button @click="onSettingsClick()" class="p-link layout-topbar-button">
-                <i class="pi pi-cog"></i>
+            <button @click="logout()" class="p-link layout-topbar-button">
+                <i class="pi pi-sign-out"></i>
                 <span>Settings</span>
             </button>
         </div>
@@ -93,3 +85,14 @@ const isOutsideClicked = (event) => {
 </template>
 
 <style lang="scss" scoped></style>
+
+<script>
+export default {
+    methods: {
+        logout() {
+            sessionStorage.clear();
+            this.$router.push({ name: 'login' });
+        },
+    },
+}
+</script>

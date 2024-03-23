@@ -6,3 +6,9 @@
 
 ## User scenario diagram
 https://drive.google.com/file/d/1PpDNxZTYQc-BbD_FvhH3TqepAS8cPTnp/view?usp=sharing
+
+TO DO: need to include instructions on how to set up and run your solution using your submitted file
+after cloning repo, run npm install
+
+to run frontend: esd > frontend > npm run dev
+to run task complex microservice: esd > complexmicroservices > task > node index.js

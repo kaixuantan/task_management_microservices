@@ -1,17 +1,17 @@
 <template>
     <div class="grid">
         <div class="col-12 flex justify-content-between">
-            <h2 class="mb-0 font-semibold">All projects ({{ selected_community.name.toUpperCase() }})</h2>
-            <div class="flex gap-3">
-                <Dropdown
-                    v-model="selected_community"
-                    :options="communities"
+            <h2 class="mb-0 font-semibold">Project {{  }}</h2>
+            <Dropdown
+                    v-model="selected_project"
+                    :options="user_projects"
                     optionLabel="name"
-                    placeholder="Selected community"
+                    placeholder="Selected project"
                     class="w-full md:w-14rem shadow-1"
-                />
-                <Button label="Add" icon="pi pi-plus" raised />
-            </div>
+            />
+        </div>
+        <div class="col-12 py-0">
+            <Divider class="text-900"/>
         </div>
         <!-- 3 cards at the top of the screen -->
         <div class="xl:col-4" v-for="n in 3" v-if="loading">
@@ -32,7 +32,7 @@
             </div>
         </div>
 
-        <div class="xl:col-4" v-for="(project, idx) in grp_projects" v-else>
+        <div class="xl:col-4" v-for="(project, idx) in projects" v-else>
             <Card style="overflow: hidden" class="shadow-2">
                 <template #header>
                     <div
@@ -65,7 +65,7 @@
                         style="width: 100%; height: 100%; object-fit: contain"
                     />
                 </template>
-                <template #title>Members: {{ project.subGroupUsers.length }} / {{ project.size }}</template>
+                <template #title>Members: {{ project.size }}</template>
                 <template #content>
                     <p class="m-0">
                         {{ project.description }}Project description
@@ -78,17 +78,22 @@
                     >
                     <!-- v-if="!enrolled" -->
                         <AvatarGroup>
-                            <!-- can change to name as well if name is filled -->
-                            <Avatar v-for="(user,idx2) in project.subGroupUsers.slice(0,3)" :key="user.userId"
-                                :label="user.userId.toString()" 
+                            <Avatar
+                                image="/images/avatars/panda.png"
                                 size="large"
                                 shape="circle"
-                                :style="{
-                                    backgroundColor:
-                                        colors[idx2+2 % colors.length],
-                                }"
                             />
-                            <Avatar :label="`+${project.subGroupUsers.length - 3}`" shape="circle" size="large" v-if="project.subGroupUsers.length > 3"/>
+                            <Avatar
+                                image="/images/avatars/fox.png"
+                                size="large"
+                                shape="circle"
+                            />
+                            <Avatar
+                                image="/images/avatars/woman.png"
+                                size="large"
+                                shape="circle"
+                            />
+                            <Avatar label="+2" shape="circle" size="large" />
                         </AvatarGroup>
                         <Button label="Enroll" />
                     </div>
@@ -101,7 +106,7 @@
                             outlined
                             class="w-full"
                         />
-                        <Button label="View" class="w-full" @click="viewProject(project.subGroupId)" />
+                        <Button label="View" class="w-full" />
                     </div>
                 </template>
             </Card>
@@ -117,55 +122,34 @@ export default {
     mixins: [sharedMixin],
     data() {
         return {
-            grp_projects: [],
-            selected_community: null,
+            selected_project: null,
             enrolled: false,
             loading: true,
         };
     },
     methods: {
-        async fetchGroupProjects(groupId) {
-            try {
-                const response = await axios.get(
-                    `${env.BASE_URL}/SubGroupAPI_REST/rest/v1/subgroup/groupsubgroup/${groupId}`,
-                    {
-                        headers: {
-                            "X-SubGroup-AppId": env.X_SubGroup_AppId,
-                            "X-SubGroup-Key": env.X_SubGroup_Key,
-                        },
-                    }
-                );
-                this.grp_projects = response.data.GroupSubGroup.subGroups;
-                // console.log(this.projects);
-            } catch (error) {
-                console.error(error);
-            }
-        },
-        viewProject(subGroupId) {
-            this.$router.push({ name: 'project', query: { subGroupId: subGroupId } });
-        }
     },
     watch: {
-        "$route.query.groupId": {
+        "$route.query.subGroupId": {
             immediate: true,
             async handler(newVal) {
                 this.loading = true;
-                await this.fetchGroupProjects(this.$route.query.groupId);
-                for (const community of this.communities) {
-                    if (community.groupId == newVal) {
-                        this.selected_community = community;
+                // await this.fetchUserProjects(this.$route.query.groupId);
+                for (const proj of this.user_projects) {
+                    if (proj.subGroupId == newVal) {
+                        this.selected_project = proj;
                         break;
                     }
                 }
                 this.loading = false;
-                console.log(this.selected_community);
+                console.log(this.selected_project);
             },
         },
-        selected_community: {
+        selected_project: {
             immediate: true,
             handler(newVal) {
                 if (newVal) {
-                this.$router.push({ query: { groupId: newVal.groupId } });
+                this.$router.push({ query: { subGroupId: newVal.subGroupId } });
                 }
             },
         },
@@ -173,8 +157,9 @@ export default {
 };
 </script>
 
-<style>
-.p-timeline-event-opposite {
-    flex: 0;
+<style scoped>
+.p-divider {
+    border-top: 1px solid 
+    #475569;
 }
 </style>
