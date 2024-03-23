@@ -27,6 +27,7 @@ export default {
         async fetchUserGroups() {
             if (!sessionStorage.getItem('communities')) {
                 try {
+                    console.log("fetching user communities");
                     let response = await axios.get(
                         `${env.BASE_URL}/GroupAPI_REST/rest/v1/group/usergroup/${this.userId}`,
                         {
@@ -41,6 +42,7 @@ export default {
                     } else {
                         let communities = response.data.UserGroup.groups;
                         sessionStorage.setItem('communities', JSON.stringify(communities));
+                        this.communities = JSON.parse(sessionStorage.getItem('communities'));
                     }
                 } catch (error) {
                     console.error(error);
@@ -67,8 +69,5 @@ export default {
                 console.error(error);
             }
         },
-    },
-    async created() {
-        await this.fetchUserGroups();
     }
 }

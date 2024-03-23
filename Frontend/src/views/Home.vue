@@ -367,18 +367,6 @@ export default {
     mixins: [sharedMixin],
     data() {
         return {
-            colors: [
-                "#ece9fc",
-                "#dee9fc",
-                "#d8e2ef",
-                "#e8e9fc",
-                "#f2e9fc",
-                "#f9e9fc",
-                "#fce9f2",
-                "#fce9e8",
-                "#f9e9e2",
-                "#f2e9d8",
-            ],
             tasks_in_progress: [],
             tasks_new: [],
             tasks_completed: [],
@@ -415,6 +403,8 @@ export default {
         },
     },
     async created() {
+        window.scrollTo(0, 0);
+        await this.fetchUserGroups();
         await this.fetchUserTasks();
         this.sortTasksByStatus(this.tasks);
         // console.log(this.tasks_in_progress);
