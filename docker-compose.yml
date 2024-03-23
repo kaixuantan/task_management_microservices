@@ -1,47 +1,68 @@
 services:
   # Simple Microservices
-  log:
-    build: ./SimpleMicroServices/log
+  amqp:
+    build: ./SimpleMicroservices/amqp
     ports:
       - "8000:8000"
-
-  notification:
-    build: ./SimpleMicroServices/notification
+  
+  log:
+    build: ./SimpleMicroservices/log
     ports:
       - "8001:8001"
     depends_on:
+      - amqp
+
+  notification:
+    build: ./SimpleMicroservices/notification
+    ports:
+      - "8002:8002"
+    depends_on:
+      - amqp
       - log
 
   # Complex Microservices
   group-creation:
-    build: ./ComplexMicroServices/GroupCreation
+    build: ./ComplexMicroservices/GroupCreation
     ports:
-      - "8002:8002"
+      - "8003:8003"
     depends_on:
+      - amqp
       - log
       - notification
 
   enrollment:
-    build: ./ComplexMicroServices/enrollment
+    build: ./ComplexMicroservices/enrollment
     ports:
-      - "8003:8003"
+      - "8004:8004"
     depends_on:
+      - amqp
       - log
       - notification
 
   report:
-    build: ./ComplexMicroServices/Report
+    build: ./ComplexMicroservices/Report
     ports:
-      - "8004:8004"
+      - "8005:8005"
     depends_on:
+      - amqp
       - log
       - notification
 
   task:
-    build: ./ComplexMicroServices/Task
+    build: ./ComplexMicroservices/Task
     ports:
-      - "8005:8005"
+      - "8006:8006"
     depends_on:
+      - amqp
+      - log
+    
+  # Wrapper Microservices
+  gemini:
+    build: ./ComplexMicroservices/GeminiWrapper
+    ports:
+      - "8007:8007"
+    depends_on:
+      - amqp
       - log
 
   # Frontend
@@ -50,9 +71,11 @@ services:
     ports:
       - "8080:8080"
     depends_on:
+      - amqp
+      - log
+      - notification
       - enrollment
       - group-creation
       - report
       - task
-      - log
-      - notification
+      - gemini
