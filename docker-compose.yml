@@ -1,0 +1,58 @@
+services:
+  # Simple Microservices
+  log:
+    build: ./SimpleMicroServices/log
+    ports:
+      - "8000:8000"
+
+  notification:
+    build: ./SimpleMicroServices/notification
+    ports:
+      - "8001:8001"
+    depends_on:
+      - log
+
+  # Complex Microservices
+  group-creation:
+    build: ./ComplexMicroServices/GroupCreation
+    ports:
+      - "8002:8002"
+    depends_on:
+      - log
+      - notification
+
+  enrollment:
+    build: ./ComplexMicroServices/enrollment
+    ports:
+      - "8003:8003"
+    depends_on:
+      - log
+      - notification
+
+  report:
+    build: ./ComplexMicroServices/Report
+    ports:
+      - "8004:8004"
+    depends_on:
+      - log
+      - notification
+
+  task:
+    build: ./ComplexMicroServices/Task
+    ports:
+      - "8005:8005"
+    depends_on:
+      - log
+
+  # Frontend
+  frontend:
+    build: ./Frontend
+    ports:
+      - "8080:8080"
+    depends_on:
+      - enrollment
+      - group-creation
+      - report
+      - task
+      - log
+      - notification
