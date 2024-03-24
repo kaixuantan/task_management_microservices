@@ -143,7 +143,7 @@ Base url: https://personal-rc7vnnm9.outsystemscloud.com
   - [GET]		Get a log 
     - /log/{logId}
   - [GET]		Get logs by type		
-    - /log/{type}
+    - /log/type/{type}
   - [GET]		Get logs by taskId		
     - /log/taskId/{taskId}
   - [GET]		Get logs by subGroupId	
