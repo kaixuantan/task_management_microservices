@@ -134,7 +134,7 @@ Base url: https://personal-rc7vnnm9.outsystemscloud.com
   - [PUT] 		Update task			
     - /task/{taskId}
   - [PUT]		Assign task to user		
-    - /task/assign
+    - /task/assign/{taskId}
   - [DELETE] 	Delete task			
     - /task/{taskId}
 - Log (https://personal-rc7vnnm9.outsystemscloud.com/LogAPI_REST/rest/v1/)
@@ -160,15 +160,15 @@ Base url: https://personal-rc7vnnm9.outsystemscloud.com
   - [GET]		Get all document in subgroup 
     - /doc/{subGroupId}
   - [POST] 		Add document		        	
-    - /doc/{type}
+    - /doc
   - [PUT] 		Update document	        	
     - /doc/{docId}
   - [DELETE] 	Delete document 			
-    - /doc/{taskId}
+    - /doc/{docId}
 - Comment (https://personal-rc7vnnm9.outsystemscloud.com/CommentAPI_REST/rest/v1/)
   - [GET] 		Get all comments			
     - /comment
-  - [GET]		Get all comments in taskId 	
+  - [GET]		Get all comments in a task	
     - /comment/taskId/{taskId}
   - [POST] 		Add comment				
     - /comment
