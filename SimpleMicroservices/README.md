@@ -158,7 +158,7 @@ Base url: https://personal-rc7vnnm9.outsystemscloud.com
   - [GET] 		Get document				
     - /doc/{docId}
   - [GET]		Get all document in subgroup 
-    - /doc/{subGroupId}
+    - /doc/subgroup/{subGroupId}
   - [POST] 		Add document		        	
     - /doc
   - [PUT] 		Update document	        	
