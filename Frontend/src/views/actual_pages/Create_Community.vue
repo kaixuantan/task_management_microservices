@@ -1,8 +1,6 @@
 <script setup>
-import { useLayout } from '@/layout/composables/layout';
 import { ref, computed } from 'vue';
 import { useToast } from 'primevue/usetoast';
-import AppConfig from '@/layout/AppConfig.vue';
 import axios from 'axios';
 import { useRouter } from 'vue-router';
 import DataTable from 'primevue/datatable';
@@ -13,33 +11,58 @@ import { watch } from 'vue';
 
 
 
-//TO EDIT WITH ACTUAL USER VALUES
-const multiselectValues = ref([
-    { name: 'Australia', code: 'AU' },
-    { name: 'Brazil', code: 'BR' },
-    { name: 'China', code: 'CN' },
-    { name: 'Egypt', code: 'EG' },
-    { name: 'France', code: 'FR' },
-    { name: 'Germany', code: 'DE' },
-    { name: 'India', code: 'IN' },
-    { name: 'Japan', code: 'JP' },
-    { name: 'Spain', code: 'ES' },
-    { name: 'United States', code: 'US' }
-]);
-const multiselectValue = ref(null);
-const multiselectValue2 = ref(null);
-const subgroups = ref([]);
-const subgroupsKey = ref(0);
-watch(subgroups, () => {
-            subgroupsKey.value++;
-        });
+const baseURL = 'https://personal-rc7vnnm9.outsystemscloud.com';
+const userAppId = env.X_User_AppId 
+const userAppKey = env.X_User_Key
+const headers = {
+  'Content-Type': 'application/json',
+  'X-User-AppId': userAppId,
+  'X-User-Key': userAppKey};
+
+
+//Fecth User Values
+const fetchUsers = async () => {
+  try {
+    const response = await axios.get(`${baseURL}/UserAPI_REST/rest/v1/user/`,{ headers });
+    console.log(response.data)
+    users.value = response.data.User.map(user => ({
+      name: user.username,
+      code: user.userId.toString()
+    }));
+  } catch (error) {
+    console.error('Error fetching users:', error);
+  }
+};
+
+//Users fetched from UserAPI
+const users = ref([]);
+//
+
+//Option values for checkbox
+const listofusers_forcheckbox = computed(() => users.value);
+//
+
+var groupid_toadd=0
+const subgrpmembers= ref(null);
+const createdById= sessionStorage.getItem('userid');
+const createdByUsername= sessionStorage.getItem('username');
+//VALUES TO SUBMIT
+const groupdetails_submit={}
+const subgroup_submit = ref([]);
+const communitymembers= ref(null);
+//
+
+
 
 const toast = useToast();
+
+const comname = ref('');
+const comsize = ref(null);
+const comdesc = ref('');
 const communities = ref([]);
-const selectedCommunities = ref(null);
-const communityDialog = ref(false);
-const deleteCommunityDialog = ref(false);
-const community = ref({
+const subgrp_popup = ref(false);
+const deletesubgrp_popup = ref(false);
+const subgrp = ref({
     name: '',
     description: '',
     members: [],
@@ -48,89 +71,77 @@ const community = ref({
 const submitted = ref(false);
 
 const openNew = () => {
-    community.value = {};
+    subgrp.value = {};
     submitted.value = false;
-    communityDialog.value = true;
+    subgrp_popup.value = true;
 };
 
-const hideCommunityDialog = () => {
-    communityDialog.value = false;
+const hidesubgrp_popup = () => {
+    subgrp_popup.value = false;
     submitted.value = false;
 };
 
-const saveCommunity = () => {
+const savesubgrp = () => {
     submitted.value = true;
-    if (community.value.name && community.value.name.trim() && community.value.description) {
-        if (community.value.id) {
-            // Update existing community
-            const index = communities.value.findIndex(c => c.id === community.value.id);
-            communities.value[index] = { ...community.value };
+    if (subgrp.value.name && subgrp.value.name.trim() && subgrp.value.description) {
+        if (subgrp.value.id) {
 
             // Update existing subgroup
-            const subgroupIndex = subgroups.value.findIndex(c => c.id === community.value.id);
-            subgroups.value[subgroupIndex] = { ...community.value };
-
-            toast.add({ severity: 'success', summary: 'Successful', detail: 'Community Updated', life: 3000 });
-        } else {
-            // Create new community
-            const newCommunity = { ...community.value, id: createId() };
-            console.log(newCommunity.id);
-            communities.value.push(newCommunity);
-            console.log(communities.value);
-            subgroups.value.push({ ...newCommunity });
-            console.log(subgroups.value);
-            toast.add({ severity: 'success', summary: 'Successful', detail: 'Community Created', life: 3000 });
+            console.log('editing')
+            const index = subgroup_submit.value.findIndex(c => c.id === subgrp.value.id);
+            subgroup_submit.value[index] = { ...subgrp.value, members: subgrpmembers.value };
+            toast.add({ severity: 'success', summary: 'Successful', detail: 'Subgroup Updated', life: 3000 });
+        } 
+        else {
+            // Create new subgrp    
+            const newsubgrp = { ...subgrp.value, id: groupid_toadd += 1, members: subgrpmembers.value};
+            subgroup_submit.value.push(newsubgrp);
+            console.log(subgroup_submit.value);
+            toast.add({ severity: 'success', summary: 'Successful', detail: 'Subgroup Created', life: 3000 });
         }
         
-        communityDialog.value = false;
-        community.value = {};
+        subgrp_popup.value = false;
+        subgrp.value = {};
+        subgrpmembers.value = [];
     }
 };
 
-const editCommunity = (communitydata) => {
-    subgroups.value = subgroups.value.filter(c => c.id !== communitydata);
-    communities.value = communities.value.filter(c => c.id !== communitydata);
-    communityDialog.value = true;
-    community.value = { ...communitydata };
+const editsubgrp = (subgrpdata) => {
+    subgrp.value = { ...subgrpdata };
+    subgrp_popup.value = true;
 };
 
-const confirmDeleteCommunity = (community) => {
-    community.value = community;
-    console.log(community.value)
-    deleteCommunityDialog.value = true;
-};
 
-const deleteCommunity = (datatodelete) => {
-    console.log(datatodelete.id)
-    subgroups.value = subgroups.value.filter(c => c.id !== datatodelete.id);
-    communities.value = communities.value.filter(c => c.id !== community.value.id);
-    deleteCommunityDialog.value = false;
-
-    community.value = {};
+const deletesubgrp = (datatodelete) => {
+    console.log(datatodelete.id);
+    subgroup_submit.value = subgroup_submit.value.filter(c => c.id !== datatodelete.id);
+    deletesubgrp_popup.value = false;
     toast.add({ severity: 'success', summary: 'Successful', detail: 'Subgroup Deleted', life: 3000 });
 };
 
-const confirmDeleteSelected = () => {
-    deleteCommunityDialog.value = true;
-};
-
-const deleteSelectedCommunities = () => {
-    communities.value = communities.value.filter(c => !selectedCommunities.value.includes(c));
-    deleteCommunityDialog.value = false;
-    selectedCommunities.value = null;
-    toast.add({ severity: 'success', summary: 'Successful', detail: 'Communities Deleted', life: 3000 });
-};
-
-const createId = () => {
-    let id = '';
-    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-    for (let i = 0; i < 5; i++) {
-        id += chars.charAt(Math.floor(Math.random() * chars.length));
-    }
-    return id;
-};
 
 
+
+const submitform = () => {
+    const groupdetails_submit = {
+    name: comname.value,
+    description: comdesc.value,
+    size: comsize.value,
+    createdById: createdById, 
+    createdByUsername: createdByUsername, 
+    createdDateTime: new Date().toISOString(), 
+  };
+
+  
+  console.log(groupdetails_submit);
+  console.log(subgroup_submit.value);
+  console.log(communitymembers);
+
+
+}
+
+
+fetchUsers();
 
 
 //END OF EDIT
@@ -146,26 +157,28 @@ const createId = () => {
         <h4>Community Details</h4>
         <div class="formgrid grid">
             <div class="field col">
-                <label for="name2">Community Name</label>
-                <InputText id="name2" type="text" />
+                <label for="comname">Community Name</label>
+                <InputText id="comname" type="text" :comname v-model="comname"/>
             </div>
             <div class="field col">
-                <label for="email2">Community Size</label>
-                <InputText id="email2" type="" />
+                <label for="comsize">Community Size</label>
+                <InputText id="comsize" type="number" v-model="comsize" />
             </div>
         </div>
 
 
-        <label for="desc">Community Description</label>
-        <Textarea style="margin-top: 7px;" id="desc" placeholder="Your Message" :autoResize="true" rows="3"
-            cols="100" />
+        <label for="comdesc">Community Description</label>
+        <Textarea style="margin-top: 7px;" id="comdesc" placeholder="Your Message" :autoResize="true" rows="3"
+            cols="100" v-model="comdesc"/>
     </div>
     
+
+    <!--Select members for community-->
     <div class="flex">
         <div class="col-12 md:col-6">
             <div class="card">
                 <h5>Add Members</h5>
-                <MultiSelect v-model="multiselectValue" :options="multiselectValues" optionLabel="name"
+                <MultiSelect v-model="communitymembers" :options="listofusers_forcheckbox" optionLabel="name"
                     placeholder="Select Members" :filter="true" class="w-full">
                     <template #value="slotProps">
                         <div class="inline-flex align-items-center py-1 px-2 bg-primary text-primary border-round mr-2"
@@ -190,13 +203,15 @@ const createId = () => {
             </div>
         </div>
 
-        <!--CODE FORSUBGROUP POPUP-->
+
+
+        <!--CODE FOR SUBGROUP TABLE-->
         <div class="col-12 md:col-6">
             <div class="card">
                 <Button label="New Subgroup" icon="pi pi-plus" class="mr-2 mb-4" severity="success" @click="openNew" />
                 <div class="card">
                     <h5>Existing Subgroups</h5>
-                    <DataTable :value="subgroups" :key="subgroupsKey">
+                    <DataTable :value="subgroup_submit">
                         <Column field="name" header="Name"></Column>
                         <Column field="description" header="Description"></Column>
                         <Column field="members" header="Members">
@@ -208,35 +223,40 @@ const createId = () => {
                         <Column>
                             <template #body="slotProps">
                                 <Button icon="pi pi-pencil" class="mr-2" severity="success" rounded
-                                    @click="editCommunity(slotProps.data)" />
+                                    @click="editsubgrp(slotProps.data)" />
                             </template>
                         </Column>
                         <Column>
                             <template #body="slotProps">
                                 <Button icon="pi pi-trash" severity="danger" rounded
-                                    @click="deleteCommunity(slotProps.data)" />
+                                    @click="deletesubgrp(slotProps.data)" />
                             </template>
                         </Column>
                     </DataTable>
                 </div>
-                <Dialog v-model:visible="communityDialog" :style="{ width: '450px' }" header="Subgroup Details"
+
+
+
+                <!--Create SubGroup Dialog-->
+                <Dialog v-model:visible="subgrp_popup" :style="{ width: '450px' }" header="Subgroup Details"
                     :modal="true" class="p-fluid">
                     <div class="field">
                         <label for="name">Subgroup Name</label>
-                        <InputText id="name" v-model.trim="community.name" required="true" autofocus
-                            :invalid="submitted && !community.name" />
-                        <small class="p-invalid" v-if="submitted && !community.name">Name is required.</small>
+                        <InputText id="name" v-model.trim="subgrp.name" required="true" autofocus
+                            :invalid="submitted && !subgrp.name" />
+                        <small class="p-invalid" v-if="submitted && !subgrp.name">Name is required.</small>
                     </div>
                     <div class="field">
                         <label for="description">Description</label>
-                        <Textarea id="description" v-model="community.description" required="true" rows="3" cols="20" />
+                        <Textarea id="description" v-model="subgrp.description" required="true" rows="3" cols="20" />
                     </div>
 
+
+                <!--Code to add subgroup members to subgroup-->
                     <div class="field">
                         <label for="members">Subgroup Members</label>
-                        <!-- Add MultiSelect or other component to handle members -->
-                        <MultiSelect v-model="multiselectValue2" :options="multiselectValues" optionLabel="name"
-                            placeholder="Select Countries" :filter="true" class="w-full">
+                        <MultiSelect v-model="subgrpmembers" :options="listofusers_forcheckbox" optionLabel="name"
+                            placeholder="Select Members" :filter="true" class="w-full">
                             <template #value="slotProps">
                                 <div class="inline-flex align-items-center py-1 px-2 bg-primary text-primary border-round mr-2"
                                     v-for="option of slotProps.value" :key="option.code">
@@ -245,7 +265,7 @@ const createId = () => {
                                     <div>{{ option.name }}</div>
                                 </div>
                                 <template v-if="!slotProps.value || slotProps.value.length === 0">
-                                    <div class="p-1">Select Countries</div>
+                                    <div class="p-1">Select Members</div>
                                 </template>
                             </template>
                             <template #option="slotProps">
@@ -260,28 +280,31 @@ const createId = () => {
 
                     <div class="field">
                         <label for="capacity">Subgroup Capacity</label>
-                        <InputNumber id="capacity" v-model="community.capacity" integeronly />
+                        <InputNumber id="capacity" v-model="subgrp.capacity" integeronly />
                     </div>
 
                     <template #footer>
-                        <Button label="Cancel" icon="pi pi-times" text="" @click="hideCommunityDialog" />
-                        <Button label="Save" icon="pi pi-check" text="" @click="saveCommunity" />
+                        <Button label="Cancel" icon="pi pi-times" text="" @click="hidesubgrp_popup" />
+                        <Button label="Save" icon="pi pi-check" text="" @click="savesubgrp" />
                     </template>
                 </Dialog>
 
-                <Dialog v-model:visible="deleteCommunityDialog" :style="{ width: '450px' }" header="Confirm"
+                <Dialog v-model:visible="deletesubgrp_popup" :style="{ width: '450px' }" header="Confirm"
                     :modal="true">
                     <div class="flex align-items-center justify-content-center">
                         <i class="pi pi-exclamation-triangle mr-3" style="font-size: 2rem" />
-                        <span v-if="community">Are you sure you want to delete <b>{{ community.name }}</b>?</span>
+                        <span v-if="community">Are you sure you want to delete <b>{{ subgrp.name }}</b>?</span>
                     </div>
                     <template #footer>
-                        <Button label="No" icon="pi pi-times" text @click="deleteCommunityDialog = false" />
-                        <Button label="Yes" icon="pi pi-check" text @click="deleteCommunity" />
+                        <Button label="No" icon="pi pi-times" text @click="deletesubgrp_popup = false" />
+                        <Button label="Yes" icon="pi pi-check" text @click="deletesubgrp" />
                     </template>
                 </Dialog>
             </div>
         </div>
+    </div>
+    <div class="flex justify-content-center align-items-center mt-8">
+    <Button label="Submit" class="mr-2 mb-2" @click="submitform"></Button>
     </div>
 
 </template>
