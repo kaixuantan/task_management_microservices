@@ -20,29 +20,9 @@ group_microservice_base_url = "https://personal-rc7vnnm9.outsystemscloud.com/Gro
 log_microservice_base_url = "https://personal-rc7vnnm9.outsystemscloud.com/LogAPI_REST/rest/v1/"
 notification_microservice_base_url = ""
 
+
 # Part 1 (1 to 3 or 16 to 19)
-@app.route("/enrollment/subgroups") 
-def get_subgroups_of_group(): 
-    response = requests.get(f"{group_microservice_base_url}/usergroup/{userId}") 
- 
-    if response.status_code == 200: 
-        consolidated = {} 
-        # for each group in response, get subgroups of group 
-        # TO DO: Edit code based on actual response structure 
-        for group in response.json(): 
-            groupId = group["groupId"] 
-            response2 = requests.get(f"{subgroup_microservice_base_url}/groupsubgroup/{groupId}") 
-            consolidated[groupId] = response2.json() 
-         
-        return jsonify(consolidated) 
-     
-
-    else:
-        return jsonify({"error": "Failed to get user groups"}), response.status_code
-
-
-# Part 2
-@app.route('/enroll', methods=['POST'])
+@app.route('/enroll', methods=['GET'])
 def enroll_user():
     user_id = request.json.get('userId')
     subgroup_id = request.json.get('subGroupId')
@@ -64,6 +44,13 @@ def enroll_user():
         'subgroups': subgroups
     }
 
+    return jsonify(consolidated_data), 200
+# Part 2 (4 to 6 or 20 to 24)
+@app.route('/enroll/notify', methods=['POST'])
+def notify_admin():
+    user_id = request.json.get('userId')
+    subgroup_id = request.json.get('subGroupId')
+    group_id = request.json.get('groupId')
     # 4. Call [PUT] update subgroup API from subgroup microservice to add user into the subgroup
     update_subgroup_response = requests.put(f'{subgroup_microservice_base_url}/subgroups/{subgroup_id}', json={'userId': user_id})
 
@@ -74,7 +61,7 @@ def enroll_user():
     # 6. Call [POST] add log API from activity log microservice to record enrolment of user to subgroup
     requests.post(f'{log_microservice_base_url}/logs', json={'userId': user_id, 'subgroupId': subgroup_id, 'action': 'enroll'})
 
-    return jsonify(consolidated_data), 200
+    return jsonify({'message': 'User has been enrolled in the subgroup'}), 200
 
 if __name__ == '__main__':
     app.run(debug=True)

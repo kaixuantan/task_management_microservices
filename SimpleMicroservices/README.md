@@ -1,3 +1,34 @@
+# Prerequites (for testing manually)
+- ensure docker desktop software is running on your computer
+- run "docker run -d --hostname esd-rabbit --name rabbitmq-mgmt -p 5672:5672 -p 15672:15672" command
+- run "python amqp_setup.py" command (amqp_setup.py is in the amqp folder from root, cd into the folder first before running the command)
+- run "python notificationServer.py" command (notificationServer.py is in the Notification folder, cd into the folder first before running the command)
+- run "python logServer.py" command (logServer.py is in the Log folder, cd into the folder first before running the command)
+
+## Log server
+- consumes messages from the `log_queue` queue with `log.*` routing key and calls the [POST] Add log route to insert into db
+- `message format`
+```json
+{
+  "userId": <userId>,
+  "subGroupId": <subGroupId>,
+  "taskId": <taskId>,
+  "type": <type>,
+  "description": <description>
+}
+```
+
+## Notification server
+- consumes messages from the `email_queue` queue with `email.*` routing key and sends email
+- `message format`
+```json
+{
+  "recipient": <email>,
+  "subject": <email_subject>,
+  "body": <email_message>
+}
+```
+
 # API Documentation
 Base url: https://personal-rc7vnnm9.outsystemscloud.com
 
@@ -83,7 +114,7 @@ Base url: https://personal-rc7vnnm9.outsystemscloud.com
     - /subgroup
   - [PUT] 		Update subgroup			
     - /subgroup/{subGroupId}
-  - [PUT]		Self-Enrol user to subgroup	
+  - [PUT]		Self enrol user to subgroup	
     - /subgroup/enrol/{subGroupId}
   - [DELETE] 	Delete subgroup			
     - /subgroup/{subGroupId}
@@ -94,6 +125,8 @@ Base url: https://personal-rc7vnnm9.outsystemscloud.com
     - /task/subgroup/{subGroupId}
   - [GET] Get user's tasks
     - /task/usertask/{userId}
+  - [GET] Get user's tasks by status
+    - /task/usertaskstatus/{userId}
   - [GET] Get task by status
     - /task/status/{status}
   - [POST] 		Add task				
@@ -101,7 +134,7 @@ Base url: https://personal-rc7vnnm9.outsystemscloud.com
   - [PUT] 		Update task			
     - /task/{taskId}
   - [PUT]		Assign task to user		
-    - /task/assign
+    - /task/assign/{taskId}
   - [DELETE] 	Delete task			
     - /task/{taskId}
 - Log (https://personal-rc7vnnm9.outsystemscloud.com/LogAPI_REST/rest/v1/)
@@ -110,11 +143,11 @@ Base url: https://personal-rc7vnnm9.outsystemscloud.com
   - [GET]		Get a log 
     - /log/{logId}
   - [GET]		Get logs by type		
-    - /log/{type}
+    - /log/type/{type}
   - [GET]		Get logs by taskId		
-    - /log/taskId/{taskId}
+    - /log/task/{taskId}
   - [GET]		Get logs by subGroupId	
-    - /log/subgroupId/{subGroupId}
+    - /log/subgroup/{subGroupId}
   - [POST] 		Add log				
     - /log
   - [PUT] 		Update log			
@@ -125,18 +158,18 @@ Base url: https://personal-rc7vnnm9.outsystemscloud.com
   - [GET] 		Get document				
     - /doc/{docId}
   - [GET]		Get all document in subgroup 
-    - /doc/{subGroupId}
+    - /doc/subgroup/{subGroupId}
   - [POST] 		Add document		        	
-    - /doc/{type}
+    - /doc
   - [PUT] 		Update document	        	
     - /doc/{docId}
   - [DELETE] 	Delete document 			
-    - /doc/{taskId}
+    - /doc/{docId}
 - Comment (https://personal-rc7vnnm9.outsystemscloud.com/CommentAPI_REST/rest/v1/)
   - [GET] 		Get all comments			
     - /comment
-  - [GET]		Get all comments in taskId 	
-    - /comment/taskId/{taskId}
+  - [GET]		Get all comments in a task	
+    - /comment/task/{taskId}
   - [POST] 		Add comment				
     - /comment
   - [PUT] 		Update comment			
@@ -161,6 +194,8 @@ Base url: https://personal-rc7vnnm9.outsystemscloud.com
   - description (varchar)
   - picture (binary data)
   - size (integer)
+  - createdById (bigint)
+  - createdByUsername (varchar)
   - createdDateTime (datetime)
   - `GroupUser table`
   - [FK] groupId (bigint)
@@ -182,6 +217,7 @@ Base url: https://personal-rc7vnnm9.outsystemscloud.com
   - `Task table`
   - [PK] taskId (bigint) (auto increment)
   - name (varchar)
+  - description (varchar)
   - [FK] createdById (bigint)
   - createdByUsername (varchar)
   - [FK] subGroupId (bigint)
@@ -192,6 +228,7 @@ Base url: https://personal-rc7vnnm9.outsystemscloud.com
   - lastUpdatedDateTime (datetime)
   - [FK] lastUpdatedById (bigint)
   - lastUpdatedByUsername (varchar)
+  - dueDateTime (datetime)
   - status (varchar)
   - `TaskAssignment`
   - [FK] taskId (bigint)
