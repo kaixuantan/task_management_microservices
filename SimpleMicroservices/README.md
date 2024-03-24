@@ -114,8 +114,8 @@ Base url: https://personal-rc7vnnm9.outsystemscloud.com
     - /subgroup
   - [PUT] 		Update subgroup			
     - /subgroup/{subGroupId}
-  - [PUT]		Self-Enrol user to subgroup	
-    - /subgroup/enrol/{subGroupId}/{userId}
+  - [PUT]		Self enrol user to subgroup	
+    - /subgroup/enrol/{subGroupId}
   - [DELETE] 	Delete subgroup			
     - /subgroup/{subGroupId}
 - Task (https://personal-rc7vnnm9.outsystemscloud.com/TaskAPI_REST/rest/v1/)
@@ -134,7 +134,7 @@ Base url: https://personal-rc7vnnm9.outsystemscloud.com
   - [PUT] 		Update task			
     - /task/{taskId}
   - [PUT]		Assign task to user		
-    - /task/assign
+    - /task/assign/{taskId}
   - [DELETE] 	Delete task			
     - /task/{taskId}
 - Log (https://personal-rc7vnnm9.outsystemscloud.com/LogAPI_REST/rest/v1/)
@@ -143,11 +143,11 @@ Base url: https://personal-rc7vnnm9.outsystemscloud.com
   - [GET]		Get a log 
     - /log/{logId}
   - [GET]		Get logs by type		
-    - /log/{type}
+    - /log/type/{type}
   - [GET]		Get logs by taskId		
-    - /log/taskId/{taskId}
+    - /log/task/{taskId}
   - [GET]		Get logs by subGroupId	
-    - /log/subgroupId/{subGroupId}
+    - /log/subgroup/{subGroupId}
   - [POST] 		Add log				
     - /log
   - [PUT] 		Update log			
@@ -158,18 +158,18 @@ Base url: https://personal-rc7vnnm9.outsystemscloud.com
   - [GET] 		Get document				
     - /doc/{docId}
   - [GET]		Get all document in subgroup 
-    - /doc/{subGroupId}
+    - /doc/subgroup/{subGroupId}
   - [POST] 		Add document		        	
-    - /doc/{type}
+    - /doc
   - [PUT] 		Update document	        	
     - /doc/{docId}
   - [DELETE] 	Delete document 			
-    - /doc/{taskId}
+    - /doc/{docId}
 - Comment (https://personal-rc7vnnm9.outsystemscloud.com/CommentAPI_REST/rest/v1/)
   - [GET] 		Get all comments			
     - /comment
-  - [GET]		Get all comments in taskId 	
-    - /comment/taskId/{taskId}
+  - [GET]		Get all comments in a task	
+    - /comment/task/{taskId}
   - [POST] 		Add comment				
     - /comment
   - [PUT] 		Update comment			
@@ -194,6 +194,8 @@ Base url: https://personal-rc7vnnm9.outsystemscloud.com
   - description (varchar)
   - picture (binary data)
   - size (integer)
+  - createdById (bigint)
+  - createdByUsername (varchar)
   - createdDateTime (datetime)
   - `GroupUser table`
   - [FK] groupId (bigint)
