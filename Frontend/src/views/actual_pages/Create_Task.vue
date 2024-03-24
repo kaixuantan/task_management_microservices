@@ -94,7 +94,31 @@ const handleSubmit = async () => {
 </script>
 
 
+<style>
+    .datetime{
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        align-content: center;
+    }
 
+    .w49 {
+        width: 49%;
+        padding-top: 0;
+        padding-bottom: 0;
+        padding-right: 0;
+    }
+
+    #inputTime::-webkit-calendar-picker-indicator {
+        background-color: #3B82F6;
+        /* filter: invert(1); */
+        border: 1px solid #3B82F6;
+        transition: background-color 0.2s, color 0.2s, border-color 0.2s, box-shadow 0.2s, outline-color 0.2s;
+        border-radius: 0 6px 6px 0;
+        outline-color: transparent;
+        margin: 0;
+    }
+</style>
 
 <template>
     <h1>Create New Task</h1>
@@ -147,10 +171,15 @@ const handleSubmit = async () => {
         <div class="col-12 md:col-6">
         <div class="card">
             <h5>Due Date and Time</h5>
-            <Calendar v-model="dueDate" :inputStyle="{ width: '100%' }" :showIcon="true" class="w-full" />
-            <div>
-                <input type="time" v-model="dueTime">
+            <div class="datetime">
+                <div class="w49">
+                    <Calendar v-model="dueDate" :inputStyle="{ width: '100%' }" :showIcon="true" class="w-full" />
+                </div>
+                <input type="time" id="inputTime" class="p-inputtext p-component w49" v-model="dueTime">
             </div>
+           <!--  <span class="p-calendar p-component p-inputwrapper p-calendar-w-btn p-inputwrapper-filled w-full" data-pc-section="root" id="pv_id_182">
+                <input type="time" v-model="dueTime" role="combobox" class="p-inputtext p-component" autocomplete="off" aria-autocomplete="none" aria-haspopup="dialog" aria-expanded="false" aria-controls="pv_id_182_panel" inputmode="none" tabindex="0" data-pc-section="input" style="width: 100%;">
+            </span> -->
         </div>
 
     </div>

@@ -59,12 +59,13 @@ app.get('/subgroup/:subGroupId', async (req, res) => {
 
 app.post('/task', async (req, res) => {
     try {
+        console.log(req.body)
         const createTaskResponse = await axios.post(
             `https://personal-rc7vnnm9.outsystemscloud.com/TaskAPI_REST/rest/v1/task`,
             {
                 name: req.body.taskName,
                 description: req.body.taskDesc,
-                dueDate: req.body.dueDateTime,
+                dueDateTime: req.body.dueDateTime,
                 subGroupId: req.body.subGroupId,
                 createdById: req.body.userId,
                 createdByUsername: req.body.username
