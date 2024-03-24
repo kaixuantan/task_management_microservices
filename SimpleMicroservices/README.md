@@ -145,9 +145,9 @@ Base url: https://personal-rc7vnnm9.outsystemscloud.com
   - [GET]		Get logs by type		
     - /log/type/{type}
   - [GET]		Get logs by taskId		
-    - /log/taskId/{taskId}
+    - /log/task/{taskId}
   - [GET]		Get logs by subGroupId	
-    - /log/subgroupId/{subGroupId}
+    - /log/subgroup/{subGroupId}
   - [POST] 		Add log				
     - /log
   - [PUT] 		Update log			
@@ -169,7 +169,7 @@ Base url: https://personal-rc7vnnm9.outsystemscloud.com
   - [GET] 		Get all comments			
     - /comment
   - [GET]		Get all comments in a task	
-    - /comment/taskId/{taskId}
+    - /comment/task/{taskId}
   - [POST] 		Add comment				
     - /comment
   - [PUT] 		Update comment			
