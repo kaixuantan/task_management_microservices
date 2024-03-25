@@ -10,7 +10,7 @@ import pika
 import json
 from dotenv import load_dotenv
 
-# load_dotenv()
+load_dotenv()
 
 app = Flask(__name__)
 CORS(app)
@@ -27,8 +27,8 @@ rabbitmq_host_log = os.getenv('HOSTNAME')
 rabbitmq_port_log = os.getenv('PORT')
 rabbitmq_exchange_log = os.getenv('EXCHANGE_NAME')
 rabbitmq_exchange_type_log = os.getenv('EXCHANGE_TYPE') 
-rabbitmq_queue_log = os.getenv('QUEUE_NAME')
-rabbitmq_routing_key_log = os.getenv('ROUTING_KEY') 
+rabbitmq_queue_log = os.getenv('QUEUE_NAME_1')
+rabbitmq_routing_key_log = os.getenv('ROUTING_KEY_1') 
 
 # load and get log.env files
 load_dotenv('notif.env')
@@ -37,8 +37,8 @@ rabbitmq_host_notif = os.getenv('HOSTNAME')
 rabbitmq_port_notif = os.getenv('PORT')
 rabbitmq_exchange_notif = os.getenv('EXCHANGE_NAME')
 rabbitmq_exchange_type_notif = os.getenv('EXCHANGE_TYPE') 
-rabbitmq_queue_notif = os.getenv('QUEUE_NAME')
-rabbitmq_routing_key_notif = os.getenv('ROUTING_KEY')  
+rabbitmq_queue_notif = os.getenv('QUEUE_NAME_2')
+rabbitmq_routing_key_notif = os.getenv('ROUTING_KEY_2')  
 
 # Email server details
 smtp_server = os.getenv('SMTP_SERVER')
@@ -56,6 +56,7 @@ def group_creation():
     # Simple check of input format and data of the request are JSON
     if request.is_json:
         try:
+            print(rabbitmq_host_log)
             group_info = request.get_json()[0] #only name is mandatory
             print("\nReceived a group_description in JSON:", group_info)
             subgroup_info = request.get_json()[1] #only name is mandatory
@@ -94,6 +95,7 @@ def processGroupCreation(group_info,subgroup_info,users_id_list):
     # create a group in group microservice
     group_result = invoke_http(group_URL, method="POST", json=group_info, headers=group_headers)
     # print(group_result)
+    print(group_result)
     group_result_status = group_result["Result"]
     groupId = group_result["GroupId"]
     # print(groupId)
@@ -101,11 +103,11 @@ def processGroupCreation(group_info,subgroup_info,users_id_list):
 
     # get group details 
     unique_group_URL = group_URL + str(groupId)
-    # print(unique_group_URL)
+    print(unique_group_URL)
     group_dict = invoke_http(unique_group_URL, method="GET", headers=group_headers)
-    # print(group_dict)
+    print(group_dict)
     group = group_dict["Group"]
-    # print(group)
+    print(group)
 
     
     # Connect to RabbitMQ

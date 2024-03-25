@@ -12,12 +12,18 @@ import { watch } from 'vue';
 
 
 const baseURL = 'https://personal-rc7vnnm9.outsystemscloud.com';
+const postURL = 'http://localhost:5100';
 const userAppId = env.X_User_AppId 
 const userAppKey = env.X_User_Key
 const headers = {
   'Content-Type': 'application/json',
   'X-User-AppId': userAppId,
-  'X-User-Key': userAppKey};
+  'X-User-Key': userAppKey,
+  'X-Group-AppId': env.X_Group_AppId,
+  'X-Group-Key': env.X_Group_Key,
+  'X_SubGroup_AppId': env.X_SubGroup_AppId,
+  'X_SubGroup_Key': env.X_SubGroup_Key,
+};
 
 
 //Fecth User Values
@@ -27,7 +33,7 @@ const fetchUsers = async () => {
     console.log(response.data)
     users.value = response.data.User.map(user => ({
       name: user.username,
-      code: user.userId.toString()
+      userId: user.userId.toString()
     }));
   } catch (error) {
     console.error('Error fetching users:', error);
@@ -82,28 +88,38 @@ const hidesubgrp_popup = () => {
 };
 
 const savesubgrp = () => {
-    submitted.value = true;
-    if (subgrp.value.name && subgrp.value.name.trim() && subgrp.value.description) {
-        if (subgrp.value.id) {
+  submitted.value = true;
+  if (subgrp.value.name && subgrp.value.name.trim() && subgrp.value.description) {
+    const formattedSubgroup = {
+      name: subgrp.value.name,
+      description: subgrp.value.description,
+      size: subgrp.value.capacity,
+      subGroupUsers: subgrpmembers.value.map(member => ({
+        userId: parseInt(member.code),
+        username: member.name
+      }))
+    };
 
-            // Update existing subgroup
-            console.log('editing')
-            const index = subgroup_submit.value.findIndex(c => c.id === subgrp.value.id);
-            subgroup_submit.value[index] = { ...subgrp.value, members: subgrpmembers.value };
-            toast.add({ severity: 'success', summary: 'Successful', detail: 'Subgroup Updated', life: 3000 });
-        } 
-        else {
-            // Create new subgrp    
-            const newsubgrp = { ...subgrp.value, id: groupid_toadd += 1, members: subgrpmembers.value};
-            subgroup_submit.value.push(newsubgrp);
-            console.log(subgroup_submit.value);
-            toast.add({ severity: 'success', summary: 'Successful', detail: 'Subgroup Created', life: 3000 });
-        }
-        
-        subgrp_popup.value = false;
-        subgrp.value = {};
-        subgrpmembers.value = [];
+    if (subgrp.value.id) {
+      // Update existing subgroup
+      console.log('editing');
+      const index = subgroup_submit.value.findIndex(c => c.id === subgrp.value.id);
+      subgroup_submit.value[index] = formattedSubgroup;
+      toast.add({ severity: 'success', summary: 'Successful', detail: 'Subgroup Updated', life: 3000 });
+    } else {
+      // Create new subgroup
+      const newSubgroupId = groupid_toadd += 1;
+      const newSubgroup = { ...formattedSubgroup, subGroupId: newSubgroupId, id: newSubgroupId };
+      subgroup_submit.value.push(newSubgroup);
+      console.log(subgroup_submit.value);
+      toast.add({ severity: 'success', summary: 'Successful', detail: 'Subgroup Created', life: 3000 });
     }
+
+    subgrp_popup.value = false;
+    subgrp.value = {};
+    subgrpmembers.value = [];
+
+  }
 };
 
 const editsubgrp = (subgrpdata) => {
@@ -122,23 +138,59 @@ const deletesubgrp = (datatodelete) => {
 
 
 
-const submitform = () => {
-    const groupdetails_submit = {
+const submitform = async () => {
+  const groupdetails_submit = {
     name: comname.value,
     description: comdesc.value,
     size: comsize.value,
-    createdById: createdById, 
-    createdByUsername: createdByUsername, 
-    createdDateTime: new Date().toISOString(), 
+    createdById: createdById,
+    createdByUsername: createdByUsername,
+    createdDateTime: new Date().toISOString(),
+    groupUsers: communitymembers.value.map(member => ({
+      userId: parseInt(member.userId),
+      username: member.name
+    }))
   };
-
-  
-  console.log(groupdetails_submit);
-  console.log(subgroup_submit.value);
-  console.log(communitymembers);
+  console.log('communityy details to submit')
+  console.log(groupdetails_submit)
 
 
-}
+  const subgroup_submit_formatted = subgroup_submit.value.map(subgroup => ({
+    name: subgroup.name,
+    description: subgroup.description,
+    picture: subgroup.picture,
+    size: subgroup.size,
+    subGroupUsers: subgroup.subGroupUsers
+  }));
+
+  const groupUsers = communitymembers.value.map(member => parseInt(member.userId));
+
+  try {
+    const response = await axios.post(`${postURL}/groupcreation`, [
+  groupdetails_submit,
+  subgroup_submit_formatted,
+  groupUsers
+], {
+  headers: {
+    'Content-Type': 'application/json',
+    'X-User-AppId': userAppId,
+    'X-User-Key': userAppKey,
+    'X-Group-AppId': env.X_Group_AppId,
+    'X-Group-Key': env.X_Group_Key,
+    'X-SubGroup-AppId': env.X_SubGroup_AppId,
+    'X-SubGroup-Key': env.X_SubGroup_Key,
+  }
+});
+
+    console.log('Response:', response.data);
+    // Handle the response as needed (e.g., show success message, redirect, etc.)
+
+  } catch (error) {
+    
+    console.error('Error:', error);
+    // Handle the error (e.g., show error message)
+  }
+};
 
 
 fetchUsers();
@@ -182,8 +234,8 @@ fetchUsers();
                     placeholder="Select Members" :filter="true" class="w-full">
                     <template #value="slotProps">
                         <div class="inline-flex align-items-center py-1 px-2 bg-primary text-primary border-round mr-2"
-                            v-for="option of slotProps.value" :key="option.code">
-                            <span :class="'mr-2 flag flag-' + option.code.toLowerCase()"
+                            v-for="option of slotProps.value" :key="option.userId">
+                            <span :class="'mr-2 flag flag-' + option.userId.toLowerCase()"
                                 style="width: 18px; height: 12px" />
                             <div>{{ option.name }}</div>
                         </div>
@@ -193,7 +245,7 @@ fetchUsers();
                     </template>
                     <template #option="slotProps">
                         <div class="flex align-items-center">
-                            <span :class="'mr-2 flag flag-' + slotProps.option.code.toLowerCase()"
+                            <span :class="'mr-2 flag flag-' + slotProps.option.userId.toLowerCase()"
                                 style="width: 18px; height: 12px" />
                             <div>{{ slotProps.option.name }}</div>
                         </div>
@@ -216,10 +268,10 @@ fetchUsers();
                         <Column field="description" header="Description"></Column>
                         <Column field="members" header="Members">
                             <template #body="slotProps">
-                                <div v-for="member in slotProps.data.members" :key="member.code">{{ member.name }}</div>
+                            <div v-for="member in slotProps.data.subGroupUsers" :key="member.userId">{{ member.username }}</div>
                             </template>
                         </Column>
-                        <Column field="capacity" header="Capacity"></Column>
+                        <Column field="size" header="Capacity"></Column>
                         <Column>
                             <template #body="slotProps">
                                 <Button icon="pi pi-pencil" class="mr-2" severity="success" rounded
@@ -259,8 +311,8 @@ fetchUsers();
                             placeholder="Select Members" :filter="true" class="w-full">
                             <template #value="slotProps">
                                 <div class="inline-flex align-items-center py-1 px-2 bg-primary text-primary border-round mr-2"
-                                    v-for="option of slotProps.value" :key="option.code">
-                                    <span :class="'mr-2 flag flag-' + option.code.toLowerCase()"
+                                    v-for="option of slotProps.value" :key="option.userId">
+                                    <span :class="'mr-2 flag flag-' + option.userId.toLowerCase()"
                                         style="width: 18px; height: 12px" />
                                     <div>{{ option.name }}</div>
                                 </div>
@@ -270,7 +322,7 @@ fetchUsers();
                             </template>
                             <template #option="slotProps">
                                 <div class="flex align-items-center">
-                                    <span :class="'mr-2 flag flag-' + slotProps.option.code.toLowerCase()"
+                                    <span :class="'mr-2 flag flag-' + slotProps.option.userId.toLowerCase()"
                                         style="width: 18px; height: 12px" />
                                     <div>{{ slotProps.option.name }}</div>
                                 </div>
