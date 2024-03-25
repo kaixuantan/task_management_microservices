@@ -125,6 +125,8 @@ Base url: https://personal-rc7vnnm9.outsystemscloud.com
     - /task/subgroup/{subGroupId}
   - [GET] Get user's tasks
     - /task/usertask/{userId}
+  - [GET] Get user's tasks by subgroup
+    - /task/usertask/{userId}/subgroup/{subgroupId}
   - [GET] Get user's tasks by status
     - /task/usertaskstatus/{userId}
   - [GET] Get task by status
