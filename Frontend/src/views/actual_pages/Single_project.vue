@@ -14,11 +14,10 @@
             <Divider />
         </div>
         <div class="col-8">
-            <div class="flex justify-content-between align-items-center">
+            <div class="flex justify-content-between align-items-center mb-3">
                 <h3 class="font-semibold m-0">Tasks</h3>
                 <Button label="Add" icon="pi pi-plus" rounded @click="redirectToCreateTask(this.$route.query.subGroupId)"/>
             </div>
-            <Divider />
             <Accordion :activeIndex="0" :multiple="true">
                 <AccordionTab header="New">
                     <div class="grid">
