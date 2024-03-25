@@ -1,6 +1,7 @@
 import pika
 import requests
 import json
+import time
 from dotenv import load_dotenv
 import os
 
@@ -10,6 +11,7 @@ load_dotenv()
 rabbitmq_host = os.getenv('HOSTNAME')
 rabbitmq_port = os.getenv('PORT')
 rabbitmq_queue = os.getenv('QUEUE_NAME')
+print(f"RabbitMQ Host: {rabbitmq_host}")
 
 # REST API details
 rest_api_url = os.getenv('REST_API_URL')
