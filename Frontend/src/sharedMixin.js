@@ -96,5 +96,27 @@ export default {
                 console.error(error);
             }
         },
+        sortTasksByStatus(tasks) {
+            tasks.forEach(task => {
+                switch(task.status) {
+                case 'In Progress':
+                    this.tasks_in_progress.push(task);
+                    break;
+                case 'New':
+                    this.tasks_new.push(task);
+                    break;
+                case 'Completed':
+                    this.tasks_completed.push(task);
+                    break;
+                default:
+                    console.log(`Unknown status: ${task.status}`);
+                }
+            });
+        },
+        formatDate(timestamp) {
+            let date = new Date(timestamp);
+            let year = date.getFullYear().toString().slice(-2);
+            return date.getDate() + "/" + (date.getMonth() + 1) + "/" + year;
+        }
     }
 }

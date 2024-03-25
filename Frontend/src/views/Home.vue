@@ -373,23 +373,6 @@ export default {
         };
     },
     methods: {
-        sortTasksByStatus(tasks) {
-            tasks.forEach(task => {
-                switch(task.status) {
-                case 'In Progress':
-                    this.tasks_in_progress.push(task);
-                    break;
-                case 'New':
-                    this.tasks_new.push(task);
-                    break;
-                case 'Completed':
-                    this.tasks_completed.push(task);
-                    break;
-                default:
-                    console.log(`Unknown status: ${task.status}`);
-                }
-            });
-        },
         redirectToCreateTask() {
             this.$router.push("/create-task");
         },
