@@ -1,11 +1,6 @@
 <script setup>
-import { onMounted, reactive, ref, watch } from "vue";
-import ProductService from "@/service/ProductService";
+import { ref } from "vue";
 import { useLayout } from "@/layout/composables/layout";
-
-const { isDarkTheme } = useLayout();
-
-const products = ref(null);
 
 const activities = ref(
     [
@@ -53,61 +48,12 @@ const projects = ref([
     },
 ]);
 
-const lineOptions = ref(null);
-const productService = new ProductService();
-
-onMounted(() => {
-    productService.getProductsSmall().then((data) => (products.value = data));
-});
-
 const calAttributes = ref([
     {
         highlight: true,
         dates: new Date(),
     },
 ]);
-
-const applyLightTheme = () => {
-    lineOptions.value = {
-        plugins: {
-            legend: {
-                labels: {
-                    color: "#495057",
-                },
-            },
-        },
-        scales: {
-            x: {
-                ticks: {
-                    color: "#495057",
-                },
-                grid: {
-                    color: "#ebedef",
-                },
-            },
-            y: {
-                ticks: {
-                    color: "#495057",
-                },
-                grid: {
-                    color: "#ebedef",
-                },
-            },
-        },
-    };
-};
-
-watch(
-    isDarkTheme,
-    (val) => {
-        if (val) {
-            applyDarkTheme();
-        } else {
-            applyLightTheme();
-        }
-    },
-    { immediate: true }
-);
 </script>
 
 <template>
