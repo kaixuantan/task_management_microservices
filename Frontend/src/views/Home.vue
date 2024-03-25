@@ -140,12 +140,6 @@ const calAttributes = ref([
                             <div v-if="tasks_in_progress.length === 0">
                                 <h5 class="mb-0 font-semibold">No tasks to show</h5>
                             </div>
-                            <div v-if="tasks_in_progress.length === 0">
-                                <EmptyState
-                                    title="No tasks in progress"
-                                    description="You have no tasks in progress"
-                                />
-                            </div>
                             <div
                                 v-for="task in tasks_in_progress.slice(0,3)"
                                 class="card shadow-1 flex align-items-center justify-content-between"

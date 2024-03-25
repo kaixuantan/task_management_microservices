@@ -1,56 +1,10 @@
 <script setup>
-import { onMounted, reactive, ref, watch } from "vue";
-import { useLayout } from "@/layout/composables/layout";
 import { useRouter } from 'vue-router';
 
 const router = useRouter(); 
-const { isDarkTheme } = useLayout();
 const redirectToCreateCommunity = () => {
     router.push({ name: 'create community' });
 }
-
-const lineOptions = ref(null);
-const applyLightTheme = () => {
-    lineOptions.value = {
-        plugins: {
-            legend: {
-                labels: {
-                    color: "#495057",
-                },
-            },
-        },
-        scales: {
-            x: {
-                ticks: {
-                    color: "#495057",
-                },
-                grid: {
-                    color: "#ebedef",
-                },
-            },
-            y: {
-                ticks: {
-                    color: "#495057",
-                },
-                grid: {
-                    color: "#ebedef",
-                },
-            },
-        },
-    };
-};
-
-watch(
-    isDarkTheme,
-    (val) => {
-        if (val) {
-            applyDarkTheme();
-        } else {
-            applyLightTheme();
-        }
-    },
-    { immediate: true }
-);
 </script>
 
 <template>
