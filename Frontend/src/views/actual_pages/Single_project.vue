@@ -16,7 +16,7 @@
         <div class="col-8">
             <div class="flex justify-content-between align-items-center">
                 <h3 class="font-semibold m-0">Tasks</h3>
-                <Button label="Add" icon="pi pi-plus" rounded />
+                <Button label="Add" icon="pi pi-plus" rounded @click="redirectToCreateTask(this.$route.query.subGroupId)"/>
             </div>
             <Divider />
             <Accordion :activeIndex="0" :multiple="true">
@@ -249,6 +249,14 @@ export default {
             } catch (error) {
                 console.error(error);
             }
+        },
+        redirectToCreateTask(subGroupId) {
+            this.$router.push({
+                                path: '/create-task',
+                                query: {
+                                    "subGroupId": subGroupId,
+                                }
+                            });
         },
     },
     watch: {

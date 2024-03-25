@@ -79,7 +79,7 @@ const calAttributes = ref([
                             </div>
                         </div>
                         <span class="text-900 font-bold text-xl block mb-2"
-                            >24
+                            >{{ tasks_in_progress.length }}
                         </span>
                     </div>
                 </div>
@@ -101,7 +101,7 @@ const calAttributes = ref([
                             </div>
                         </div>
                         <span class="text-900 font-bold text-xl block mb-2"
-                            >24
+                            >{{ tasks_new.length }}
                         </span>
                     </div>
                 </div>
@@ -125,7 +125,7 @@ const calAttributes = ref([
                             </div>
                         </div>
                         <span class="text-900 font-bold text-xl block mb-2"
-                            >24
+                            >{{ tasks_completed.length }}
                         </span>
                     </div>
                 </div>
@@ -137,28 +137,40 @@ const calAttributes = ref([
                 <div class="col-12">
                     <TabView>
                         <TabPanel header="In progress">
+                            <div v-if="tasks_in_progress.length === 0">
+                                <h5 class="mb-0 font-semibold">No tasks to show</h5>
+                            </div>
+                            <div v-if="tasks_in_progress.length === 0">
+                                <EmptyState
+                                    title="No tasks in progress"
+                                    description="You have no tasks in progress"
+                                />
+                            </div>
                             <div
-                                v-for="project in projects"
+                                v-for="task in tasks_in_progress.slice(0,3)"
                                 class="card shadow-1 flex align-items-center justify-content-between"
                             >
                                 <div class="flex">
                                     <Avatar
-                                        :icon="project.icon"
+                                        :label="task.name.charAt(0).toUpperCase()"
                                         class="mr-3"
                                         size="xlarge"
                                     />
                                     <div class="flex align-items-center">
                                         <div>
                                             <h5 class="mb-0 font-semibold">
-                                                {{ project.name }}
+                                                {{ task.name }}
                                             </h5>
-                                            <p>{{ project.description }}</p>
+                                            <p>{{ task.subGroupName }}</p>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </TabPanel>
                         <TabPanel header="New Assigned">
+                            <div v-if="tasks_new.length === 0">
+                                <h5 class="mb-0 font-semibold">No tasks to show</h5>
+                            </div>
                             <div
                                 v-for="task in tasks_new.slice(0,3)"
                                 class="card shadow-1 flex align-items-center justify-content-between"
@@ -181,18 +193,29 @@ const calAttributes = ref([
                             </div>
                         </TabPanel>
                         <TabPanel header="Completed">
-                            <p class="m-0">
-                                At vero eos et accusamus et iusto odio
-                                dignissimos ducimus qui blanditiis praesentium
-                                voluptatum deleniti atque corrupti quos dolores
-                                et quas molestias excepturi sint occaecati
-                                cupiditate non provident, similique sunt in
-                                culpa qui officia deserunt mollitia animi, id
-                                est laborum et dolorum fuga. Et harum quidem
-                                rerum facilis est et expedita distinctio. Nam
-                                libero tempore, cum soluta nobis est eligendi
-                                optio cumque nihil impedit quo minus.
-                            </p>
+                            <div v-if="tasks_completed.length === 0">
+                                <h5 class="mb-0 font-semibold">No tasks to show</h5>
+                            </div>
+                            <div
+                                v-for="task in tasks_completed.slice(0,3)"
+                                class="card shadow-1 flex align-items-center justify-content-between"
+                            >
+                                <div class="flex">
+                                    <Avatar
+                                        :label="task.name.charAt(0).toUpperCase()"
+                                        class="mr-3"
+                                        size="xlarge"
+                                    />
+                                    <div class="flex align-items-center">
+                                        <div>
+                                            <h5 class="mb-0 font-semibold">
+                                                {{ task.name }}
+                                            </h5>
+                                            <p>{{ task.subGroupName }}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </TabPanel>
                     </TabView>
                 </div>
