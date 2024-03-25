@@ -29,9 +29,6 @@ if not amqp_utils.check_exchange(channel, exchangename, exchangetype):
     print("\nCreate the 'Exchange' before running this microservice. \nExiting the program.")
     sys.exit(0)  # Exit with a success status
 
-# External API endpoint
-external_api_url = 'https://api.example.com/endpoint'
-
 def forward_message_to_api(ch, method, properties, body):
     """
     Callback function to handle incoming AMQP messages
