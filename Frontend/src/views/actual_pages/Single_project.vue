@@ -179,13 +179,9 @@
                 </div>
                 <div>
                     <h3 class="font-semibold">
-                        Individual Contribution Report
+                        Project summary & Ideas
                     </h3>
-                    <Button
-                        label="Generate"
-                        icon="pi pi-file"
-                        @click="viewProjects(community.groupId)"
-                    />
+                    
                 </div>
             </div>
         </div>

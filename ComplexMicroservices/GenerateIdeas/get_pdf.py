@@ -18,6 +18,3 @@ def download_pdf(docId):
         return pdf_data
     else:
         print(f"Failed to download PDF. Status code: {response.status_code}")
-
-if __name__ == "__main__":
-    download_pdf(3)
