@@ -1,7 +1,8 @@
 <template>
     <div class="grid">
         <div class="col-12 flex justify-content-between pb-0">
-            <h2 class="mb-0 font-semibold">{{ selected_project.name }}</h2>
+            <h2 class="mb-0 font-semibold" v-if="selected_project">{{ selected_project.name }}</h2>
+            <h2 class="mb-0 font-semibold" v-else>Fetching project...</h2>
             <Dropdown
                 v-model="selected_project"
                 :options="user_projects"
@@ -162,13 +163,18 @@
                         <i class="pi pi-pencil text-500 text-xl"></i>
                     </Button>
                 </div>
-                <p class="font-medium text-justify">
-                    {{ selected_project.description }}
-                </p>
-                <h3 class="font-semibold mt-0">Members</h3>
-                <div class="flex align-items-center gap-3" v-for="(user,idx) in selected_project.subGroupUsers">
-                    <!-- image="/images/avatars/panda.png" -->
-                    <span class="font-medium text-lg">{{ idx+1 }}. {{ user.username.toUpperCase() }}</span>
+                <div v-if="selected_project">
+                    <p class="font-medium text-justify">
+                        {{ selected_project.description }}
+                    </p>
+                    <h3 class="font-semibold mt-0">Members</h3>
+                    <div class="flex align-items-center gap-3" v-for="(user,idx) in selected_project.subGroupUsers">
+                        <!-- image="/images/avatars/panda.png" -->
+                        <span class="font-medium text-lg">{{ idx+1 }}. {{ user.username.toUpperCase() }}</span>
+                    </div>
+                </div>
+                <div v-else>
+                    <p class="font-medium">Fetching project...</p>
                 </div>
             </div>
 
@@ -263,6 +269,7 @@ export default {
             immediate: true,
             async handler(newVal) {
                 this.loading = true;
+                await this.fetchUserProjects();
                 for (const proj of this.user_projects) {
                     if (proj.subGroupId == newVal) {
                         this.selected_project = proj;

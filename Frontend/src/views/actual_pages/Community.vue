@@ -14,7 +14,7 @@ const redirectToCreateCommunity = () => {
             <Button label="Create" icon="pi pi-plus" rounded raised @click="redirectToCreateCommunity"/>
         </div>
         <!-- 3 cards at the top of the screen -->
-        <div class="xl:col-4" v-for="n in 3" v-if="communities.length == 0">
+        <div class="xl:col-4" v-for="n in 3" v-if="communities.length === 0">
             <div class="border-round border-1 surface-border p-4 surface-card shadow-1">
                 <div class="flex mb-3 gap-3">
                     <Skeleton shape="circle" size="4rem" class="mr-2"></Skeleton>
@@ -94,6 +94,7 @@ export default {
         }
     },
     async created() {
+        await this.fetchUserGroups();
     },
 };
 </script>

@@ -19,10 +19,10 @@ app.post('/ideas', async (req, res) => {
 
     // Publish the message to the queue
     console.log(req.body);
-    const { projectId, message } = req.body;
+    const { docId, message } = req.body;
     console.log(message);
     const buffer = Buffer.from(JSON.stringify(message));
-    const routingKey = `idea.${projectId}`
+    const routingKey = `idea.${docId}`
     // Publish the message to the exchange
     channel.publish(exchangeName, routingKey, buffer, { persistent: true });
 

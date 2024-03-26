@@ -151,6 +151,7 @@ export default {
             immediate: true,
             async handler(newVal) {
                 this.loading = true;
+                await this.fetchUserGroups();
                 await this.fetchGroupProjects(this.$route.query.groupId);
                 for (const community of this.communities) {
                     if (community.groupId == newVal) {
