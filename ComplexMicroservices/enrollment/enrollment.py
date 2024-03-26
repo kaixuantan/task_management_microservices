@@ -1,12 +1,19 @@
 from flask import Flask, request, jsonify
+from flask_cors import CORS
 import requests
 
 import os
 import sys
 
-app = Flask(__name__)
+import pika
+import json
+from dotenv import load_dotenv
 
-# Provided sub group app ID and API key 
+
+app = Flask(__name__)
+CORS(app)
+
+# Credentials for calling microservices
 sub_group_credentials = { 
     "sub_group_app_id": "dPgLc9FzdypatRXjVJl1", 
     "sub_group_api_key": "jRysav78rLvL7hgfSBGG1MuRuDjMaU" 
@@ -24,6 +31,23 @@ group_microservice_base_url = "https://personal-rc7vnnm9.outsystemscloud.com/Gro
 # log_microservice_base_url = "https://personal-rc7vnnm9.outsystemscloud.com/LogAPI_REST/rest/v1/"
 # notification_microservice_base_url = ""
 
+# load notif.env file
+load_dotenv('notif.env')
+rabbitmq_host_notif = os.getenv('HOSTNAME')
+rabbitmq_port_notif = os.getenv('PORT')
+rabbitmq_exchange_notif = os.getenv('EXCHANGE_NAME')
+rabbitmq_exchange_type_notif = os.getenv('EXCHANGE_TYPE') 
+rabbitmq_queue_notif = os.getenv('QUEUE_NAME')
+rabbitmq_routing_key_notif = os.getenv('ROUTING_KEY')  
+
+# load log.env file
+load_dotenv('log.env')
+rabbitmq_host_log = os.getenv('HOSTNAME')
+rabbitmq_port_log = os.getenv('PORT')
+rabbitmq_exchange_log = os.getenv('EXCHANGE_NAME')
+rabbitmq_exchange_type_log = os.getenv('EXCHANGE_TYPE') 
+rabbitmq_queue_log = os.getenv('QUEUE_NAME')
+rabbitmq_routing_key_log = os.getenv('ROUTING_KEY') 
 
 # Part 1: Return consolidated user's group & group's subgroups
 @app.route('/enrollment', methods=['GET'])
@@ -73,28 +97,98 @@ def get_subgroups_of_group():
 
     
 # Part 2: Enroll user and RabbitMQ
-@app.route('/enrollment', methods=['PUT'])
+@app.route('/enrollment', methods=['POST'])
 def notify_admin():
     user_id = request.json.get('userId')
     subgroup_id = request.json.get('subGroupId')
-    
-    # 1. Call [PUT] update subgroup API from subgroup microservice to add user into the subgroup
-    try:
-        update_subgroup_response = requests.put(f'{subgroup_microservice_base_url}/subgroups/{subgroup_id}', json={'userId': user_id}, headers={"X-SubGroup-AppId": sub_group_credentials["sub_group_app_id"], "X-SubGroup-Key": sub_group_credentials["sub_group_api_key"]})
 
-        # 2. If all users in group have been enrolled, publish all user enrollment event to email_queue
-        if all(user['enrolled'] for user in update_subgroup_response.json()['users']):
-            print("Sending the event to email_queue")
+    # # Create a connection and channel to RabbitMQ
+    # connection = create_connection()
+    # channel = create_channel(connection)
+
+    # # Create the exchange and queues if they don't exist
+    # create_exchange(channel, exchangename, exchangetype)
+    # create_queues(channel, exchangename, queue_names, routing_keys)
+
+    # 1. Call [GET] subgroup API from subgroup microservice to check if there is space in the subgroup
+    try:
+        subgroup_response = requests.get(f'{subgroup_microservice_base_url}/{subgroup_id}', headers={"X-SubGroup-AppId": sub_group_credentials["sub_group_app_id"], "X-SubGroup-Key": sub_group_credentials["sub_group_api_key"]})
+        if subgroup_response.json()['SubGroup']['size'] == len(subgroup_response.json()['SubGroup']['subGroupUsers']) :
+            return jsonify({'message': 'Subgroup is full'}), 400
+
+        # 2. Call [PUT] update subgroup API from subgroup microservice to add user into the subgroup
+        update_subgroup_response = requests.put(f'{subgroup_microservice_base_url}/enrol/{subgroup_id}', json={'userId': user_id}, headers={"X-SubGroup-AppId": sub_group_credentials["sub_group_app_id"], "X-SubGroup-Key": sub_group_credentials["sub_group_api_key"]})
+
+
 
         # 3. Publish user enrollment event to log_queue
-        print("Sending the event to log_queue")
+        # channel.basic_publish(exchange=exchangename, routing_key=routing_keys[1], body=f"User {user_id} has been enrolled in subgroup {subgroup_id}")
+
+        # Connect to RabbitMQ
+        connection = pika.BlockingConnection(pika.ConnectionParameters
+                        (host=rabbitmq_host_log, port=rabbitmq_port_log,
+                        heartbeat=3600, blocked_connection_timeout=3600))
+        channel = connection.channel()
+
+        # Defining message 
+        message = {
+            "log type": "Users enrolled", 
+            "description": "All users in group have been enrolled"
+        }
+
+        # Send message to exchange
+        channel.basic_publish(
+            exchange=rabbitmq_exchange_log,
+            routing_key=rabbitmq_routing_key_log,
+            body=json.dumps(message),
+            properties=pika.BasicProperties(
+                delivery_mode=2, # make message persistent
+            )
+        )
+        
+        # Close the connection when done
+        connection.close()
+
+        # 4. If all users in group have been enrolled, publish all user enrollment event to email_queue
+        if all(user['enrolled'] for user in update_subgroup_response.json()['users']):
+            # channel.basic_publish(exchange=exchangename, routing_key=routing_keys[0], body="All users in group have been enrolled")
+
+            # Connect to RabbitMQ
+            connection = pika.BlockingConnection(pika.ConnectionParameters
+                            (host=rabbitmq_host_notif, port=rabbitmq_port_notif,
+                            heartbeat=3600, blocked_connection_timeout=3600))
+            channel = connection.channel()
+
+            # Defining message 
+            message = {
+                "log type": "Users enrolled", 
+                "description": "All users in group have been enrolled"
+            }
+
+            # Send message to exchange
+            channel.basic_publish(
+                exchange=rabbitmq_exchange_notif,
+                routing_key=rabbitmq_routing_key_notif,
+                body=json.dumps(message),
+                properties=pika.BasicProperties(
+                    delivery_mode=2, # make message persistent
+                )
+            )
+
+            # Close the connection when done
+            connection.close()
+
+        # 5. If the subgroup is now full after the user has been added, return a message to the user
+        updated_subgroup_response = requests.get(f'{subgroup_microservice_base_url}/{subgroup_id}', headers={"X-SubGroup-AppId": sub_group_credentials["sub_group_app_id"], "X-SubGroup-Key": sub_group_credentials["sub_group_api_key"]})
+        if updated_subgroup_response.json()['SubGroup']['size'] == len(updated_subgroup_response.json()['SubGroup']['subGroupUsers']) :
+            return jsonify({'message': f'Subgroup {subgroup_id} is now full'}), 200
+
 
         return jsonify({'message': 'User has been enrolled in the subgroup'}), 200
 
     except:
         return jsonify({'message': 'User enrollment failed'}), 400
-
-
+    
 if __name__ == '__main__':
     app.run(debug=True)
     # app.run(host="0.0.0.0", port=5009, debug=True)
