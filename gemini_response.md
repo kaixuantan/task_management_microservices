@@ -1,22 +1,49 @@
-**Summary**
+**1. Summary and Key Requirements:**
 
-The document outlines the requirements for an Enterprise Solution Development project for the IS213 course. The goal is to design and implement an enterprise solution using a microservices architecture.
+This project document outlines the requirements for an Enterprise Solution Development project involving microservices architecture. Key requirements include:
 
-**Key Requirements**
+* Implement and demonstrate 3 user scenarios using microservices.
+* Utilize various technologies such as Python, Flask, REST, RabbitMQ, Docker, and Visual Studio Code.
+* Employ HTTP and AMQP communication between microservices.
+* Integrate an external service into the solution.
+* Incorporate at least one microservice that uses a database.
+* Implement beyond-the-labs (BTL) features that enhance the scenario.
+* Prepare a proposal, presentation, report, executables, and a video recording for evaluation.
 
-* Design and implement a microservices solution for a business scenario
-* Use appropriate technologies and tools
-* Implement at least 3 user scenarios
-* Leverage REST and AMQP communication
-* Use Docker and Docker Compose
-* Demonstrate Beyond-The-Labs (BTL) implementations
-* Submit a proposal, presentation, report, and executables
-* Undergo intra- and inter-team peer evaluations
+**2. Project Ideas:**
 
-**Project Ideas**
+**Idea 1: Restaurant Management System**
 
-1. **Taxi Booking System:** Develop a taxi booking system with user scenarios such as booking a ride, tracking the taxi, and managing payments. Implement microservices for passenger, driver, and booking management. Use REST and AMQP for communication.
-2. **Food Delivery Platform:** Create a food delivery platform with user scenarios for ordering food, tracking delivery, and managing customer accounts. Design microservices for restaurant, customer, and order management. Utilize RabbitMQ for asynchronous order processing.
-3. **E-Commerce Marketplace:** Implement an e-commerce marketplace with user scenarios for browsing products, adding items to cart, and completing purchases. Create microservices for product catalog, shopping cart, and order fulfillment. Use Docker Compose for deployment.
-4. **ERP System:** Develop an ERP system with user scenarios for managing invoices, processing orders, and tracking inventory. Implement microservices for accounting, sales, and inventory management. Use Beyond-The-Labs technologies such as GraphQL for API queries.
-5. **Logistics Management System:** Create a logistics management system with user scenarios for tracking shipments, managing warehouses, and optimizing delivery routes. Design microservices for shipment tracking, warehouse management, and route optimization. Utilize external services for real-time GPS tracking.
+* User Scenarios:
+    * Customers place orders through a mobile app.
+    * Kitchen staff receive orders and prepare food.
+    * Delivery drivers deliver orders to customers.
+* Technologies:
+    * Python, Flask, REST, RabbitMQ, Docker, MySQL
+* BTL Features:
+    * Integration with a third-party payment gateway
+    * Real-time order tracking using GPS
+
+**Idea 2: Patient Health Tracking**
+
+* User Scenarios:
+    * Patients monitor their health data and communicate with healthcare providers.
+    * Healthcare providers track patient progress and provide remote consultations.
+    * Pharmacists manage medication orders and provide patient counseling.
+* Technologies:
+    * Python, Flask, REST, MongoDB, Docker, Twilio
+* BTL Features:
+    * Integration with wearable devices for health data collection
+    * Machine learning algorithms for personalized health recommendations
+
+**Idea 3: E-commerce Marketplace**
+
+* User Scenarios:
+    * Buyers browse and purchase products.
+    * Sellers list products and manage orders.
+    * Admins manage the marketplace and user accounts.
+* Technologies:
+    * Python, Django, REST, PostgreSQL, Docker, Stripe
+* BTL Features:
+    * Integration with an external shipping carrier
+    * Product recommendations based on user purchase history

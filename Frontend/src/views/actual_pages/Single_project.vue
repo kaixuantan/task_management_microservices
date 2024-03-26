@@ -152,6 +152,42 @@
                     </div>
                 </AccordionTab>
             </Accordion>
+
+            <div class="card shadow-1 mt-5">
+                <div class="mb-3">
+                    <div class="mb-3">
+                        <h3 class="font-semibold inline">Ideas&nbsp</h3>
+                        <span class="text-500"
+                            >Powered by Gemini
+                            <img
+                                src="/icons/google-gemini-icon.png"
+                                height="14px"
+                                alt=""
+                        /></span>
+                    </div>
+                    <FileUpload
+                        name="demo[]"
+                        @uploader="onUpload($event)"
+                        accept="application/pdf"
+                        :customUpload="true"
+                        :fileLimit="1"
+                    >
+                        <template #empty>
+                            <p>Drag and drop project PDF here</p>
+                        </template>
+                    </FileUpload>
+                </div>
+                <div>
+                    <h3 class="font-semibold">
+                        Individual Contribution Report
+                    </h3>
+                    <Button
+                        label="Generate"
+                        icon="pi pi-file"
+                        @click="viewProjects(community.groupId)"
+                    />
+                </div>
+            </div>
         </div>
         <div class="col-4">
             <div class="card shadow-1">
@@ -178,43 +214,7 @@
                 </div>
             </div>
 
-            <div class="card shadow-1">
-                <div class="mb-3">
-                    <div class="mb-3">
-                        <h3 class="font-semibold inline">Ideas&nbsp</h3>
-                        <span class="text-500"
-                            >Powered by Gemini
-                            <img
-                                src="/icons/google-gemini-icon.png"
-                                height="14px"
-                                alt=""
-                        /></span>
-                    </div>
-                    <FileUpload
-                        name="demo[]"
-                        url="/api/upload"
-                        @upload="onAdvancedUpload($event)"
-                        accept="application/pdf"
-                        :maxFileSize="1000000"
-                        :auto="true"
-                        :showUploadButton="false"
-                    >
-                        <template #empty>
-                            <p>Drag and drop project PDF here</p>
-                        </template>
-                    </FileUpload>
-                </div>
-                <div>
-                    <h3 class="font-semibold">
-                        Individual Contribution Report
-                    </h3>
-                    <Button
-                        label="Generate"
-                        icon="pi pi-file"
-                        @click="viewProjects(community.groupId)"
-                    />
-                </div>
-            </div>
+            
         </div>
         <!-- 3 cards at the top of the screen -->
     </div>
@@ -262,6 +262,68 @@ export default {
                                     "subGroupId": subGroupId,
                                 }
                             });
+        },
+        async onUpload(event) {
+            // console.log(event);
+            // const file = event.files[0]; // Get the uploaded file
+            // const reader = new FileReader();
+            // reader.onload = function() {
+            //     const arrayBuffer = this.result;
+            //     axios.post(`${env.BASE_URL}/DocAPI_REST/rest/v1/doc/`, arrayBuffer, {
+            //         headers: {
+            //             'Content-Type': 'application/pdf',
+            //             "X-Doc-AppId": env.X_Doc_AppId,
+            //             "X-Doc-Key": env.X_Doc_Key,
+            //         }
+            //     })
+            //     .then(response => {
+            //         console.log(response);
+            //     })
+            //     .catch(error => {
+            //         console.error(error);
+            //     });
+            // }
+            // reader.readAsArrayBuffer(file);
+            console.log(event);
+            const file = event.files[0]; // Get the uploaded file
+            try {
+                const base64String = await this.processFile(file);
+                const response = await this.uploadFile(base64String);
+                console.log(response);
+            } catch (error) {
+                console.error(error);
+            }
+        },
+        processFile(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = function() {
+                    let base64String = this.result;
+                    base64String = base64String.replace('data:application/pdf;base64,', ''); // Remove the prefix
+                    resolve(base64String);
+                }
+                reader.onerror = reject;
+                reader.readAsDataURL(file); // Read the file as a base64 string
+            });
+        },
+        async uploadFile(base64String) {
+            const data = {
+                document: base64String,
+                // Add other parameters here
+                subGroupId: this.$route.query.subGroupId,
+            };
+            try {
+                let response = await axios.post(`${env.BASE_URL}/DocAPI_REST/rest/v1/doc/`, data, {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        "X-Doc-AppId": env.X_Doc_AppId,
+                        "X-Doc-Key": env.X_Doc_Key,
+                    }
+                });
+                return response.data;
+            } catch (error) {
+                console.error(error);
+            }
         },
     },
     watch: {
