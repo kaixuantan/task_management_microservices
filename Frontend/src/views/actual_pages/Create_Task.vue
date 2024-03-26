@@ -10,7 +10,7 @@ import { ref, computed, onMounted } from 'vue';
 const multiselectAssignees = ref('');
 const subGroupId = ref('');
 //TO EDIT WITH ACTUAL SUBGRPID
-subGroupId.value = 27;
+subGroupId.value = 46;
 // subGroupId.value = sessionStorage.getItem('subGroupId');
 //END OF EDIT
 

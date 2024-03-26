@@ -1,6 +1,6 @@
 # Prerequites (for testing manually)
 - ensure docker desktop software is running on your computer
-- run "docker run -d --hostname esd-rabbit --name rabbitmq-mgmt -p 5672:5672 -p 15672:15672" command
+- run "docker run -d --hostname esd-rabbit --name rabbitmq-mgmt -p 5672:5672 -p 15672:15672 rabbitmq:3-management" command
 - run "python amqp_setup.py" command (amqp_setup.py is in the amqp folder from root, cd into the folder first before running the command)
 - run "python notificationServer.py" command (notificationServer.py is in the Notification folder, cd into the folder first before running the command)
 - run "python logServer.py" command (logServer.py is in the Log folder, cd into the folder first before running the command)
@@ -125,6 +125,8 @@ Base url: https://personal-rc7vnnm9.outsystemscloud.com
     - /task/subgroup/{subGroupId}
   - [GET] Get user's tasks
     - /task/usertask/{userId}
+  - [GET] Get user's tasks by subgroup
+    - /task/usertask/{userId}/subgroup/{subgroupId}
   - [GET] Get user's tasks by status
     - /task/usertaskstatus/{userId}
   - [GET] Get task by status

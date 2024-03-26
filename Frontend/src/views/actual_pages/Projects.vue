@@ -1,7 +1,8 @@
 <template>
     <div class="grid">
         <div class="col-12 flex justify-content-between">
-            <h2 class="mb-0 font-semibold">All projects ({{ selected_community.name.toUpperCase() }})</h2>
+            <h2 class="mb-0 font-semibold" v-if="selected_community">All projects ({{ selected_community.name.toUpperCase() }})</h2>
+            <h2 class="mb-0 font-semibold" v-else>Fetching projects</h2>
             <div class="flex gap-3">
                 <Dropdown
                     v-model="selected_community"
@@ -80,7 +81,7 @@
                         <AvatarGroup>
                             <!-- can change to name as well if name is filled -->
                             <Avatar v-for="(user,idx2) in project.subGroupUsers.slice(0,3)" :key="user.userId"
-                                :label="user.userId.toString()" 
+                                :label="user.username.charAt(0).toUpperCase()" 
                                 size="large"
                                 shape="circle"
                                 :style="{
@@ -150,6 +151,7 @@ export default {
             immediate: true,
             async handler(newVal) {
                 this.loading = true;
+                await this.fetchUserGroups();
                 await this.fetchGroupProjects(this.$route.query.groupId);
                 for (const community of this.communities) {
                     if (community.groupId == newVal) {

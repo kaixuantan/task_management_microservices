@@ -1,56 +1,10 @@
 <script setup>
-import { onMounted, reactive, ref, watch } from "vue";
-import { useLayout } from "@/layout/composables/layout";
 import { useRouter } from 'vue-router';
 
 const router = useRouter(); 
-const { isDarkTheme } = useLayout();
 const redirectToCreateCommunity = () => {
     router.push({ name: 'create community' });
 }
-
-const lineOptions = ref(null);
-const applyLightTheme = () => {
-    lineOptions.value = {
-        plugins: {
-            legend: {
-                labels: {
-                    color: "#495057",
-                },
-            },
-        },
-        scales: {
-            x: {
-                ticks: {
-                    color: "#495057",
-                },
-                grid: {
-                    color: "#ebedef",
-                },
-            },
-            y: {
-                ticks: {
-                    color: "#495057",
-                },
-                grid: {
-                    color: "#ebedef",
-                },
-            },
-        },
-    };
-};
-
-watch(
-    isDarkTheme,
-    (val) => {
-        if (val) {
-            applyDarkTheme();
-        } else {
-            applyLightTheme();
-        }
-    },
-    { immediate: true }
-);
 </script>
 
 <template>
@@ -60,7 +14,7 @@ watch(
             <Button label="Create" icon="pi pi-plus" rounded raised @click="redirectToCreateCommunity"/>
         </div>
         <!-- 3 cards at the top of the screen -->
-        <div class="xl:col-4" v-for="n in 3" v-if="communities.length == 0">
+        <div class="xl:col-4" v-for="n in 3" v-if="communities.length === 0">
             <div class="border-round border-1 surface-border p-4 surface-card shadow-1">
                 <div class="flex mb-3 gap-3">
                     <Skeleton shape="circle" size="4rem" class="mr-2"></Skeleton>
@@ -140,6 +94,7 @@ export default {
         }
     },
     async created() {
+        await this.fetchUserGroups();
     },
 };
 </script>

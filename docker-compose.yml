@@ -10,6 +10,9 @@ services:
   
   amqp:
     build: ./SimpleMicroservices/amqp
+    image: kelynwong/amqp
+    env_file:
+      - ./SimpleMicroservices/amqp/.env
     ports:
       - "8000:8000"
     depends_on:
@@ -17,6 +20,9 @@ services:
   
   log:
     build: ./SimpleMicroservices/log
+    image: kelynwong/log
+    env_file:
+      - ./SimpleMicroservices/log/.env
     ports:
       - "8001:8001"
     depends_on:
@@ -25,6 +31,9 @@ services:
 
   notification:
     build: ./SimpleMicroservices/notification
+    image: kelynwong/notification
+    env_file:
+      - ./SimpleMicroservices/notification/.env
     ports:
       - "8002:8002"
     depends_on:
