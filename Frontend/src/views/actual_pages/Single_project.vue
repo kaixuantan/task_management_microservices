@@ -1,5 +1,6 @@
 <template>
     <div class="grid">
+        <Toast position="bottom-right" group="br" />
         <div class="col-12 flex justify-content-between pb-0">
             <h2 class="mb-0 font-semibold" v-if="selected_project">{{ selected_project.name }}</h2>
             <h2 class="mb-0 font-semibold" v-else>Fetching project...</h2>
@@ -209,9 +210,9 @@
                     <p class="font-medium">Fetching project...</p>
                 </div>
             </div>
-
-            
         </div>
+
+        <Button @click="test">test</Button>
         <!-- 3 cards at the top of the screen -->
     </div>
 </template>
@@ -234,6 +235,16 @@ export default {
         };
     },
     methods: {
+        test() {
+            console.log("i am working");
+            this.$toast.add({
+                severity: "success",
+                summary: "Success",
+                detail: "This is a test",
+                group: "br",
+               
+            });
+        },
         async fetchProjectTasks(subGroupId) {
             try {
                 const response = await axios.get(
@@ -260,31 +271,30 @@ export default {
                             });
         },
         async onUpload(event) {
-            // console.log(event);
-            // const file = event.files[0]; // Get the uploaded file
-            // const reader = new FileReader();
-            // reader.onload = function() {
-            //     const arrayBuffer = this.result;
-            //     axios.post(`${env.BASE_URL}/DocAPI_REST/rest/v1/doc/`, arrayBuffer, {
-            //         headers: {
-            //             'Content-Type': 'application/pdf',
-            //             "X-Doc-AppId": env.X_Doc_AppId,
-            //             "X-Doc-Key": env.X_Doc_Key,
-            //         }
-            //     })
-            //     .then(response => {
-            //         console.log(response);
-            //     })
-            //     .catch(error => {
-            //         console.error(error);
-            //     });
-            // }
-            // reader.readAsArrayBuffer(file);
             console.log(event);
             const file = event.files[0]; // Get the uploaded file
             try {
                 const base64String = await this.processFile(file);
                 const response = await this.uploadFile(base64String);
+                
+                console.log(response);
+                if (response.Result.Success) {
+                    this.$toast.add({
+                        severity: "success",
+                        summary: "Success",
+                        detail: "File uploaded successfully. An email will be sent once the document is processed.",
+                        life: 5000,
+                        group: 'br',
+                    });
+                } else {
+                    this.$toast.add({
+                        severity: "error",
+                        summary: "Error",
+                        detail: "File upload failed",
+                        life: 3000,
+                        group: 'br',
+                    });
+                }
                 console.log(response);
             } catch (error) {
                 console.error(error);
