@@ -101,7 +101,8 @@ def get_subgroups_of_group():
 def notify_admin():
     user_id = request.json.get('userId')
     subgroup_id = request.json.get('subGroupId')
-
+    username = request.json.get('username')
+    email = request.json.get('email')
     # # Create a connection and channel to RabbitMQ
     # connection = create_connection()
     # channel = create_channel(connection)
@@ -116,8 +117,10 @@ def notify_admin():
         if subgroup_response.json()['SubGroup']['size'] == len(subgroup_response.json()['SubGroup']['subGroupUsers']) :
             return jsonify({'message': 'Subgroup is full'}), 400
 
+        groupId = subgroup_response.json()['SubGroup']['groupId'] 
+
         # 2. Call [PUT] update subgroup API from subgroup microservice to add user into the subgroup
-        update_subgroup_response = requests.put(f'{subgroup_microservice_base_url}/enrol/{subgroup_id}', json={'userId': user_id}, headers={"X-SubGroup-AppId": sub_group_credentials["sub_group_app_id"], "X-SubGroup-Key": sub_group_credentials["sub_group_api_key"]})
+        update_subgroup_response = requests.put(f'{subgroup_microservice_base_url}/enrol/{subgroup_id}', json={'userId': user_id, 'subGroupId':subgroup_id, 'username': username, 'email': email}, headers={"X-SubGroup-AppId": sub_group_credentials["sub_group_app_id"], "X-SubGroup-Key": sub_group_credentials["sub_group_api_key"]})
 
 
 
@@ -150,7 +153,13 @@ def notify_admin():
         connection.close()
 
         # 4. If all users in group have been enrolled, publish all user enrollment event to email_queue
-        if all(user['enrolled'] for user in update_subgroup_response.json()['users']):
+        # if all(user['enrolled'] for user in update_subgroup_response.json()['users']):
+        count = 0
+        group_subgroup_response = requests.get(f'{subgroup_microservice_base_url}/groupsubgroup/{groupId}', headers={"X-SubGroup-AppId": sub_group_credentials["sub_group_app_id"], "X-SubGroup-Key": sub_group_credentials["sub_group_api_key"]})
+        for subgroup in group_subgroup_response.json()['GroupSubGroup']['subGroups']:
+            if subgroup['size'] == len(subgroup['subGroupUsers']):
+                count += 1
+        if count == len(group_subgroup_response.json()['GroupSubGroup']['subGroups']):
             # channel.basic_publish(exchange=exchangename, routing_key=routing_keys[0], body="All users in group have been enrolled")
 
             # Connect to RabbitMQ
@@ -190,5 +199,4 @@ def notify_admin():
         return jsonify({'message': 'User enrollment failed'}), 400
     
 if __name__ == '__main__':
-    app.run(debug=True)
-    # app.run(host="0.0.0.0", port=5009, debug=True)
+    app.run(host="0.0.0.0", port=5009, debug=True)
