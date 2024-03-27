@@ -2,9 +2,13 @@ from flask import Flask, jsonify
 from flask_cors import CORS
 from flask import request
 import json
-from process_pdf import process_pdf
 import requests
 import os
+
+from process_pdf import process_pdf
+from send_amqp import send_log, send_notif
+from get_users_email import get_users_email
+
 from dotenv import load_dotenv
 load_dotenv()
 
@@ -49,6 +53,10 @@ def upload_file(subGroupId, fileType, fileData):
         else:
             url = "https://personal-rc7vnnm9.outsystemscloud.com/DocAPI_REST/rest/v1/doc/"
             response = requests.post(url, headers=headers, data=json.dumps(fileData))
+        
+        # Notification and Logging
+        if fileType == "md":
+            notify_users(subGroupId)
         return response.json()
     except Exception as error:
         print(error)
@@ -68,5 +76,10 @@ def check_file_exist(subGroupId, fileType):
     else:
         return None
 
+def notify_users(subGroupId):
+    emails = get_users_email(subGroupId)
+    for email in emails:
+        send_notif(email, "Project summary and ideas generated successfully!", "Head to the project page to view the details. Feel free to Upload a new PDF file to generate the response again. \n Disclaimer: Content generated using AI, please check for accuracy.")
+    
 if __name__ == '__main__':
     app.run(debug=True)
