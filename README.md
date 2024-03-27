@@ -12,3 +12,7 @@ after cloning repo, run npm install
 
 to run frontend: esd > frontend > npm run dev
 to run task complex microservice: esd > complexmicroservices > task > node index.js
+
+In root folder
+1. run "docker compose build"
+2. run "docker compose up"
