@@ -60,7 +60,5 @@ def send_message(channel, routing_key, message):
     )
 
     print(f"Message sent to the exchange '{rabbitmq_exchange}' with routing key '{routing_key}'.")
-
-
-# Close the connection
-connection.close()
+    # Close the connection
+    connection.close()

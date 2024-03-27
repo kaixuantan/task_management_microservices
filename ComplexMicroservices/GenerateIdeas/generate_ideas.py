@@ -15,19 +15,19 @@ load_dotenv()
 app = Flask(__name__)
 CORS(app)
 
-@app.route('/ideas/generate/<subGroupId>', methods=['GET'])
-def generate_ideas(subGroupId):
+@app.route('/ideas/generate/<subGroupId>/<userId>', methods=['GET'])
+def generate_ideas(subGroupId, userId):
     # Here you can add the functionality you want.
     # For example, let's return a simple JSON response.
     
     text = process_pdf(subGroupId)
-    print(text)
+    # print(text)
     data = {
                 "document": text,
                 "subGroupId": subGroupId,
                 "type": "md",
             }
-    return upload_file(subGroupId, "md", data)
+    return upload_file(subGroupId, "md", data, userId)
     
 
 @app.route('/ideas/upload', methods=['POST'])
@@ -38,7 +38,7 @@ def upload():
     
     return upload_file(subGroupId, fileType, data)
 
-def upload_file(subGroupId, fileType, fileData):
+def upload_file(subGroupId, fileType, fileData, userId):
     headers = {
         'Content-Type': 'application/json',
         "X-Doc-AppId": os.getenv("X_Doc_AppId"),
@@ -53,14 +53,21 @@ def upload_file(subGroupId, fileType, fileData):
         else:
             url = "https://personal-rc7vnnm9.outsystemscloud.com/DocAPI_REST/rest/v1/doc/"
             response = requests.post(url, headers=headers, data=json.dumps(fileData))
-        
-        # Notification and Logging
-        if fileType == "md":
-            notify_users(subGroupId)
-        return response.json()
     except Exception as error:
-        print(error)
+        print(f"Error: {error}")
         return {"error": "Failed to upload file"}
+    
+    if response and fileType == "md":
+        # Notification and Logging
+        try:
+            # notify_users(subGroupId)
+            send_log(subGroupId, userId, "Generate ideas", f"{userId} generated ideas and project summary for {subGroupId}")
+        except Exception as error:
+            print(f"Error: {error}")
+            return {"error": "Failed to send notification / logs"}
+    
+    if response:
+        return response.json()
 
 def check_file_exist(subGroupId, fileType):
     url = f"https://personal-rc7vnnm9.outsystemscloud.com/DocAPI_REST/rest/v1/doc/subgrouptype/{subGroupId}"

@@ -19,7 +19,7 @@ def process_pdf(subGroupId):
         reader = PdfReader(BytesIO(pdf_data))
         number_of_pages = len(reader.pages)
         text = ''.join([page.extract_text() for page in reader.pages])
-        print(text[:2155])
+        # print(text[:2155])
 
         model = genai.GenerativeModel('gemini-pro')
 

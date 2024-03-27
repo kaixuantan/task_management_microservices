@@ -322,7 +322,7 @@ export default {
         },
         send_gemini() {
             try {
-                let response = axios.get(`http://localhost:5000/ideas/generate/${this.$route.query.subGroupId}`, {
+                let response = axios.get(`http://localhost:5000/ideas/generate/${this.$route.query.subGroupId}/${this.userId}`, {
                     headers: {
                         'Content-Type': 'application/json',
                     }
