@@ -35,9 +35,9 @@
                                     {{ task.createdByUsername }}
                                 </p>
                                 <p class="font-semibold mb-0">Description:</p>
-                                <p class="text-justify">
+                                <div class="text-justify overflow-hidden text-overflow-ellipsis mb-2">
                                     {{ task.description }}
-                                </p>
+                                </div>
                                 <div class="mb-2">
                                     <span class="font-semibold">Due: </span
                                     ><span>{{
@@ -80,9 +80,9 @@
                                     {{ task.createdByUsername }}
                                 </p>
                                 <p class="font-semibold mb-0">Description:</p>
-                                <p class="text-justify">
+                                <div class="text-justify overflow-hidden text-overflow-ellipsis mb-2">
                                     {{ task.description }}
-                                </p>
+                                </div>
                                 <div class="mb-2">
                                     <span class="font-semibold">Due: </span
                                     ><span>{{
@@ -123,9 +123,9 @@
                                     {{ task.createdByUsername }}
                                 </p>
                                 <p class="font-semibold mb-0">Description:</p>
-                                <p class="text-justify">
+                                <div class="text-justify overflow-hidden text-overflow-ellipsis mb-2">
                                     {{ task.description }}
-                                </p>
+                                </div>
                                 <div class="mb-2">
                                     <span class="font-semibold">Due: </span
                                     ><span>{{
@@ -182,7 +182,8 @@
                     <h3 class="font-semibold">
                         Project summary & Ideas
                     </h3>
-                    
+                    <div v-html="gemini_response" v-if="gemini_response" class="text-lg"></div>
+                    <p class="font-medium" v-else>No PDF uploaded yet!</p> 
                 </div>
             </div>
         </div>
@@ -211,8 +212,6 @@
                 </div>
             </div>
         </div>
-
-        <Button @click="test">test</Button>
         <!-- 3 cards at the top of the screen -->
     </div>
 </template>
@@ -220,6 +219,8 @@
 <script>
 import sharedMixin from "@/sharedMixin";
 import axios from "axios";
+import { marked } from "marked";
+import DOMPurify from 'dompurify';
 
 export default {
     mixins: [sharedMixin],
@@ -232,19 +233,10 @@ export default {
             tasks_in_progress: [],
             tasks_new: [],
             tasks_completed: [],
+            gemini_response: "",
         };
     },
     methods: {
-        test() {
-            console.log("i am working");
-            this.$toast.add({
-                severity: "success",
-                summary: "Success",
-                detail: "This is a test",
-                group: "br",
-               
-            });
-        },
         async fetchProjectTasks(subGroupId) {
             try {
                 const response = await axios.get(
@@ -276,14 +268,14 @@ export default {
             try {
                 const base64String = await this.processFile(file);
                 const response = await this.uploadFile(base64String);
-                
+                 
                 console.log(response);
                 if (response.Result.Success) {
+                    this.send_gemini();
                     this.$toast.add({
                         severity: "success",
                         summary: "Success",
-                        detail: "File uploaded successfully. An email will be sent once the document is processed.",
-                        life: 5000,
+                        detail: "File uploaded successfully.\nAn email will be sent once the document is processed.",
                         group: 'br',
                     });
                 } else {
@@ -295,7 +287,6 @@ export default {
                         group: 'br',
                     });
                 }
-                console.log(response);
             } catch (error) {
                 console.error(error);
             }
@@ -315,15 +306,13 @@ export default {
         async uploadFile(base64String) {
             const data = {
                 document: base64String,
-                // Add other parameters here
                 subGroupId: this.$route.query.subGroupId,
+                type: "pdf",
             };
             try {
-                let response = await axios.post(`${env.BASE_URL}/DocAPI_REST/rest/v1/doc/`, data, {
+                let response = await axios.post(`http://localhost:5000/ideas/upload`, data, {
                     headers: {
                         'Content-Type': 'application/json',
-                        "X-Doc-AppId": env.X_Doc_AppId,
-                        "X-Doc-Key": env.X_Doc_Key,
                     }
                 });
                 return response.data;
@@ -331,6 +320,40 @@ export default {
                 console.error(error);
             }
         },
+        send_gemini() {
+            try {
+                let response = axios.get(`http://localhost:5000/ideas/generate/${this.$route.query.subGroupId}`, {
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                })
+                .then(response => {
+                    console.log(response.data);
+                })
+            } catch (error) {
+                console.error(error);
+            }
+        },
+        async fetch_gemini_response() {
+            try {
+                let response = await axios.get(`${env.BASE_URL}/DocAPI_REST/rest/v1/doc/subgrouptype/${this.$route.query.subGroupId}`, {
+                    headers: {
+                        "Content-Type": "application/json",
+                        "X-Doc-AppId": env.X_Doc_AppId,
+                        "X-Doc-Key": env.X_Doc_Key,
+                        "type": "md",
+                    }
+                });
+                console.log(response);
+                if (response.data.Result.Success) {
+                    const md_text = response.data.DocAPI.document;
+                    const formatted_html = DOMPurify.sanitize(marked(md_text));
+                    this.gemini_response = formatted_html;
+                }
+            } catch (error) {
+                console.error(error);
+            }
+        }
     },
     watch: {
         "$route.query.subGroupId": {
@@ -345,13 +368,14 @@ export default {
                     }
                 }
                 await this.fetchProjectTasks(this.$route.query.subGroupId);
+                await this.fetch_gemini_response();
                 this.tasks_in_progress = [];
                 this.tasks_new = [];
                 this.tasks_completed = [];
                 this.sortTasksByStatus(this.proj_tasks);
                 this.loading = false;
-                console.log(this.selected_project);
-                console.log(this.user_projects);
+                // console.log(this.selected_project);
+                // console.log(this.user_projects);
             },
         },
         selected_project: {

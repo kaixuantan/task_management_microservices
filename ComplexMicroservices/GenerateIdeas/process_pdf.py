@@ -10,10 +10,10 @@ load_dotenv()
 
 GOOGLE_API_KEY=os.getenv('GEMINI_API_KEY')
 genai.configure(api_key=GOOGLE_API_KEY)
-print(GOOGLE_API_KEY)
 
-def process_pdf(docId):
-    pdf_data = download_pdf(docId)
+def process_pdf(subGroupId):
+    print(f"process_pdf {subGroupId} is running")
+    pdf_data = download_pdf(subGroupId)
 
     if pdf_data:
         reader = PdfReader(BytesIO(pdf_data))
@@ -36,7 +36,8 @@ def process_pdf(docId):
         elapsed_time = end_time - start_time
 
         # Open a file in write mode ('w') and write the response text to it
-        with open('gemini_response.md', 'w') as file:
-            file.write(f"{response.text}")
+        # with open('./gemini_response.md', 'w') as file:
+        #     file.write(f"{response.text}")
 
         print(f"Time taken: {elapsed_time} seconds")
+        return response.text
