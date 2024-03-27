@@ -33,6 +33,11 @@
             </div>
         </div>
 
+        <div v-if="grp_projects.length == 0">
+            <div class="col-12">
+                <h3 class="font-semibold">No projects to show!</h3>
+            </div>
+        </div>
         <div class="xl:col-4" v-for="(project, idx) in grp_projects" v-else>
             <Card style="overflow: hidden" class="shadow-2">
                 <template #header>
@@ -136,7 +141,9 @@ export default {
                         },
                     }
                 );
-                this.grp_projects = response.data.GroupSubGroup.subGroups;
+                if (response.data.Result.Success) {
+                    this.grp_projects = response.data.GroupSubGroup.subGroups;
+                }
                 // console.log(this.projects);
             } catch (error) {
                 console.error(error);
@@ -151,6 +158,7 @@ export default {
             immediate: true,
             async handler(newVal) {
                 this.loading = true;
+                await this.fetchUserGroups();
                 await this.fetchGroupProjects(this.$route.query.groupId);
                 for (const community of this.communities) {
                     if (community.groupId == newVal) {

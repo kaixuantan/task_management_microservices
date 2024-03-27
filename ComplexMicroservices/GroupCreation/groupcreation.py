@@ -150,7 +150,7 @@ def processGroupCreation(group_info,subgroup_info,users_id_list):
         subgroup_headers = {'X-SubGroup-AppId': request.headers.get('X-SubGroup-AppId'), "X-SubGroup-Key": request.headers.get('X-SubGroup-Key')}
         # create subgroup
         subgroup_result = invoke_http(subgroup_URL, method="POST", json=subgroup_info[i], headers=subgroup_headers)
-        # print(subgroup_result)
+        print(subgroup_result)
         subgroup_result_status = subgroup_result["Result"]
         subGroupId = subgroup_result["SubGroupId"]
         print("subgroup_result:", subgroup_result_status, '\n') # creation successful

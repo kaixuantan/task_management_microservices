@@ -1,7 +1,9 @@
 <template>
     <div class="grid">
+        <Toast position="bottom-right" group="br" />
         <div class="col-12 flex justify-content-between pb-0">
-            <h2 class="mb-0 font-semibold">{{ selected_project.name }}</h2>
+            <h2 class="mb-0 font-semibold" v-if="selected_project">{{ selected_project.name }}</h2>
+            <h2 class="mb-0 font-semibold" v-else>Fetching project...</h2>
             <Dropdown
                 v-model="selected_project"
                 :options="user_projects"
@@ -33,9 +35,9 @@
                                     {{ task.createdByUsername }}
                                 </p>
                                 <p class="font-semibold mb-0">Description:</p>
-                                <p class="text-justify">
+                                <div class="text-justify overflow-hidden text-overflow-ellipsis mb-2">
                                     {{ task.description }}
-                                </p>
+                                </div>
                                 <div class="mb-2">
                                     <span class="font-semibold">Due: </span
                                     ><span>{{
@@ -78,9 +80,9 @@
                                     {{ task.createdByUsername }}
                                 </p>
                                 <p class="font-semibold mb-0">Description:</p>
-                                <p class="text-justify">
+                                <div class="text-justify overflow-hidden text-overflow-ellipsis mb-2">
                                     {{ task.description }}
-                                </p>
+                                </div>
                                 <div class="mb-2">
                                     <span class="font-semibold">Due: </span
                                     ><span>{{
@@ -121,9 +123,9 @@
                                     {{ task.createdByUsername }}
                                 </p>
                                 <p class="font-semibold mb-0">Description:</p>
-                                <p class="text-justify">
+                                <div class="text-justify overflow-hidden text-overflow-ellipsis mb-2">
                                     {{ task.description }}
-                                </p>
+                                </div>
                                 <div class="mb-2">
                                     <span class="font-semibold">Due: </span
                                     ><span>{{
@@ -151,28 +153,8 @@
                     </div>
                 </AccordionTab>
             </Accordion>
-        </div>
-        <div class="col-4">
-            <div class="card shadow-1">
-                <div
-                    class="flex justify-content-between align-items-center mb-3"
-                >
-                    <h3 class="font-semibold m-0">About</h3>
-                    <Button text rounded>
-                        <i class="pi pi-pencil text-500 text-xl"></i>
-                    </Button>
-                </div>
-                <p class="font-medium text-justify">
-                    {{ selected_project.description }}
-                </p>
-                <h3 class="font-semibold mt-0">Members</h3>
-                <div class="flex align-items-center gap-3" v-for="(user,idx) in selected_project.subGroupUsers">
-                    <!-- image="/images/avatars/panda.png" -->
-                    <span class="font-medium text-lg">{{ idx+1 }}. {{ user.username.toUpperCase() }}</span>
-                </div>
-            </div>
 
-            <div class="card shadow-1">
+            <div class="card shadow-1 mt-5">
                 <div class="mb-3">
                     <div class="mb-3">
                         <h3 class="font-semibold inline">Ideas&nbsp</h3>
@@ -186,12 +168,10 @@
                     </div>
                     <FileUpload
                         name="demo[]"
-                        url="/api/upload"
-                        @upload="onAdvancedUpload($event)"
+                        @uploader="onUpload($event)"
                         accept="application/pdf"
-                        :maxFileSize="1000000"
-                        :auto="true"
-                        :showUploadButton="false"
+                        :customUpload="true"
+                        :fileLimit="1"
                     >
                         <template #empty>
                             <p>Drag and drop project PDF here</p>
@@ -200,13 +180,35 @@
                 </div>
                 <div>
                     <h3 class="font-semibold">
-                        Individual Contribution Report
+                        Project summary & Ideas
                     </h3>
-                    <Button
-                        label="Generate"
-                        icon="pi pi-file"
-                        @click="viewProjects(community.groupId)"
-                    />
+                    <div v-html="gemini_response" v-if="gemini_response" class="text-lg"></div>
+                    <p class="font-medium" v-else>No PDF uploaded yet!</p> 
+                </div>
+            </div>
+        </div>
+        <div class="col-4">
+            <div class="card shadow-1">
+                <div
+                    class="flex justify-content-between align-items-center mb-3"
+                >
+                    <h3 class="font-semibold m-0">About</h3>
+                    <Button text rounded>
+                        <i class="pi pi-pencil text-500 text-xl"></i>
+                    </Button>
+                </div>
+                <div v-if="selected_project">
+                    <p class="font-medium text-justify">
+                        {{ selected_project.description }}
+                    </p>
+                    <h3 class="font-semibold mt-0">Members</h3>
+                    <div class="flex align-items-center gap-3" v-for="(user,idx) in selected_project.subGroupUsers">
+                        <!-- image="/images/avatars/panda.png" -->
+                        <span class="font-medium text-lg">{{ idx+1 }}. {{ user.username.toUpperCase() }}</span>
+                    </div>
+                </div>
+                <div v-else>
+                    <p class="font-medium">Fetching project...</p>
                 </div>
             </div>
         </div>
@@ -217,6 +219,8 @@
 <script>
 import sharedMixin from "@/sharedMixin";
 import axios from "axios";
+import { marked } from "marked";
+import DOMPurify from 'dompurify';
 
 export default {
     mixins: [sharedMixin],
@@ -229,6 +233,7 @@ export default {
             tasks_in_progress: [],
             tasks_new: [],
             tasks_completed: [],
+            gemini_response: "",
         };
     },
     methods: {
@@ -257,12 +262,105 @@ export default {
                                 }
                             });
         },
+        async onUpload(event) {
+            console.log(event);
+            const file = event.files[0]; // Get the uploaded file
+            try {
+                const base64String = await this.processFile(file);
+                const response = await this.uploadFile(base64String);
+                 
+                console.log(response);
+                if (response.Result.Success) {
+                    this.send_gemini();
+                    this.$toast.add({
+                        severity: "success",
+                        summary: "Success",
+                        detail: "File uploaded successfully.\nAn email will be sent once the document is processed.",
+                        group: 'br',
+                    });
+                } else {
+                    this.$toast.add({
+                        severity: "error",
+                        summary: "Error",
+                        detail: "File upload failed",
+                        life: 3000,
+                        group: 'br',
+                    });
+                }
+            } catch (error) {
+                console.error(error);
+            }
+        },
+        processFile(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = function() {
+                    let base64String = this.result;
+                    base64String = base64String.replace('data:application/pdf;base64,', ''); // Remove the prefix
+                    resolve(base64String);
+                }
+                reader.onerror = reject;
+                reader.readAsDataURL(file); // Read the file as a base64 string
+            });
+        },
+        async uploadFile(base64String) {
+            const data = {
+                document: base64String,
+                subGroupId: this.$route.query.subGroupId,
+                type: "pdf",
+            };
+            try {
+                let response = await axios.post(`http://localhost:5000/ideas/upload`, data, {
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                });
+                return response.data;
+            } catch (error) {
+                console.error(error);
+            }
+        },
+        send_gemini() {
+            try {
+                let response = axios.get(`http://localhost:5000/ideas/generate/${this.$route.query.subGroupId}`, {
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                })
+                .then(response => {
+                    console.log(response.data);
+                })
+            } catch (error) {
+                console.error(error);
+            }
+        },
+        async fetch_gemini_response() {
+            try {
+                let response = await axios.get(`${env.BASE_URL}/DocAPI_REST/rest/v1/doc/subgrouptype/${this.$route.query.subGroupId}`, {
+                    headers: {
+                        "Content-Type": "application/json",
+                        "X-Doc-AppId": env.X_Doc_AppId,
+                        "X-Doc-Key": env.X_Doc_Key,
+                        "type": "md",
+                    }
+                });
+                console.log(response);
+                if (response.data.Result.Success) {
+                    const md_text = response.data.DocAPI.document;
+                    const formatted_html = DOMPurify.sanitize(marked(md_text));
+                    this.gemini_response = formatted_html;
+                }
+            } catch (error) {
+                console.error(error);
+            }
+        }
     },
     watch: {
         "$route.query.subGroupId": {
             immediate: true,
             async handler(newVal) {
                 this.loading = true;
+                await this.fetchUserProjects();
                 for (const proj of this.user_projects) {
                     if (proj.subGroupId == newVal) {
                         this.selected_project = proj;
@@ -270,13 +368,14 @@ export default {
                     }
                 }
                 await this.fetchProjectTasks(this.$route.query.subGroupId);
+                await this.fetch_gemini_response();
                 this.tasks_in_progress = [];
                 this.tasks_new = [];
                 this.tasks_completed = [];
                 this.sortTasksByStatus(this.proj_tasks);
                 this.loading = false;
-                console.log(this.selected_project);
-                console.log(this.user_projects);
+                // console.log(this.selected_project);
+                // console.log(this.user_projects);
             },
         },
         selected_project: {
