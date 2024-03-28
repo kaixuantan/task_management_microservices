@@ -1,4 +1,4 @@
-from flask import Flask, jsonify
+from flask import Flask
 from flask_cors import CORS
 from flask import request
 import json
@@ -89,4 +89,4 @@ def notify_users(subGroupId):
         send_notif(email, "Project summary and ideas generated successfully!", "Head to the project page to view the details. Feel free to Upload a new PDF file to generate the response again. \n Disclaimer: Content generated using AI, please check for accuracy.")
     
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(host='0.0.0.0',port=5000, debug=True)

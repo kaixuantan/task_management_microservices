@@ -18,7 +18,6 @@ smtp_username = os.getenv('SMTP_USERNAME')
 smtp_password = os.getenv('SMTP_PASSWORD')
 
 print(f"RabbitMQ Host: {rabbitmq_host}")
-
 # Connect to RabbitMQ
 connection = pika.BlockingConnection(pika.ConnectionParameters
                                      (host=rabbitmq_host, port=rabbitmq_port,

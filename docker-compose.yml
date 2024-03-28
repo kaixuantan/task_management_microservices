@@ -42,41 +42,15 @@ services:
       - log
 
   # Complex Microservices
-  group-creation:
-    build: ./ComplexMicroservices/GroupCreation
-    ports:
-      - "8003:8003"
-    depends_on:
-      - rabbitmq
-      - amqp
-      - log
-      - notification
-
-  enrollment:
-    build: ./ComplexMicroservices/enrollment
-    ports:
-      - "8004:8004"
-    depends_on:
-      - rabbitmq
-      - amqp
-      - log
-      - notification
-
   idea:
     build: ./ComplexMicroservices/GenerateIdeas
     ports:
-      - "8005:8005"
+      - "5000:5000"
+    env_file:
+      - ./ComplexMicroservices/GenerateIdeas/.env
     depends_on:
       - rabbitmq
       - amqp
       - log
       - notification
-
-  task:
-    build: ./ComplexMicroservices/Task
-    ports:
-      - "8006:8006"
-    depends_on:
-      - rabbitmq
-      - amqp
-      - log
+    restart: on-failure
