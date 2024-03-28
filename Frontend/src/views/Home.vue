@@ -132,7 +132,6 @@ const calAttributes = ref([
 
                 <div class="col-12 flex justify-content-between">
                     <h2 class="mb-0 font-semibold">My Tasks</h2>
-                    <Button label="Add task" icon="pi pi-plus" rounded raised @click="redirectToCreateTask"/>
                 </div>
                 <div class="col-12">
                     <TabView>
@@ -339,9 +338,7 @@ export default {
         };
     },
     methods: {
-        redirectToCreateTask() {
-            this.$router.push("/create-task");
-        },
+
     },
     computed: {
         sideMenuActive() {

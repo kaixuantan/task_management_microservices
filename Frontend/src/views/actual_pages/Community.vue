@@ -44,7 +44,7 @@ console.log(userole)
                             </div>
                         </div>
                         <Button text>
-                            <i class="pi pi-pencil text-500 text-xl" v-if="userole == 'admin'" @click="editcomunity"></i>
+                            <i class="pi pi-pencil text-500 text-xl" v-if="userole == 'admin'" @click="editcomunity(community)"></i>
                         </Button>
                     </div>
                     <img alt="user header" src="https://cdn-icons-png.freepik.com/512/2592/2592465.png" style="width: 50%; height: 50%; object-fit: contain; margin: 0 auto; display: block;" />
@@ -64,6 +64,20 @@ console.log(userole)
             </Card>
         </div>
     </div>
+    <Dialog v-model:visible="editDialog" :style="{ width: '450px' }" header="Edit Community" :modal="true" class="p-fluid">
+  <div class="field">
+    <label for="name">Community Name</label>
+    <InputText id="name" v-model.trim="selectedCommunity.name" required="true" autofocus />
+  </div>
+  <div class="field">
+    <label for="description">Description</label>
+    <Textarea id="description" v-model="selectedCommunity.description" required="true" rows="3" cols="20" />
+  </div>
+  <template #footer>
+    <Button label="Cancel" icon="pi pi-times" text @click="editDialog = false" />
+    <Button label="Save" icon="pi pi-check" text @click="saveCommunity" />
+  </template>
+</Dialog>
 </template>
 
 <script>
@@ -74,19 +88,62 @@ export default {
     mixins: [sharedMixin],
     data() {
         return {
+    editDialog: false,
+    selectedCommunity: null,
         };
     },
     methods: {
         viewProjects(groupId) {
             this.$router.push({ name: 'projects', query: { groupId: groupId } });
         },
-        editcomunity(){
+        editcomunity(community){
+        this.selectedCommunity = { ...community, groupId: community.groupId };
+        this.editDialog = true;
+        },
+        async saveCommunity() {
+  try {
+    // Update the community
+    console.log(this.selectedCommunity)
+    let response = await axios.put(
+      `${env.BASE_URL}/GroupAPI_REST/rest/v1/group/${this.selectedCommunity.groupId}`,
+      {
+        createdById: this.selectedCommunity.createdById,
+        name: this.selectedCommunity.name,
+        createdDateTime: this.selectedCommunity.createdDateTime,
+        description: this.selectedCommunity.description,
+        size: this.selectedCommunity.size,
 
-        }
+      },
+      {
+        headers: {
+          "X-Group-AppId": env.X_Group_AppId,
+          "X-Group-Key": env.X_Group_Key,
+        },
+      }
+    );
+    console.log(response.data);
+    
+    // Close the edit dialog
+    this.editDialog = false;
+    
+    // Refresh the list of communities
+    await this.fetchUserGroups();
+    
+    // Show a success toast message
+    this.$toast.add({ severity: 'success', summary: 'Successful', detail: 'Community updated', life: 3000 });
+  } 
+  catch (error) {
+    console.error('Error updating community:', error);
+    // Show an error toast message
+    this.$toast.add({ severity: 'error', summary: 'Error', detail: 'Failed to update community', life: 3000 });
+  }
+},
     },
     async created() {
         await this.fetchUserGroups();
     },
+
+
 };
 </script>
 

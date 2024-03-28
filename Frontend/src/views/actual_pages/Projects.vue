@@ -67,8 +67,8 @@
                     </div>
                     <img
                         alt="user header"
-                        src="https://espanol.verizon.com/learning/_next/static/images/87c8be7b206ab401b295fd1d21620b79.jpg"
-                        style="width: 100%; height: 100%; object-fit: contain"
+                        src="https://cdn-icons-png.freepik.com/512/4946/4946348.png"
+                        style="width: 50%; height: 50%; object-fit: contain; margin: 0 auto; display: block;"
                     />
                 </template>
                 <template #title>Members: {{ project.subGroupUsers.length }} / {{ project.size }}</template>
