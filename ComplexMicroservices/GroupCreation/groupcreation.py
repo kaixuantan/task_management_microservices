@@ -56,7 +56,6 @@ def group_creation():
     # Simple check of input format and data of the request are JSON
     if request.is_json:
         try:
-            print(rabbitmq_host_log)
             group_info = request.get_json()[0] #only name is mandatory
             print("\nReceived a group_description in JSON:", group_info)
             subgroup_info = request.get_json()[1] #only name is mandatory
@@ -77,7 +76,7 @@ def group_creation():
 
             return jsonify({
                 "code": 500,
-                "message": "create_group.py internal error: " + ex_str
+                "message": "groupcreation.py internal error: " + ex_str
             }), 500
 
     # if reached here, not a JSON request.
@@ -95,7 +94,6 @@ def processGroupCreation(group_info,subgroup_info,users_id_list):
     # create a group in group microservice
     group_result = invoke_http(group_URL, method="POST", json=group_info, headers=group_headers)
     # print(group_result)
-    print(group_result)
     group_result_status = group_result["Result"]
     groupId = group_result["GroupId"]
     # print(groupId)
@@ -103,11 +101,11 @@ def processGroupCreation(group_info,subgroup_info,users_id_list):
 
     # get group details 
     unique_group_URL = group_URL + str(groupId)
-    print(unique_group_URL)
+    # print(unique_group_URL)
     group_dict = invoke_http(unique_group_URL, method="GET", headers=group_headers)
-    print(group_dict)
+    # print(group_dict)
     group = group_dict["Group"]
-    print(group)
+    # print(group)
 
     
     # Connect to RabbitMQ
@@ -150,7 +148,7 @@ def processGroupCreation(group_info,subgroup_info,users_id_list):
         subgroup_headers = {'X-SubGroup-AppId': request.headers.get('X-SubGroup-AppId'), "X-SubGroup-Key": request.headers.get('X-SubGroup-Key')}
         # create subgroup
         subgroup_result = invoke_http(subgroup_URL, method="POST", json=subgroup_info[i], headers=subgroup_headers)
-        print(subgroup_result)
+        # print(subgroup_result)
         subgroup_result_status = subgroup_result["Result"]
         subGroupId = subgroup_result["SubGroupId"]
         print("subgroup_result:", subgroup_result_status, '\n') # creation successful
@@ -225,7 +223,7 @@ def processUserAssignment(group,user_id_list,subgroup_namelist):
                 "userId": id,
                 "username": username
             }
-            print(assignee)
+            # print(assignee)
             users_assigned.append(assignee)
 
             user_email = user["email"]
