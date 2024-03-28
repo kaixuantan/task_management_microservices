@@ -3,14 +3,14 @@ from flask_cors import CORS
 
 import os, sys
 
-import requests
+# import requests
 from invokes import invoke_http
 
 import pika
 import json
 from dotenv import load_dotenv
 
-load_dotenv()
+# load_dotenv()
 
 app = Flask(__name__)
 CORS(app)
@@ -22,23 +22,23 @@ subgroup_URL = "https://personal-rc7vnnm9.outsystemscloud.com/SubGroupAPI_REST/r
 user_URL = "https://personal-rc7vnnm9.outsystemscloud.com/UserAPI_REST/rest/v1/user/"
 
 # load and get log.env files
-load_dotenv('log.env')
+load_dotenv('/SimpleMicroservices/log/.env')
 rabbitmq_host_log = os.getenv('HOSTNAME')
 rabbitmq_port_log = os.getenv('PORT')
 rabbitmq_exchange_log = os.getenv('EXCHANGE_NAME')
 rabbitmq_exchange_type_log = os.getenv('EXCHANGE_TYPE') 
-rabbitmq_queue_log = os.getenv('QUEUE_NAME_1')
-rabbitmq_routing_key_log = os.getenv('ROUTING_KEY_1') 
+rabbitmq_queue_log = os.getenv('QUEUE_NAME')
+rabbitmq_routing_key_log = os.getenv('ROUTING_KEY') 
 
 # load and get log.env files
-load_dotenv('notif.env')
+load_dotenv('/SimpleMicroservices/notification/.env')
 # RabbitMQ connection details
 rabbitmq_host_notif = os.getenv('HOSTNAME')
 rabbitmq_port_notif = os.getenv('PORT')
 rabbitmq_exchange_notif = os.getenv('EXCHANGE_NAME')
 rabbitmq_exchange_type_notif = os.getenv('EXCHANGE_TYPE') 
-rabbitmq_queue_notif = os.getenv('QUEUE_NAME_2')
-rabbitmq_routing_key_notif = os.getenv('ROUTING_KEY_2')  
+rabbitmq_queue_notif = os.getenv('QUEUE_NAME')
+rabbitmq_routing_key_notif = os.getenv('ROUTING_KEY')  
 
 # Email server details
 smtp_server = os.getenv('SMTP_SERVER')
@@ -96,7 +96,7 @@ def processGroupCreation(group_info,subgroup_info,users_id_list):
     # print(group_result)
     group_result_status = group_result["Result"]
     groupId = group_result["GroupId"]
-    print(groupId)
+    # print(groupId)
     print('group_result:', group_result_status) # creation successful
 
     # get group details 
@@ -146,7 +146,6 @@ def processGroupCreation(group_info,subgroup_info,users_id_list):
     for i in range(len(subgroup_info)): 
         print('\n\n-----Invoking subgroup microservice-----')
         subgroup_headers = {'X-SubGroup-AppId': request.headers.get('X-SubGroup-AppId'), "X-SubGroup-Key": request.headers.get('X-SubGroup-Key')}
-        subgroup_info[i]['groupId'] = groupId
         # create subgroup
         subgroup_result = invoke_http(subgroup_URL, method="POST", json=subgroup_info[i], headers=subgroup_headers)
         # print(subgroup_result)
