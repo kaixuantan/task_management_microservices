@@ -62,7 +62,7 @@
                             </div>
                         </div>
                         <Button text rounded>
-                            <i class="pi pi-pencil text-500 text-xl"></i>
+                            <i class="pi pi-pencil text-500 text-xl" v-if="userrole=='admin'" @click="editproject(project)"></i>
                         </Button>
                     </div>
                     <img
@@ -78,7 +78,7 @@
                     </p>
                 </template>
                 <template #footer>
-                    <div class="flex mt-1 justify-content-between" v-if="!isUserEnrolled(project)">
+                    <div class="flex mt-1 justify-content-between" v-if="!isUserEnrolled(project) && userrole !== 'admin'">
 
                     <!-- v-if="!enrolled" -->
                         <AvatarGroup>
@@ -94,7 +94,9 @@
                             />
                             <Avatar :label="`+${project.subGroupUsers.length - 3}`" shape="circle" size="large" v-if="project.subGroupUsers.length > 3"/>
                         </AvatarGroup>
-                        <Button label="Enrol" @click="enrol(project.subGroupId,userId, selected_community.groupId)"/>
+                        <div class="flex justify-content-center align-items-center ml-4 my-4">
+                        <Button label="Enrol" @click="enrol(project.subGroupId,userId, selected_community.groupId)" style="width: 212px;"/>
+                        </div>
                     </div>
 
                     <!-- v-else -->
@@ -111,6 +113,20 @@
             </Card>
         </div>
     </div>
+    <Dialog v-model:visible="editDialog" :style="{ width: '450px' }" header="Edit Project" :modal="true" class="p-fluid">
+  <div class="field">
+    <label for="name">Project Name</label>
+    <InputText id="name" v-model.trim="selectedproject.name" required="true" autofocus />
+  </div>
+  <div class="field">
+    <label for="description">Description</label>
+    <Textarea id="description" v-model="selectedproject.description" required="true" rows="3" cols="20" />
+  </div>
+  <template #footer>
+    <Button label="Cancel" icon="pi pi-times" text @click="editDialog = false" />
+    <Button label="Save" icon="pi pi-check" text @click="saveproject" />
+  </template>
+</Dialog>
 </template>
 
 <script>
@@ -125,6 +141,9 @@ export default {
             selected_community: null,
             enrolled: false,
             loading: true,
+            userrole: sessionStorage.getItem('role'), 
+            editDialog: false,
+            selectedproject: null,
         };
     },
     methods: {
@@ -183,6 +202,55 @@ export default {
         const userId = sessionStorage.getItem("userid");
         return project.subGroupUsers.some(user => user.userId === parseInt(userId));
     },
+
+    editproject(project){
+        console.log(project)
+        this.selectedproject = { ...project, projectId: project.subGroupId, name: project.name, description: project.description};
+        this.editDialog = true;
+        },
+        async saveproject() {
+  try {
+    // Update the community
+    console.log(this.selectedproject)
+    console.log(this.selectedproject.projectId)
+    console.log(this.selectedproject.name)
+    console.log(this.selectedproject.description)
+    console.log(this.selectedproject.size)
+    console.log(this.selectedproject.subGroupUsers)
+    let response = await axios.put(
+      `${env.BASE_URL}/SubGroupAPI_REST/rest/v1/subgroup/${this.selectedproject.projectId}`,
+      {
+        name: this.selectedproject.name,
+        groupId: this.selectedproject.groupId,
+        description: this.selectedproject.description,
+        size: this.selectedproject.size,
+        subGroupUsers: this.selectedproject.subGroupUsers,
+      },
+      {
+        headers: {
+          "X-SubGroup-AppId": env.X_SubGroup_AppId,
+          "X-SubGroup-Key": env.X_SubGroup_Key,
+        },
+      }
+    );
+    console.log(response.data);
+    
+    // Close the edit dialog
+    this.editDialog = false;
+    
+    // Refresh the list of projects
+    await this.fetchGroupProjects(this.selected_community.groupId);
+    alert("Project updated successfully")
+    
+    // Show a success toast message
+    this.$toast.add({ severity: 'success', summary: 'Successful', detail: 'Project updated', life: 3000 });
+  } 
+  catch (error) {
+    console.error('Error updating Project:', error);
+    // Show an error toast message
+    this.$toast.add({ severity: 'error', summary: 'Error', detail: 'Failed to update Project', life: 3000 });
+  }
+},
     },
     watch: {
         "$route.query.groupId": {
