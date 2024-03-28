@@ -33,7 +33,7 @@
             </div>
         </div>
 
-        <div v-if="grp_projects.length == 0">
+        <div v-if="grp_projects.length == 0 && !loading">
             <div class="col-12">
                 <h3 class="font-semibold">No projects to show!</h3>
             </div>
@@ -96,7 +96,7 @@
                             />
                             <Avatar :label="`+${project.subGroupUsers.length - 3}`" shape="circle" size="large" v-if="project.subGroupUsers.length > 3"/>
                         </AvatarGroup>
-                        <Button label="Enroll" />
+                        <Button label="Enrol" @click="enrol(project.subGroupId,userId, selected_community.groupId)"/>
                     </div>
 
                     <!-- v-else -->
@@ -151,7 +151,11 @@ export default {
         },
         viewProject(subGroupId) {
             this.$router.push({ name: 'project', query: { subGroupId: subGroupId } });
-        }
+        },
+        enrol(subGroupId, userId, groupId) {
+            console.log(subGroupId, parseInt(userId), groupId);
+            // this.enrolled = true;
+        },
     },
     watch: {
         "$route.query.groupId": {
