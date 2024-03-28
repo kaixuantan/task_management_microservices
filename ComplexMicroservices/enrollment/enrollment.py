@@ -37,8 +37,8 @@ rabbitmq_host_notif = os.getenv('HOSTNAME')
 rabbitmq_port_notif = os.getenv('PORT')
 rabbitmq_exchange_notif = os.getenv('EXCHANGE_NAME')
 rabbitmq_exchange_type_notif = os.getenv('EXCHANGE_TYPE') 
-rabbitmq_queue_notif = os.getenv('QUEUE_NAME')
-rabbitmq_routing_key_notif = os.getenv('ROUTING_KEY')  
+rabbitmq_queue_notif = os.getenv('QUEUE_NAME_2')
+rabbitmq_routing_key_notif = os.getenv('ROUTING_KEY_2')  
 
 # load log.env file
 load_dotenv('log.env')
@@ -46,8 +46,8 @@ rabbitmq_host_log = os.getenv('HOSTNAME')
 rabbitmq_port_log = os.getenv('PORT')
 rabbitmq_exchange_log = os.getenv('EXCHANGE_NAME')
 rabbitmq_exchange_type_log = os.getenv('EXCHANGE_TYPE') 
-rabbitmq_queue_log = os.getenv('QUEUE_NAME')
-rabbitmq_routing_key_log = os.getenv('ROUTING_KEY') 
+rabbitmq_queue_log = os.getenv('QUEUE_NAME_1')
+rabbitmq_routing_key_log = os.getenv('ROUTING_KEY_1') 
 
 # Part 1: Return consolidated user's group & group's subgroups
 @app.route('/enrollment', methods=['GET'])

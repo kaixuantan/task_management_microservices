@@ -78,10 +78,8 @@
                     </p>
                 </template>
                 <template #footer>
-                    <div
-                        class="flex mt-1 justify-content-between"
-                        v-if="!enrolled"
-                    >
+                    <div class="flex mt-1 justify-content-between" v-if="!isUserEnrolled(project)">
+
                     <!-- v-if="!enrolled" -->
                         <AvatarGroup>
                             <!-- can change to name as well if name is filled -->
@@ -152,10 +150,39 @@ export default {
         viewProject(subGroupId) {
             this.$router.push({ name: 'project', query: { subGroupId: subGroupId } });
         },
-        enrol(subGroupId, userId, groupId) {
+        async enrol(subGroupId, userId, groupId) {
             console.log(subGroupId, parseInt(userId), groupId);
-            // this.enrolled = true;
+            const email = sessionStorage.getItem("email");
+            const username= sessionStorage.getItem("username");
+            console.log(email, username);
+            try {
+                const response= await axios.post(
+                    `http://localhost:5009/enrollment`,
+                    {
+                        subGroupId: subGroupId,
+                        userId: parseInt(userId),
+                        email: email,
+                        username: username,
+
+                    },
+                    {
+                        headers: {
+                            "X-SubGroup-AppId": env.X_SubGroup_AppId,
+                            "X-SubGroup-Key": env.X_SubGroup_Key,
+                        },
+                    }
+                );
+                console.log(response.data);
+                await this.fetchGroupProjects(groupId);
+                alert("Enrolled successfully")
+            } catch (error) {
+                console.error(error);
+            }
         },
+        isUserEnrolled(project) {
+        const userId = sessionStorage.getItem("userid");
+        return project.subGroupUsers.some(user => user.userId === parseInt(userId));
+    },
     },
     watch: {
         "$route.query.groupId": {
