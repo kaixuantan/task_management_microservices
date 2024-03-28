@@ -62,8 +62,8 @@ services:
       - log
       - notification
 
-  report:
-    build: ./ComplexMicroservices/Report
+  idea:
+    build: ./ComplexMicroservices/GenerateIdeas
     ports:
       - "8005:8005"
     depends_on:
@@ -80,29 +80,3 @@ services:
       - rabbitmq
       - amqp
       - log
-    
-  # Wrapper Microservices
-  gemini:
-    build: ./ComplexMicroservices/GeminiWrapper
-    ports:
-      - "8007:8007"
-    depends_on:
-      - rabbitmq
-      - amqp
-      - log
-
-  # Frontend
-  frontend:
-    build: ./Frontend
-    ports:
-      - "8080:8080"
-    depends_on:
-      - rabbitmq
-      - amqp
-      - log
-      - notification
-      - enrollment
-      - group-creation
-      - report
-      - task
-      - gemini
