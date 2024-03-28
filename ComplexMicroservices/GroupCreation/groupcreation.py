@@ -199,7 +199,7 @@ def processGroupCreation(group_info,subgroup_info,users_id_list):
     return {
         "code": 201,
         "data": {
-            "subgroup_result": subgroup,
+            "subgroup_result": subgroup_list,
             "final_group_result": assigned_group
         }
     }
