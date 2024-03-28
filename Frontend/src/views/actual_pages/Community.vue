@@ -5,34 +5,26 @@ const router = useRouter();
 const redirectToCreateCommunity = () => {
     router.push({ name: 'create community' });
 }
+const userole= sessionStorage.getItem('role');
+console.log(userole)
 </script>
 
 <template>
     <div class="grid">
         <div class="col-12 flex justify-content-between">
             <h2 class="mb-0 font-semibold">Communities</h2>
-            <Button label="Create" icon="pi pi-plus" rounded raised @click="redirectToCreateCommunity"/>
+            <Button v-if="userole == 'admin'" label="Create" icon="pi pi-plus" rounded raised @click="redirectToCreateCommunity"/>
         </div>
-        <!-- 3 cards at the top of the screen -->
-        <div class="xl:col-4" v-for="n in 3" v-if="communities.length === 0">
-            <div class="border-round border-1 surface-border p-4 surface-card shadow-1">
-                <div class="flex mb-3 gap-3">
-                    <Skeleton shape="circle" size="4rem" class="mr-2"></Skeleton>
-                    <div class="flex align-items-center">
-                        <Skeleton width="10rem" height="1.5rem" class="mb-2"></Skeleton>
-                    </div>
-                </div>
-                <Skeleton width="100%" height="20rem" class="mb-3"></Skeleton>
-                <div>
-                    <Skeleton width="50%" height="1.5rem"></Skeleton>
-                </div>
-                <div class="flex justify-content-end mt-3">
-                    <Skeleton width="4rem" height="2rem"></Skeleton>
-                </div>
-            </div>
+        
+        <!-- Display message when there are no communities -->
+        <div class="col-12" v-if="communities.length === 0">
+        <p class="text-center text-gray-500">No communities to display</p>
+        <div class="flex justify-content-center">
+        <img src="/demo/images/No-result-found.png" alt="No results found" style="max-width: 300px; height: auto;"/>
+        </div>
         </div>
 
-        <div class="xl:col-4" v-for="(community,idx) in communities" v-else>
+        <div class="xl:col-4" v-else v-for="(community,idx) in communities">
             <Card style="overflow: hidden" class="shadow-2">
                 <template #header>
                     <div class="p-4 flex justify-content-between align-items-center">
@@ -52,17 +44,13 @@ const redirectToCreateCommunity = () => {
                             </div>
                         </div>
                         <Button text>
-                            <i class="pi pi-pencil text-500 text-xl"></i>
+                            <i class="pi pi-pencil text-500 text-xl" v-if="userole == 'admin'" @click="editcomunity"></i>
                         </Button>
                     </div>
-                    <img
-                        alt="user header"
-                        src="https://espanol.verizon.com/learning/_next/static/images/87c8be7b206ab401b295fd1d21620b79.jpg"
-                        style="width: 100%; height: 100%; object-fit: contain;"
-                    />
+                    <img alt="user header" src="https://cdn-icons-png.freepik.com/512/2592/2592465.png" style="width: 50%; height: 50%; object-fit: contain; margin: 0 auto; display: block;" />
                 </template>
-                <template #title>Members: {{ community.size }}</template>
-                <template #subtitle>{{ community.description }} Description about community </template>
+                <template #title>Community Size: {{ community.size }}</template>
+                <template #subtitle>Community Description: {{ community.description }} </template>
                 <!-- <template #content>
                     <p class="m-0">
                         Description about community
@@ -91,6 +79,9 @@ export default {
     methods: {
         viewProjects(groupId) {
             this.$router.push({ name: 'projects', query: { groupId: groupId } });
+        },
+        editcomunity(){
+
         }
     },
     async created() {

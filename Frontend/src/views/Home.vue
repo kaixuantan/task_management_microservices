@@ -231,10 +231,12 @@ const calAttributes = ref([
                         }"
                     />
                     <Avatar
-                        :label="`+${communities.length - 5}`"
-                        class="mr-2"
-                        size="large"
-                        shape="circle"
+                    v-if="communities.length > 5"
+                    :label="`+${communities.length - 5}`"
+                    class="mr-2"
+                    size="large"
+                    shape="circle"
+
                     />
                 </div>
                 <div v-else>
@@ -249,13 +251,14 @@ const calAttributes = ref([
                             backgroundColor: colors[index % colors.length],
                         }"
                     />
-                    <Avatar
-                        :label="`+${communities.length - 7}`"
-                        class="mr-2"
-                        size="large"
-                        shape="circle"
-                    />
-                </div>
+                     <Avatar
+                     v-if="communities.length > 7"
+                    :label="`+${communities.length - 7}`"
+                     class="mr-2"
+                     size="large"
+                     shape="circle"
+                     />
+                    </div>
                 <Divider />
                 <div>
                     <h5>Calendar</h5>
@@ -352,6 +355,7 @@ export default {
         window.scrollTo(0, 0);
         await this.fetchUserGroups();
         await this.fetchUserTasks();
+        await this.fetchUserData();
         this.sortTasksByStatus(this.tasks);
         // console.log(this.tasks_in_progress);
         // console.log(this.tasks_new);

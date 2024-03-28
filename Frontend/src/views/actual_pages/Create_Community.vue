@@ -34,7 +34,8 @@ const fetchUsers = async () => {
     console.log(response.data)
     users.value = response.data.User.map(user => ({
       name: user.username,
-      userId: user.userId.toString()
+      userId: user.userId.toString(),
+      email: user.email
     }));
   } catch (error) {
     console.error('Error fetching users:', error);
@@ -109,8 +110,9 @@ const savesubgrp = () => {
       description: subgrp.value.description,
       size: subgrp.value.capacity,
       subGroupUsers: subgrpmembers.value!=null ? subgrpmembers.value.map(member => ({
-        userId: parseInt(member.code),
-        username: member.name
+        userId: parseInt(member.userId),
+        username: member.name,
+        email: member.email
       })) : []
     };
     
@@ -167,7 +169,8 @@ const submitform = async () => {
     createdDateTime: new Date().toISOString(),
     groupUsers: communitymembers.value.map(member => ({
     userId: parseInt(member.userId),
-    username: member.name
+    username: member.name,
+    email: member.email
     }))
   };
   console.log('communityy details to submit')

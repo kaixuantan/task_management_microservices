@@ -112,6 +112,31 @@ export default {
             let date = new Date(timestamp);
             let year = date.getFullYear().toString().slice(-2);
             return date.getDate() + "/" + (date.getMonth() + 1) + "/" + year;
+        },
+        async fetchUserData(){
+            try{
+                console.log(this.userId)
+                let response = await axios.get(
+                    `${env.BASE_URL}/UserAPI_REST/rest/v1/user/${this.userId}/`,
+                    {
+                        headers: {
+                            "X-User-AppId": env.X_User_AppId,
+                            "X-User-Key": env.X_User_Key,
+                        },
+                    }
+                );
+                if (response.data.Result.Success !== true) {
+                    console.error("Error fetching user groups");
+                } else {
+                    sessionStorage.setItem('email', response.data.User.email)
+                    sessionStorage.setItem('role', response.data.User.role)
+                }
+
+
+            }
+            catch(error){
+                console.error(error);
+            }
         }
     }
 }

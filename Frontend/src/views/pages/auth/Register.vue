@@ -43,6 +43,7 @@ const handleSubmit = async () => {
   "email": email.value,
   "role": selectedRole.value,
 }
+
     console.log('Called User API')
     console.log(username.value)
     console.log(selectedRole.value)
@@ -51,6 +52,8 @@ const handleSubmit = async () => {
     
     // Handle the response
     console.log('User added:', response.data);
+    sessionStorage.setItem('email', email.value);
+    sessionStorage.setItem('role', selectedRole.value);
     alert('Account has been created successfully. Please login.'); // Show alert message
     router.push('./login'); // Redirect to the login page
     return response.data;

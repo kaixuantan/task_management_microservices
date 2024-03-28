@@ -18,7 +18,7 @@ onBeforeUnmount(() => {
 });
 
 const logoUrl = computed(() => {
-    return `/logo-dark.svg`;
+    return `/demo/images/TaskMaster.png`;
 });
 
 const onTopBarMenuButton = () => {
