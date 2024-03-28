@@ -1,6 +1,6 @@
 from flask import Flask
 from flask_cors import CORS
-from flask import request
+from flask_restx import Api, Resource, fields
 import json
 import requests
 import os
@@ -14,29 +14,42 @@ load_dotenv()
 
 app = Flask(__name__)
 CORS(app)
+api = Api(app)
 
-@app.route('/ideas/generate/<subGroupId>/<userId>', methods=['GET'])
-def generate_ideas(subGroupId, userId):
-    # Here you can add the functionality you want.
-    # For example, let's return a simple JSON response.
-    
-    text = process_pdf(subGroupId)
-    # print(text)
-    data = {
-                "document": text,
-                "subGroupId": subGroupId,
-                "type": "md",
-            }
-    return upload_file(subGroupId, "md", data, userId)
+ns = api.namespace('ideas', description='Operations related to idea generation and project summary')
+
+@ns.route('/generate/<subGroupId>/<userId>')
+class IdeaGeneration(Resource):
+    @api.doc(params={'subGroupId': 'subGroupId of project that the pdf belongs to', 'userId': 'The user who uploaded the pdf'})
+    def get(self, subGroupId, userId):
+        # Here you can add the functionality you want.
+        # For example, let's return a simple JSON response.
+        
+        text = process_pdf(subGroupId)
+        # print(text)
+        data = {
+                    "document": text,
+                    "subGroupId": subGroupId,
+                    "type": "md",
+                }
+        return upload_file(subGroupId, "md", data, userId)
     
 
-@app.route('/ideas/upload', methods=['POST'])
-def upload():
-    data = request.get_json()
-    subGroupId = data['subGroupId']
-    fileType = data['type']
-    
-    return upload_file(subGroupId, fileType, data)
+upload_model = api.model('Upload', {
+    'subGroupId': fields.Integer(required=True, description='Subgroup ID'),
+    'type': fields.String(required=True, description='File type'),
+    'document': fields.String(required=True, description='Document content'),
+})
+
+@ns.route('/upload')
+class IdeaUpload(Resource):
+    @api.expect(upload_model, validate=True)
+    def post(self):
+        data = api.payload
+        subGroupId = data['subGroupId']
+        fileType = data['type']
+        
+        return upload_file(subGroupId, fileType, data)
 
 def upload_file(subGroupId, fileType, fileData, userId):
     headers = {
