@@ -1,0 +1,251 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+      "title": "Your API",
+      "version": "1.0.0"
+    },
+    "paths": {
+      "/subgroup/{subGroupId}": {
+        "get": {
+          "summary": "Retrieve users in subgroup as attendees",
+          "parameters": [
+            {
+              "in": "path",
+              "name": "subGroupId",
+              "required": true,
+              "description": "ID of the subgroup",
+              "schema": {
+                "type": "integer"
+              }
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "Successful response",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "Result": {
+                        "type": "object",
+                        "properties": {
+                          "Success": {
+                            "type": "boolean"
+                          },
+                          "ErrorMessage": {
+                            "type": "string"
+                          }
+                        }
+                      },
+                      "SubGroup": {
+                        "type": "object",
+                        "properties": {
+                          "subGroupId": {
+                            "type": "integer"
+                          },
+                          "groupId": {
+                            "type": "integer"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "description": {
+                            "type": "string"
+                          },
+                          "picture": {
+                            "type": "string"
+                          },
+                          "size": {
+                            "type": "integer"
+                          },
+                          "subGroupUsers": {
+                            "type": "array",
+                            "items": {
+                              "type": "object",
+                              "properties": {
+                                "subGroupId": {
+                                  "type": "integer"
+                                },
+                                "userId": {
+                                  "type": "integer"
+                                },
+                                "username": {
+                                  "type": "string"
+                                },
+                                "email": {
+                                  "type": "string"
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "/task": {
+        "post": {
+          "summary": "Create a task",
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "name": {
+                      "type": "string"
+                    },
+                    "description": {
+                      "type": "string"
+                    },
+                    "dueDateTime": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "subGroupId": {
+                      "type": "integer"
+                    },
+                    "createdById": {
+                      "type": "integer"
+                    },
+                    "createdByUsername": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "headers": {
+            "X-Task-AppId": {
+              "schema": {
+                "type": "string"
+              },
+              "required": true,
+              "description": "Application ID for Task"
+            },
+            "X-Task-Key": {
+              "schema": {
+                "type": "string"
+              },
+              "required": true,
+              "description": "Key for Task"
+            }
+          },
+          "responses": {
+            "200": {
+              "description": "Successful response",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "Result": {
+                        "type": "object",
+                        "properties": {
+                          "Success": {
+                            "type": "boolean"
+                          },
+                          "ErrorMessage": {
+                            "type": "string"
+                          }
+                        }
+                      },
+                      "TaskId": {
+                        "type": "integer"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "put": {
+          "summary": "Update assignees for a task",
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "assigneeUserId": {
+                        "type": "integer"
+                      },
+                      "assigneeUsername": {
+                        "type": "string"
+                      },
+                      "assigneeEmail": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "headers": {
+            "X-Task-AppId": {
+              "schema": {
+                "type": "string"
+              },
+              "required": true,
+              "description": "Application ID for Task"
+            },
+            "X-Task-Key": {
+              "schema": {
+                "type": "string"
+              },
+              "required": true,
+              "description": "Key for Task"
+            },
+            "assignorId": {
+              "schema": {
+                "type": "integer"
+              },
+              "required": true,
+              "description": "User ID of the assignor"
+            },
+            "assignorUsername": {
+              "schema": {
+                "type": "string"
+              },
+              "required": true,
+              "description": "Username of the assignor"
+            }
+          },
+          "responses": {
+            "200": {
+              "description": "Successful response",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "type": "object",
+                    "properties": {
+                      "Success": {
+                        "type": "boolean"
+                      },
+                      "ErrorMessage": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  

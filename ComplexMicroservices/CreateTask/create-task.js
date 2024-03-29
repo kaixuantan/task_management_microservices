@@ -4,9 +4,8 @@ const express = require('express');
 const cors = require('cors');
 const axios = require('axios');
 const amqp = require('amqplib');
-const nodemailer = require('nodemailer');
 const swaggerUI = require('swagger-ui-express');
-const swaggerSpec = require('./swagger');
+const swaggerDocument = require('./swagger.json');
 
 const app = express();
 app.use(cors());
@@ -33,32 +32,9 @@ const smtp_username = process.env.SMTP_USERNAME;
 const smtp_password = process.env.SMTP_PASSWORD;
 const test_email = process.env.TEST_EMAIL;
 
-// Serve Swagger documentation
-app.use('/api-docs', swaggerUI.serve, swaggerUI.setup(swaggerSpec));
+// Serve Swagger UI
+app.use('/api', swaggerUI.serve, swaggerUI.setup(swaggerDocument));
 
-/**
- * @swagger
- * /subgroup/{subGroupId}:
- *   get:
- *     summary: Get subgroup by ID
- *     description: Retrieve a subgroup by its ID.
- *     parameters:
- *       - in: path
- *         name: subGroupId
- *         required: true
- *         schema:
- *           type: integer
- *         description: ID of the subgroup to retrieve
- *     responses:
- *       '200':
- *         description: Successful operation
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/Subgroup'
- *       '404':
- *         description: Subgroup not found
- */
 app.get('/subgroup/:subGroupId', async (req, res) => {
     try {
         const subGroupId = req.params.subGroupId;
@@ -94,71 +70,6 @@ app.get('/subgroup/:subGroupId', async (req, res) => {
     }
 });
 
-/**
- * @swagger
- * /task:
- *   post:
- *     summary: Create a new task
- *     description: Create a new task with the provided details
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               taskName:
- *                 type: string
- *                 description: The name of the task
- *               taskDesc:
- *                 type: string
- *                 description: The description of the task
- *               dueDateTime:
- *                 type: string
- *                 format: date-time
- *                 description: The due date and time of the task
- *               subGroupId:
- *                 type: integer
- *                 description: The ID of the subgroup to which the task belongs
- *               userId:
- *                 type: integer
- *                 description: The ID of the user creating the task
- *               username:
- *                 type: string
- *                 description: The username of the user creating the task
- *               assignedTo:
- *                 type: array
- *                 items:
- *                   type: object
- *                   properties:
- *                     taskId:
- *                       type: integer
- *                       description: The ID of the task
- *                     assigneeUserId:
- *                       type: integer
- *                       description: The ID of the user assigned to the task
- *                     assigneeUsername:
- *                       type: string
- *                       description: The username of the user assigned to the task
- *     responses:
- *       '201':
- *         description: Task created successfully
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   description: Confirmation message
- *                 taskId:
- *                   type: integer
- *                   description: The ID of the newly created task
- *       '400':
- *         description: Bad request, invalid input data
- *       '500':
- *         description: Internal server error
- */
 app.post('/task', async (req, res) => {
     // Connect to RabbitMQ to send log
     const connection = await amqp.connect(`amqp://${rabbitmq_host}:${rabbitmq_port}`);
@@ -222,24 +133,13 @@ app.post('/task', async (req, res) => {
         console.log(`Message sent to the exchange '${rabbitmq_exchange}' with routing key '${rabbitmq_log_routing_key}'.`);
 
         // for notif
-        const notifMsg = {
-            recipient: test_email,
-            subject: 'Test Notification',
-            body: 'This is a test notification message for RabbitMQ.'
-        };
-
-        // Send the message to RabbitMQ
-        await channel.publish(rabbitmq_exchange, rabbitmq_notif_routing_key, Buffer.from(JSON.stringify(notifMsg)), { persistent: true });
-        console.log(`Message sent to RabbitMQ exchange '${rabbitmq_exchange}' with routing key '${rabbitmq_notif_routing_key}'.`);
-
         const formattedDate = formatDate(req.body.dueDateTime);
         const taskURL = `http://localhost:5173/task/${taskId}`;
 
-        const mailOptions = {
-            from: smtp_username,
-            to: [req.body.assignedTo.map(assignee => `${assignee.assigneeEmail}`).join(', ')], 
+        const notifMsg = {
+            recipient: [req.body.assignedTo.map(assignee => `${assignee.assigneeEmail}`).join(', ')],
             subject: '[TaskMaster] New Task Alert',
-            text: `
+            body: `
                 Hello ${req.body.assignedTo.map(assignee => `${assignee.assigneeUsername}`).join(', ')}!
 
                 A new task has been created:
@@ -252,10 +152,13 @@ app.post('/task', async (req, res) => {
                 You can login to view the task details here: ${taskURL}
 
                 Best regards,
-                TaskMaster`
+                TaskMaster
+            `
         };
 
-        await sendEmail(mailOptions);
+        // Send the message to RabbitMQ
+        await channel.publish(rabbitmq_exchange, rabbitmq_notif_routing_key, Buffer.from(JSON.stringify(notifMsg)), { persistent: true });
+        console.log(`Message sent to RabbitMQ exchange '${rabbitmq_exchange}' with routing key '${rabbitmq_notif_routing_key}'.`);
 
     } catch (error) {
         console.log(error)
@@ -330,25 +233,6 @@ function getSingaporeTimestamp() {
     const sgTimezoneOffset = 8 * 60; // Offset in minutes
     const singaporeTime = new Date(currentDate.getTime() + sgTimezoneOffset * 60000);
     return singaporeTime.toISOString();
-}
-
-async function sendEmail(mailOptions) {
-    const transporter = nodemailer.createTransport({
-        host: smtp_server,
-        port: smtp_port,
-        auth: {
-            user: smtp_username,
-            pass: smtp_password
-        }
-    });
-
-    transporter.sendMail(mailOptions, (error, info) => {
-        if (error) {
-            console.error('Error sending email:', error);
-        } else {
-            console.log('Email sent:', info.response);
-        }
-    });
 }
 
 function formatDate(dateString) {
