@@ -44,7 +44,7 @@ services:
     restart: on-failure
 
   # Complex Microservices
-  idea:
+  generate-idea:
     build: ./ComplexMicroservices/GenerateIdeas
     ports:
       - "5000:5000"
@@ -83,8 +83,8 @@ services:
       - notification
     restart: on-failure
   
-  task:
-    build: ./ComplexMicroservices/Task
+  create-task:
+    build: ./ComplexMicroservices/CreateTask
     ports:
       - "5003:5000"
     env_file:
