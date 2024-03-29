@@ -176,7 +176,7 @@ export default {
             console.log(email, username);
             try {
                 const response= await axios.post(
-                    `http://localhost:5009/enrollment`,
+                    `http://localhost:5002/enrollment`,
                     {
                         subGroupId: subGroupId,
                         userId: parseInt(userId),

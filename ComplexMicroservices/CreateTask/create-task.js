@@ -33,7 +33,7 @@ const smtp_password = process.env.SMTP_PASSWORD;
 const test_email = process.env.TEST_EMAIL;
 
 // Serve Swagger UI
-app.use('/api', swaggerUI.serve, swaggerUI.setup(swaggerDocument));
+app.use('/', swaggerUI.serve, swaggerUI.setup(swaggerDocument));
 
 app.get('/subgroup/:subGroupId', async (req, res) => {
     try {

@@ -218,46 +218,48 @@ const calAttributes = ref([
             <Panel>
                 <h5>Communities</h5>
                 <div class="flex-auto" v-if="sideMenuActive">
-                    <Avatar
-                        v-for="(community, index) in communities.slice(0, 5)"
-                        :key="index"
-                        :label="community.name.charAt(0).toUpperCase()"
-                        class="mr-2"
-                        size="large"
-                        shape="circle"
-                        :style="{
-                            backgroundColor: colors[index % colors.length],
-                        }"
-                    />
-                    <Avatar
-                    v-if="communities.length > 5"
-                    :label="`+${communities.length - 5}`"
-                    class="mr-2"
-                    size="large"
-                    shape="circle"
-
-                    />
+                    <a v-for="(community, index) in communities.slice(0, 5)" :key="index" :href="`/projects?groupId=${community.groupId}`">
+                        <Avatar
+                            :label="community.name.charAt(0).toUpperCase()"
+                            class="mr-2"
+                            size="large"
+                            shape="circle"
+                            :style="{
+                                backgroundColor: colors[index % colors.length],
+                            }"
+                        />
+                    </a>
+                    <a v-if="communities.length > 5" :href="`/community`">
+                        <Avatar
+                            :label="`+${communities.length - 5}`"
+                            class="mr-2"
+                            size="large"
+                            shape="circle"
+                        />
+                    </a>
                 </div>
                 <div v-else>
-                    <Avatar
-                        v-for="(community, index) in communities.slice(0, 7)"
-                        :key="index"
-                        :label="community.charAt(0)"
-                        class="mr-2"
-                        size="large"
-                        shape="circle"
-                        :style="{
-                            backgroundColor: colors[index % colors.length],
-                        }"
-                    />
-                     <Avatar
-                     v-if="communities.length > 7"
-                    :label="`+${communities.length - 7}`"
-                     class="mr-2"
-                     size="large"
-                     shape="circle"
-                     />
-                    </div>
+                    <a v-for="(community, index) in communities.slice(0, 7)" :key="index" :href="`/projects?groupId=${community.groupId}`">
+                        <Avatar
+                            :label="community.charAt(0)"
+                            class="mr-2"
+                            size="large"
+                            shape="circle"
+                            :style="{
+                                backgroundColor: colors[index % colors.length],
+                            }"
+                        />
+                    </a>
+                    <a v-if="communities.length > 7" :href="`/community`">
+                        <Avatar
+                            :label="`+${communities.length - 7}`"
+                            class="mr-2"
+                            size="large"
+                            shape="circle"
+                        />
+                    </a>
+                </div>
+
                 <Divider />
                 <div>
                     <h5>Calendar</h5>

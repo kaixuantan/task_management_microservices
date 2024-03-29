@@ -40,6 +40,7 @@ export default {
                 if (response.data.Result.Success !== true) {
                     console.error("Error fetching user groups");
                 } else {
+                    console.log(response.data.UserGroup.groups)
                     this.communities = response.data.UserGroup.groups;
                 }
             } catch (error) {
