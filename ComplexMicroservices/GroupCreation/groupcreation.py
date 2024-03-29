@@ -310,4 +310,4 @@ def processUserAssignment(group,user_id_list,subgroup_namelist):
 if __name__ == "__main__":
     print("This is flask " + os.path.basename(__file__) +
           " for creating a group...")
-    app.run(host="0.0.0.0", port=5100, debug=True)
+    app.run(host="0.0.0.0", port=5000, debug=True)
