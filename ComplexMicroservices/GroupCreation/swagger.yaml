@@ -17,59 +17,11 @@ paths:
               type: array
               items:
                 oneOf:
-                  - type: object
-                    properties:
-                      name:
-                        type: string
-                        description: The name of the group
-                      description:
-                        type: string
-                        description: A brief description of the group
-                      picture:
-                        type: string
-                        description: An image associated
-                      size:
-                        type: integer
-                        description: Number of people in a group
-                      createdById:
-                        type: integer
-                        description: UserId of user who created group
-                      createdByUsername:
-                        type: string
-                        description: Username of user who created group
-                      groupUsers:
-                        type: array
-                        description: Empty array (to be updated when users assigned to group)
-                      # Add more properties as needed for group info
-                    required:
-                      - name
-                      - size
-                      - createdById
-                      - createdByUsername
-                  - type: array
-                    items:
-                      type: object
-                      properties:
-                        name:
-                          type: string
-                          description: The name of the subgroup
-                        description:
-                          type: string
-                          description: A brief description of the subgroup
-                        picture:
-                          type: string
-                          description: An image associated
-                        size:
-                          type: integer
-                          description: Number of people in a subgroup
-                        subGroupUsers:
-                          type: array
-                          description: Empty array (to be updated when users join to subgroup)
-                        # Add more properties as needed for subgroup info
+                  - $ref: '#/components/schemas/Group'
+                  - $ref: '#/components/schemas/Subgroup'
                   - type: array
                     items:
                       type: integer
-
       responses:
         '201':
           description: Group creation successful
@@ -93,7 +45,6 @@ components:
     Group:
       type: object
       properties:
-        # Define properties of the group object
         groupId:
           type: integer
           description: The groupId of the group
@@ -121,10 +72,11 @@ components:
         groupUsers:
           type: array
           description: List of users (objects) who are assigned to group
+          items:
+            type: object
     Subgroup:
       type: object
       properties:
-        # Define properties of the subgroup object
         subGroupId:
           type: integer
           description: The subGroupId of the subgroup
@@ -146,9 +98,5 @@ components:
         subGroupUsers:
           type: array
           description: List of users (objects) who join the subgroup
-
-
-
-
-
-
+          items:
+            type: object
