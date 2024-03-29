@@ -31,8 +31,8 @@ group_microservice_base_url = "https://personal-rc7vnnm9.outsystemscloud.com/Gro
 # log_microservice_base_url = "https://personal-rc7vnnm9.outsystemscloud.com/LogAPI_REST/rest/v1/"
 # notification_microservice_base_url = ""
 
+load_dotenv()
 # load notif.env file
-load_dotenv('notif.env')
 rabbitmq_host_notif = os.getenv('HOSTNAME')
 rabbitmq_port_notif = os.getenv('PORT')
 rabbitmq_exchange_notif = os.getenv('EXCHANGE_NAME')
@@ -41,7 +41,6 @@ rabbitmq_queue_notif = os.getenv('QUEUE_NAME_2')
 rabbitmq_routing_key_notif = os.getenv('ROUTING_KEY_2')  
 
 # load log.env file
-load_dotenv('log.env')
 rabbitmq_host_log = os.getenv('HOSTNAME')
 rabbitmq_port_log = os.getenv('PORT')
 rabbitmq_exchange_log = os.getenv('EXCHANGE_NAME')

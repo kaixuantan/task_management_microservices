@@ -18,11 +18,11 @@ CORS(app)
 # URLs
 group_URL = "https://personal-rc7vnnm9.outsystemscloud.com/GroupAPI_REST/rest/v1/group/"
 subgroup_URL = "https://personal-rc7vnnm9.outsystemscloud.com/SubGroupAPI_REST/rest/v1/subgroup/"
-# activity_log_URL = "https://personal-rc7vnnm9.outsystemscloud.com/LogAPI_REST/rest/v1/log/"
+
 user_URL = "https://personal-rc7vnnm9.outsystemscloud.com/UserAPI_REST/rest/v1/user/"
 
 # load and get log.env files
-load_dotenv('/SimpleMicroservices/log/.env')
+load_dotenv()
 rabbitmq_host_log = os.getenv('HOSTNAME')
 rabbitmq_port_log = os.getenv('PORT')
 rabbitmq_exchange_log = os.getenv('EXCHANGE_NAME')
@@ -30,8 +30,6 @@ rabbitmq_exchange_type_log = os.getenv('EXCHANGE_TYPE')
 rabbitmq_queue_log = os.getenv('QUEUE_NAME')
 rabbitmq_routing_key_log = os.getenv('ROUTING_KEY') 
 
-# load and get log.env files
-load_dotenv('/SimpleMicroservices/notification/.env')
 # RabbitMQ connection details
 rabbitmq_host_notif = os.getenv('HOSTNAME')
 rabbitmq_port_notif = os.getenv('PORT')
