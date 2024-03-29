@@ -85,6 +85,8 @@ services:
     build: ./ComplexMicroservices/Task
     ports:
       - "5003:5000"
+    env_file:
+      - ./ComplexMicroservices/CreateTask/.env
     depends_on:
       - rabbitmq
       - amqp

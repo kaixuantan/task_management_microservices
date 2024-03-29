@@ -75,8 +75,10 @@ app.get('/subgroup/:subGroupId', async (req, res) => {
         users.forEach(obj => {
             obj.assigneeUserId = obj.userId;
             obj.assigneeUsername = obj.username;
+            obj.assigneeEmail = obj.email;
             delete obj.userId; 
             delete obj.username;
+            delete obj.email;
         });
 
         res.json(users);
@@ -196,7 +198,7 @@ app.post('/task', async (req, res) => {
                     'X-Task-AppId': TaskAppId,
                     'X-Task-Key': TaskKey,
                     'assignorId': req.body.userId,
-                    'assignorUsername': req.body.username
+                    'assignorUsername': req.body.username,
                 }
             }
         )
@@ -235,7 +237,7 @@ app.post('/task', async (req, res) => {
 
         const mailOptions = {
             from: smtp_username,
-            to: test_email, // NEED TO GET EMAIL
+            to: [req.body.assignedTo.map(assignee => `${assignee.assigneeEmail}`).join(', ')], 
             subject: '[TaskMaster] New Task Alert',
             text: `
                 Hello ${req.body.assignedTo.map(assignee => `${assignee.assigneeUsername}`).join(', ')}!
@@ -363,5 +365,5 @@ function formatDate(dateString) {
 }
 
 app.listen(PORT, () => {
-    console.log(`Server is running on port http://localhost:${PORT}`);
+    console.log(`Server is running on port http://0.0.0.0:${PORT}`);
 });

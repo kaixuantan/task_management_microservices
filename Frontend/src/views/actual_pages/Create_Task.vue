@@ -165,7 +165,7 @@ const handleSubmit = async () => {
                         </div>
                     </template>
                 </MultiSelect>
-                <!-- <div>{{ multiselectAssignee}}</div> -->
+                <div>{{ multiselectAssignee}}</div>
             </div>
         </div>
         <div class="col-12 md:col-6">
