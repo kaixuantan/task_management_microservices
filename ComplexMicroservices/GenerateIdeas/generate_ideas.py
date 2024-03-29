@@ -6,7 +6,7 @@ import requests
 import os
 
 from process_pdf import process_pdf
-from send_amqp import send_log, send_notif
+from send_amqp import *
 from get_users_email import get_users_email
 
 from dotenv import load_dotenv
@@ -18,9 +18,21 @@ api = Api(app)
 
 ns = api.namespace('ideas', description='Operations related to idea generation and project summary')
 
+# Define your response fields
+result_model = api.model('Result', {
+    'Success': fields.Boolean,
+    'ErrorMessage': fields.String
+})
+
+resource_fields = api.model('Resource', {
+    'DocId': fields.String,
+    'Result': fields.Nested(result_model)
+})
+
 @ns.route('/generate/<subGroupId>/<userId>')
 class IdeaGeneration(Resource):
     @api.doc(params={'subGroupId': 'subGroupId of project that the pdf belongs to', 'userId': 'The user who uploaded the pdf'})
+    @api.marshal_with(resource_fields) 
     def get(self, subGroupId, userId):
         # Here you can add the functionality you want.
         # For example, let's return a simple JSON response.
@@ -44,6 +56,7 @@ upload_model = api.model('Upload', {
 @ns.route('/upload')
 class IdeaUpload(Resource):
     @api.expect(upload_model, validate=True)
+    @api.marshal_with(resource_fields)
     def post(self):
         data = api.payload
         subGroupId = data['subGroupId']
@@ -68,16 +81,18 @@ def upload_file(subGroupId, fileType, fileData, userId):
             response = requests.post(url, headers=headers, data=json.dumps(fileData))
     except Exception as error:
         print(f"Error: {error}")
-        return {"error": "Failed to upload file"}
+        return {"Result": {"Success": False, "ErrorMessage": "Failed to upload file"}}
     
     if response and fileType == "md":
         # Notification and Logging
         try:
-            notify_users(subGroupId)
-            send_log(subGroupId, userId, "Generate ideas", f"{userId} generated ideas and project summary for {subGroupId}")
+            connection, channel = open_connection()
+            notify_users(subGroupId, channel)
+            send_log(subGroupId, userId, "Generate ideas", f"{userId} generated ideas and project summary for {subGroupId}", channel)
+            close(connection)
         except Exception as error:
             print(f"Error: {error}")
-            return {"error": "Failed to send notification / logs"}
+            return {"Result": {"Success": False, "ErrorMessage": "Failed to notify users or do logging"}}
     
     if response:
         return response.json()
@@ -96,10 +111,10 @@ def check_file_exist(subGroupId, fileType):
     else:
         return None
 
-def notify_users(subGroupId):
+def notify_users(subGroupId, channel):
     emails = get_users_email(subGroupId)
     for email in emails:
-        send_notif(email, "Project summary and ideas generated successfully!", "Head to the project page to view the details. Feel free to Upload a new PDF file to generate the response again. \n Disclaimer: Content generated using AI, please check for accuracy.")
+        send_notif(email, "Project summary and ideas generated successfully!", "Head to the project page to view the details. Feel free to Upload a new PDF file to generate the response again. \nDisclaimer: Content generated using AI, please check for accuracy.", channel)
     
 if __name__ == '__main__':
     app.run(host='0.0.0.0',port=5000, debug=True)

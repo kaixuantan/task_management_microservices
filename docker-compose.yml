@@ -28,6 +28,7 @@ services:
     depends_on:
       - rabbitmq
       - amqp
+    restart: on-failure
 
   notification:
     build: ./SimpleMicroservices/notification
@@ -40,6 +41,7 @@ services:
       - rabbitmq
       - amqp
       - log
+    restart: on-failure
 
   # Complex Microservices
   idea:
