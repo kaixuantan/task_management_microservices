@@ -73,7 +73,7 @@ def upload_file(subGroupId, fileType, fileData, userId):
     if response and fileType == "md":
         # Notification and Logging
         try:
-            # notify_users(subGroupId)
+            notify_users(subGroupId)
             send_log(subGroupId, userId, "Generate ideas", f"{userId} generated ideas and project summary for {subGroupId}")
         except Exception as error:
             print(f"Error: {error}")
