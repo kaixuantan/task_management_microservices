@@ -55,39 +55,39 @@ services:
       - notification
     restart: on-failure
 
-    group-creation:
-      build: ./ComplexMicroservices/GroupCreation
-      ports:
-        - "5001:5000"
-      env_file:
-      - ./ComplexMicroservices/GroupCreation/.env
-      depends_on:
-        - rabbitmq
-        - amqp
-        - log
-        - notification
-      restart: on-failure
+  group-creation:
+    build: ./ComplexMicroservices/GroupCreation
+    ports:
+      - "5001:5000"
+    env_file:
+    - ./ComplexMicroservices/GroupCreation/.env
+    depends_on:
+      - rabbitmq
+      - amqp
+      - log
+      - notification
+    restart: on-failure
 
-    enrollment:
-      build: ./ComplexMicroservices/enrollment
-      ports:
-        - "5002:5000"
-      env_file:
-      - ./ComplexMicroservices/enrollment/.env
-      depends_on:
-        - rabbitmq
-        - amqp
-        - log
-        - notification
-      restart: on-failure
-    
-    task:
-      build: ./ComplexMicroservices/Task
-      ports:
-        - "5003:5000"
-      depends_on:
-        - rabbitmq
-        - amqp
-        - log
-        - notification
-      restart: on-failure
+  enrollment:
+    build: ./ComplexMicroservices/enrollment
+    ports:
+      - "5002:5000"
+    env_file:
+    - ./ComplexMicroservices/enrollment/.env
+    depends_on:
+      - rabbitmq
+      - amqp
+      - log
+      - notification
+    restart: on-failure
+  
+  task:
+    build: ./ComplexMicroservices/Task
+    ports:
+      - "5003:5000"
+    depends_on:
+      - rabbitmq
+      - amqp
+      - log
+      - notification
+    restart: on-failure
