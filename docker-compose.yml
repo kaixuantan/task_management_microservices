@@ -28,6 +28,7 @@ services:
     depends_on:
       - rabbitmq
       - amqp
+    restart: on-failure
 
   notification:
     build: ./SimpleMicroservices/notification
@@ -40,6 +41,7 @@ services:
       - rabbitmq
       - amqp
       - log
+    restart: on-failure
 
   # Complex Microservices
   idea:
@@ -81,13 +83,13 @@ services:
       - notification
     restart: on-failure
   
-  task:
-    build: ./ComplexMicroservices/Task
-    ports:
-      - "5003:5000"
-    depends_on:
-      - rabbitmq
-      - amqp
-      - log
-      - notification
-    restart: on-failure
+  # task:
+  #   build: ./ComplexMicroservices/Task
+  #   ports:
+  #     - "5003:5000"
+  #   depends_on:
+  #     - rabbitmq
+  #     - amqp
+  #     - log
+  #     - notification
+  #   restart: on-failure

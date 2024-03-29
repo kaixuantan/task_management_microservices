@@ -17,15 +17,17 @@ smtp_port = os.getenv('SMTP_PORT')
 smtp_username = os.getenv('SMTP_USERNAME')
 smtp_password = os.getenv('SMTP_PASSWORD')
 
-print(f"RabbitMQ Host: {rabbitmq_host}")
-# Connect to RabbitMQ
-connection = pika.BlockingConnection(pika.ConnectionParameters
-                                     (host=rabbitmq_host, port=rabbitmq_port,
-                                      heartbeat=3600, blocked_connection_timeout=3600))
-channel = connection.channel()
+
+def open_connection():
+    # Connect to RabbitMQ
+    connection = pika.BlockingConnection(pika.ConnectionParameters
+                                        (host=rabbitmq_host, port=rabbitmq_port,
+                                        heartbeat=3600, blocked_connection_timeout=3600))
+    channel = connection.channel()
+    return connection, channel
 
 
-def send_notif(email, subject, body):
+def send_notif(email, subject, body, channel):
     routing_key = "email.generateIdeas"
     # Define the message
     message = {
@@ -36,7 +38,7 @@ def send_notif(email, subject, body):
     
     send_message(channel, routing_key, message)
 
-def send_log(userId, subGroupId, logType, description):
+def send_log(userId, subGroupId, logType, description, channel):
     routing_key = "log.generateIdeas"
     # Define the message
     message = {
@@ -61,5 +63,7 @@ def send_message(channel, routing_key, message):
     )
 
     print(f"Message sent to the exchange '{rabbitmq_exchange}' with routing key '{routing_key}'.")
+
+def close(connection):
     # Close the connection
     connection.close()
