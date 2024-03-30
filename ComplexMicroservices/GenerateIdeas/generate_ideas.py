@@ -114,7 +114,14 @@ def check_file_exist(subGroupId, fileType):
 def notify_users(subGroupId, channel):
     emails = get_users_email(subGroupId)
     for email in emails:
-        send_notif(email, "Project summary and ideas generated successfully!", "Head to the project page to view the details. Feel free to Upload a new PDF file to generate the response again. \nDisclaimer: Content generated using AI, please check for accuracy.", channel)
+        send_notif(email, 
+                   "[TaskMaster] Project summary and Ideas generated", 
+                   f"Hello {email},
+                   \nHead to the project page to view the details. Feel free to Upload a new PDF file to generate a new response. 
+                   \nDisclaimer: Content generated using AI, please check for accuracy.
+                   \nBest regards,
+                   \nTaskMaster", 
+                   channel)
     
 if __name__ == '__main__':
     app.run(host='0.0.0.0',port=5000, debug=True)
