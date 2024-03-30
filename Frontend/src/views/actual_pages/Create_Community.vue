@@ -229,15 +229,12 @@ if(subgroup_submit.value.length==0){
 });
 
     console.log('Response:', response.data);
-    router.push('/community');
-    alert('Community Created Successfully')
-    // Handle the response as needed (e.g., show success message, redirect, etc.)
-
+    alert('Community Created Successfully', () => {
+      router.push('/community');
+    });
   } catch (error) {
-    
     console.error('Error:', error);
-    alert('Error creating community', error.message)
-    // Handle the error (e.g., show error message)
+    alert('Error creating community', error.message);
   }
 };
 
