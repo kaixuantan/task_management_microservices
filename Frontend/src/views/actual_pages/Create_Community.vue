@@ -211,6 +211,7 @@ if(subgroup_submit.value.length==0){
 
 
   try {
+    console.log(subgroup_submit_formatted)
     const response = await axios.post(`http://localhost:5001/groupcreation`, [
   groupdetails_submit,
   subgroup_submit_formatted,

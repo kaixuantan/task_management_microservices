@@ -375,7 +375,7 @@ export default {
                 this.sortTasksByStatus(this.proj_tasks);
                 this.loading = false;
                 // console.log(this.selected_project);
-                console.log(this.user_projects);
+                // console.log(this.user_projects);
             },
         },
         selected_project: {
