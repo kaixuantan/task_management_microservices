@@ -43,14 +43,17 @@ console.log(userole)
                                 <!-- <p class="m-0 text-500">Organisation</p> -->
                             </div>
                         </div>
-                        <Button text>
-                            <i class="pi pi-pencil text-500 text-xl" v-if="userole == 'admin'" @click="editcomunity(community)"></i>
+                        <Button text @click="editcommunity(community)">
+                            <i class="pi pi-pencil text-500 text-xl" v-if="userole == 'admin'"></i>
                         </Button>
                     </div>
                     <img alt="user header" src="https://cdn-icons-png.freepik.com/512/2592/2592465.png" style="width: 50%; height: 50%; object-fit: contain; margin: 0 auto; display: block;" />
                 </template>
                 <template #title>Community Size: {{ community.size }}</template>
-                <template #subtitle>Community Description: {{ community.description }} </template>
+                <template #subtitle>
+                    <span class="block">Community Description:</span> 
+                    {{ community.description }} 
+                </template>
                 <!-- <template #content>
                     <p class="m-0">
                         Description about community
@@ -96,9 +99,9 @@ export default {
         viewProjects(groupId) {
             this.$router.push({ name: 'projects', query: { groupId: groupId } });
         },
-        editcomunity(community){
-        this.selectedCommunity = { ...community, groupId: community.groupId };
-        this.editDialog = true;
+        editcommunity(community){
+            this.selectedCommunity = { ...community, groupId: community.groupId };
+            this.editDialog = true;
         },
         async saveCommunity() {
   try {

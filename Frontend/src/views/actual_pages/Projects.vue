@@ -61,8 +61,8 @@
                                 </h5>
                             </div>
                         </div>
-                        <Button text rounded>
-                            <i class="pi pi-pencil text-500 text-xl" v-if="userrole=='admin'" @click="editproject(project)"></i>
+                        <Button text rounded @click="editproject(project)">
+                            <i class="pi pi-pencil text-500 text-xl" v-if="userrole=='admin'"></i>
                         </Button>
                     </div>
                     <img
