@@ -1,7 +1,7 @@
 {
     "openapi": "3.0.0",
     "info": {
-      "title": "Your API",
+      "title": "Task Complex Microservice API",
       "version": "1.0.0"
     },
     "paths": {
