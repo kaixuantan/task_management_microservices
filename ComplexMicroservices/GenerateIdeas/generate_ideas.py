@@ -62,7 +62,7 @@ class IdeaUpload(Resource):
         subGroupId = data['subGroupId']
         fileType = data['type']
         
-        return upload_file(subGroupId, fileType, data)
+        return upload_file(subGroupId, fileType, data, None)
 
 def upload_file(subGroupId, fileType, fileData, userId):
     headers = {

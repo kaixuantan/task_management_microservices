@@ -306,7 +306,7 @@ export default {
         async uploadFile(base64String) {
             const data = {
                 document: base64String,
-                subGroupId: this.$route.query.subGroupId,
+                subGroupId: parseInt(this.$route.query.subGroupId),
                 type: "pdf",
             };
             try {
