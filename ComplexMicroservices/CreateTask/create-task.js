@@ -117,6 +117,7 @@ app.post('/task', async (req, res) => {
         res.status(201).json({ message: 'Task created successfully', taskId });
         
         var timestamp = getSingaporeTimestamp();
+        console.log(timestamp)
 
         // for log
         const message = {
@@ -124,7 +125,7 @@ app.post('/task', async (req, res) => {
             subGroupId: req.body.subGroupId,
             taskId: taskId,
             type: 'Create Task',
-            description: 'This is a test log message.',
+            description: 'A task has been created',
             timestamp: timestamp
         };
 
@@ -134,32 +135,34 @@ app.post('/task', async (req, res) => {
 
         // for notif
         const formattedDate = formatDate(req.body.dueDateTime);
+        console.log(formattedDate)
         const taskURL = `http://localhost:5173/task/${taskId}`;
 
-        const notifMsg = {
-            recipient: [req.body.assignedTo.map(assignee => `${assignee.assigneeEmail}`).join(', ')],
-            subject: '[TaskMaster] New Task Alert',
-            body: `
-                Hello ${req.body.assignedTo.map(assignee => `${assignee.assigneeUsername}`).join(', ')}!
+        console.log(req.body.assignedTo)
+        for (i = 0; i < req.body.assignedTo.length; i++) {
+            const notifMsg = {
+                recipient: req.body.assignedTo[i].assigneeEmail,
+                subject: '[TaskMaster] New Task Alert',
+                body: `
+                    Hello ${req.body.assignedTo[i].assigneeUsername}!
+    
+                    A new task has been created by ${req.body.username}:
+                    Task Name: ${req.body.taskName}
+                    Description: ${req.body.taskDesc}
+                    Due On: ${formattedDate}
+                    All assignees: ${req.body.assignedTo.map(assignee => `${assignee.assigneeUsername}`).join(', ')}
+    
+                    You can login to view the task details here: ${taskURL}
+    
+                    Best regards,
+                    TaskMaster
+                `
+            };
 
-                A new task has been created:
-                Task Name: ${req.body.taskName}
-                Description: ${req.body.taskDesc}
-                Due On: ${formattedDate}
-                Assignees:
-                ${req.body.assignedTo.map(assignee => `- ${assignee.assigneeUsername}`).join('\n')}
-
-                You can login to view the task details here: ${taskURL}
-
-                Best regards,
-                TaskMaster
-            `
-        };
-
-        // Send the message to RabbitMQ
-        await channel.publish(rabbitmq_exchange, rabbitmq_notif_routing_key, Buffer.from(JSON.stringify(notifMsg)), { persistent: true });
-        console.log(`Message sent to RabbitMQ exchange '${rabbitmq_exchange}' with routing key '${rabbitmq_notif_routing_key}'.`);
-
+            // Send the message to RabbitMQ
+            await channel.publish(rabbitmq_exchange, rabbitmq_notif_routing_key, Buffer.from(JSON.stringify(notifMsg)), { persistent: true });
+            console.log(`Message sent to RabbitMQ exchange '${rabbitmq_exchange}' with routing key '${rabbitmq_notif_routing_key}'.`);    
+        }
     } catch (error) {
         console.log(error)
         if (error.code === 'ERR_BAD_RESPONSE') {
@@ -207,7 +210,6 @@ app.post('/task', async (req, res) => {
 
             // for log
             var timestamp = getSingaporeTimestamp();
-
             const message = {
                 userId: req.body.userId,
                 subGroupId: req.body.subGroupId,
@@ -230,24 +232,31 @@ app.post('/task', async (req, res) => {
 
 function getSingaporeTimestamp() {
     const currentDate = new Date();
-    const sgTimezoneOffset = 8 * 60; // Offset in minutes
-    const singaporeTime = new Date(currentDate.getTime() + sgTimezoneOffset * 60000);
-    return singaporeTime.toISOString();
+    const singaporeTimezone = 'Asia/Singapore'; // Singapore time zone
+    const singaporeTime = currentDate.toLocaleString('en-US', { timeZone: singaporeTimezone });
+    return singaporeTime;
 }
 
 function formatDate(dateString) {
-    const date = new Date(dateString);
+    // Convert the input date string to a Date object
+    const inputDate = new Date(dateString);
+
+    // Format the date in the desired format
     const options = {
         day: '2-digit',
         month: 'long',
         year: 'numeric',
         hour: '2-digit',
         minute: '2-digit',
-        hour12: true
+        hour12: true,
+        timeZone: 'Asia/Singapore' // Specify the time zone
     };
-    return date.toLocaleString('en-US', options);
+    const timeZoneOffset = -8 * 60; // Convert hours to minutes
+    const adjustedDate = new Date(inputDate.getTime() + timeZoneOffset * 60 * 1000);
+
+    return adjustedDate.toLocaleString('en-SG', options);
 }
 
 app.listen(PORT, () => {
-    console.log(`Server is running on port http://localhost:${PORT}`);
+    console.log(`Server is running on port http://0.0.0.0:${PORT}`);
 });

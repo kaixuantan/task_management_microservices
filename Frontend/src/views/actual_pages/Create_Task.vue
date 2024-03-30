@@ -11,15 +11,13 @@ const multiselectAssignees = ref('');
 const subGroupId = ref('');
 
 const queryString = window.location.search;
-console.log(queryString)
 const urlParams = new URLSearchParams(queryString);
-const sgid = urlParams.get('subGroupId')
 subGroupId.value = urlParams.get('subGroupId');
-console.log(subGroupId);
+console.log(subGroupId.value);
 
 onMounted(async () => {
     try {
-        const response = await axios.get(`http://0.0.0.0:5000/subgroup/${subGroupId.value}`); 
+        const response = await axios.get(`http://localhost:5003/subgroup/${subGroupId.value}`); 
         multiselectAssignees.value = response.data;
     } catch (error) {
         console.error('Error fetching assignees:', error);
@@ -79,7 +77,7 @@ const handleSubmit = async () => {
         // console.log(multiselectAssignee.value)
         // console.log(dueDate.value)
 
-        const response = await axios.post(`http://0.0.0.0:5000/task`, taskData);
+        const response = await axios.post(`http://localhost:5003/task`, taskData);
         
         // Handle the response
         console.log('Task added:', response.data);
@@ -168,7 +166,7 @@ const handleSubmit = async () => {
                         </div>
                     </template>
                 </MultiSelect>
-                <div>{{ multiselectAssignee}}</div>
+                <!-- <div>{{ multiselectAssignee}}</div> -->
             </div>
         </div>
         <div class="col-12 md:col-6">
