@@ -249,7 +249,6 @@ export default {
                     }
                 );
                 this.proj_tasks = response.data.TaskAPI;
-                // console.log(this.projects);
             } catch (error) {
                 console.error(error);
             }
