@@ -10,33 +10,40 @@ import pika
 import json
 from dotenv import load_dotenv
 
-# load_dotenv()
+from flasgger import Swagger
 
 app = Flask(__name__)
 CORS(app)
 
+# Initialize flasgger 
+app.config['SWAGGER'] = {
+    'title': 'Group Creation Complex Microservice',
+    'version': 1.0,
+    "openapi": "3.0.2",
+    'description': 'API for creating groups with complex attributes'
+}
+swagger = Swagger(app)
+
+
 # URLs
 group_URL = "https://personal-rc7vnnm9.outsystemscloud.com/GroupAPI_REST/rest/v1/group/"
 subgroup_URL = "https://personal-rc7vnnm9.outsystemscloud.com/SubGroupAPI_REST/rest/v1/subgroup/"
-
 user_URL = "https://personal-rc7vnnm9.outsystemscloud.com/UserAPI_REST/rest/v1/user/"
 
-# load and get log.env files
+# load and get .env files
 load_dotenv()
-rabbitmq_host_log = os.getenv('HOSTNAME')
-rabbitmq_port_log = os.getenv('PORT')
-rabbitmq_exchange_log = os.getenv('EXCHANGE_NAME')
-rabbitmq_exchange_type_log = os.getenv('EXCHANGE_TYPE') 
-rabbitmq_queue_log = os.getenv('QUEUE_NAME')
-rabbitmq_routing_key_log = os.getenv('ROUTING_KEY') 
+rabbitmq_host = os.getenv('HOSTNAME')
+rabbitmq_port = os.getenv('PORT')
+rabbitmq_exchange = os.getenv('EXCHANGE_NAME')
+rabbitmq_exchange_type = os.getenv('EXCHANGE_TYPE')
 
-# RabbitMQ connection details
-rabbitmq_host_notif = os.getenv('HOSTNAME')
-rabbitmq_port_notif = os.getenv('PORT')
-rabbitmq_exchange_notif = os.getenv('EXCHANGE_NAME')
-rabbitmq_exchange_type_notif = os.getenv('EXCHANGE_TYPE') 
-rabbitmq_queue_notif = os.getenv('QUEUE_NAME')
-rabbitmq_routing_key_notif = os.getenv('ROUTING_KEY')  
+# load and get log queue and routing key
+rabbitmq_queue_log = os.getenv('QUEUE_NAME_1')
+rabbitmq_routing_key_log = os.getenv('ROUTING_KEY_1') 
+
+# load and get notif queue and routing key
+rabbitmq_queue_notif = os.getenv('QUEUE_NAME_2')
+rabbitmq_routing_key_notif = os.getenv('ROUTING_KEY_2')  
 
 # Email server details
 smtp_server = os.getenv('SMTP_SERVER')
@@ -44,14 +51,95 @@ smtp_port = os.getenv('SMTP_PORT')
 smtp_username = os.getenv('SMTP_USERNAME')
 smtp_password = os.getenv('SMTP_PASSWORD')
 
-# user_email = os.getenv('TEST_EMAIL')
-
 
 # Group Creation complex microservice
 
 @app.route("/groupcreation", methods=['POST'])
 def group_creation():
     # Simple check of input format and data of the request are JSON
+    """
+    Create group with users assigned and subgroups
+    ---
+    
+    requestBody:
+        description: Create a new group with subgroups and assign users
+        required: true
+        content:
+            application/json:
+                schema:
+                    type: array
+                    items:
+                        oneOf:
+                            -   type: object
+                                properties:
+                                    name:
+                                        type: string
+                                        description: The name of the group
+                                    description:
+                                        type: string
+                                        description: A brief description of the group
+                                    picture:
+                                        type: string
+                                        description: An image associated
+                                    size:
+                                        type: integer
+                                        description: Number of people in a group
+                                    createdById:
+                                        type: integer
+                                        description: UserId of user who created group
+                                    createdByUsername:
+                                        type: string
+                                        description: Username of user who created group
+                                    groupUsers:
+                                        type: array
+                                        description: Empty array (to be updated when users assigned to group)
+                                        items:
+                                            type: object
+                                required:
+                                - name
+                                - size
+                                - createdById
+                                - createdByUsername
+
+                            -   type: array
+                                items:
+                                    type: object
+                                    properties:
+                                        name:
+                                            type: string
+                                            description: The name of the subgroup
+                                        description:
+                                            type: string
+                                            description: A brief description of the subgroup
+                                        picture:
+                                            type: string
+                                            description: An image associated
+                                        size:
+                                            type: integer
+                                            description: Number of people in a subgroup
+                                        subGroupUsers:
+                                            type: array
+                                            description: Empty array (to be updated when users join to subgroup)
+                                            items:
+                                                type: object
+                                required:
+                                - name
+                                - size
+                            -   type: array
+                                items:
+                                    type: integer
+                
+
+    responses:
+        201:
+            description: Return group with users assigned and subgroups 
+        400:
+            description: Invalid input
+        500: 
+            description: Error creating group
+
+    """
+
     if request.is_json:
         try:
             group_info = request.get_json()[0] #only name is mandatory
@@ -84,6 +172,7 @@ def group_creation():
     }), 400
 
 def processGroupCreation(group_info,subgroup_info,users_id_list):
+
     # Send the group info
     # Invoke the group microservice
 
@@ -108,7 +197,7 @@ def processGroupCreation(group_info,subgroup_info,users_id_list):
     
     # Connect to RabbitMQ
     connection = pika.BlockingConnection(pika.ConnectionParameters
-                                        (host=rabbitmq_host_log, port=rabbitmq_port_log,
+                                        (host=rabbitmq_host, port=rabbitmq_port,
                                         heartbeat=3600, blocked_connection_timeout=3600))
     channel = connection.channel()
 
@@ -122,7 +211,7 @@ def processGroupCreation(group_info,subgroup_info,users_id_list):
 
     # Send the message to the exchange
     channel.basic_publish(
-        exchange=rabbitmq_exchange_log,
+        exchange=rabbitmq_exchange,
         routing_key=rabbitmq_routing_key_log,
         body=json.dumps(message),
         properties=pika.BasicProperties(
@@ -130,7 +219,7 @@ def processGroupCreation(group_info,subgroup_info,users_id_list):
         )
     )
 
-    print(f"Message sent to the exchange '{rabbitmq_exchange_log}' with routing key '{rabbitmq_routing_key_log}'.")
+    print(f"Message sent to the exchange '{rabbitmq_exchange}' with routing key '{rabbitmq_routing_key_log}'.")
 
     # Close the connection
     connection.close()
@@ -162,7 +251,7 @@ def processGroupCreation(group_info,subgroup_info,users_id_list):
 
     # Connect to RabbitMQ
     connection = pika.BlockingConnection(pika.ConnectionParameters
-                                        (host=rabbitmq_host_log, port=rabbitmq_port_log,
+                                        (host=rabbitmq_host, port=rabbitmq_port,
                                         heartbeat=3600, blocked_connection_timeout=3600))
     channel = connection.channel()
 
@@ -174,7 +263,7 @@ def processGroupCreation(group_info,subgroup_info,users_id_list):
 
     # Send the message to the exchange
     channel.basic_publish(
-        exchange=rabbitmq_exchange_log,
+        exchange=rabbitmq_exchange,
         routing_key=rabbitmq_routing_key_log,
         body=json.dumps(message),
         properties=pika.BasicProperties(
@@ -182,7 +271,7 @@ def processGroupCreation(group_info,subgroup_info,users_id_list):
         )
     )
 
-    print(f"Message sent to the exchange '{rabbitmq_exchange_log}' with routing key '{rabbitmq_routing_key_log}'.")
+    print(f"Message sent to the exchange '{rabbitmq_exchange}' with routing key '{rabbitmq_routing_key_log}'.")
 
     # Close the connection
     connection.close()
@@ -228,7 +317,7 @@ def processUserAssignment(group,user_id_list,subgroup_namelist):
 
             # Connect to RabbitMQ
             connection = pika.BlockingConnection(pika.ConnectionParameters
-                                                (host=rabbitmq_host_notif, port=rabbitmq_port_notif,
+                                                (host=rabbitmq_host, port=rabbitmq_port,
                                                 heartbeat=3600, blocked_connection_timeout=3600))
             channel = connection.channel()
 
@@ -248,7 +337,7 @@ def processUserAssignment(group,user_id_list,subgroup_namelist):
 
             # Send the message to the exchange
             channel.basic_publish(
-                exchange=rabbitmq_exchange_notif,
+                exchange=rabbitmq_exchange,
                 routing_key=rabbitmq_routing_key_notif,
                 body=json.dumps(message),
                 properties=pika.BasicProperties(
@@ -256,7 +345,7 @@ def processUserAssignment(group,user_id_list,subgroup_namelist):
                 )
             )
 
-            print(f"Message sent to the exchange '{rabbitmq_exchange_notif}' with routing key '{rabbitmq_routing_key_notif}'.")
+            print(f"Message sent to the exchange '{rabbitmq_exchange}' with routing key '{rabbitmq_routing_key_notif}'.")
 
             # Close the connection
             connection.close()
@@ -274,7 +363,7 @@ def processUserAssignment(group,user_id_list,subgroup_namelist):
     
     # Connect to RabbitMQ
     connection = pika.BlockingConnection(pika.ConnectionParameters
-                                        (host=rabbitmq_host_log, port=rabbitmq_port_log,
+                                        (host=rabbitmq_host, port=rabbitmq_port,
                                         heartbeat=3600, blocked_connection_timeout=3600))
     channel = connection.channel()
 
@@ -288,7 +377,7 @@ def processUserAssignment(group,user_id_list,subgroup_namelist):
 
     # Send the message to the exchange
     channel.basic_publish(
-        exchange=rabbitmq_exchange_log,
+        exchange=rabbitmq_exchange,
         routing_key=rabbitmq_routing_key_log,
         body=json.dumps(message),
         properties=pika.BasicProperties(
@@ -296,7 +385,7 @@ def processUserAssignment(group,user_id_list,subgroup_namelist):
         )
     )
 
-    print(f"Message sent to the exchange '{rabbitmq_exchange_log}' with routing key '{rabbitmq_routing_key_log}'.")
+    print(f"Message sent to the exchange '{rabbitmq_exchange}' with routing key '{rabbitmq_routing_key_log}'.")
 
     # Close the connection
     connection.close()
