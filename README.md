@@ -26,7 +26,7 @@ Your website is now live and can be accessed at http://localhost:5173. Enjoy bro
 ### Swagger API Documentation for Complex Microservices
 
 Please note: This documentation is only accessible once the Docker containers are up and running.
-| Complex Microservices          | URL                           |
+| Complex Microservices          | Swagger Docs URL                           |
 |-----------------|-------------------------------|
 | Generate Ideas  | http://localhost:5000         |
 | Group Creation  | http://localhost:5000/apidocs |
