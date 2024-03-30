@@ -107,6 +107,10 @@
                             />
                         <Button label="View" class="w-full" @click="viewProject(project.subGroupId)" />
                     </div>
+
+                    <div class="flex gap-3 mt-1" v-if="userrole == 'admin'">
+                        <Button label="View" class="w-full" @click="viewProject(project.subGroupId)" />
+                    </div>
                 </template>
             </Card>
         </div>
