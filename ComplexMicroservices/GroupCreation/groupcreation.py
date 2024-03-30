@@ -234,6 +234,7 @@ def processGroupCreation(group_info,subgroup_info,users_id_list):
         print('\n\n-----Invoking subgroup microservice-----')
         subgroup_headers = {'X-SubGroup-AppId': request.headers.get('X-SubGroup-AppId'), "X-SubGroup-Key": request.headers.get('X-SubGroup-Key')}
         # create subgroup
+        subgroup_info[i]["groupId"] = groupId
         subgroup_result = invoke_http(subgroup_URL, method="POST", json=subgroup_info[i], headers=subgroup_headers)
         # print(subgroup_result)
         subgroup_result_status = subgroup_result["Result"]

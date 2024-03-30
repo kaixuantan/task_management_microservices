@@ -78,7 +78,7 @@
                     </p>
                 </template>
                 <template #footer>
-                    <div class="flex mt-1 justify-content-between" v-if="!isUserEnrolled(project) && userrole !== 'admin'">
+                    <div class="flex mt-1 justify-content-between" v-if="!isUserEnrolled(project) && userrole !== 'admin' && project.subGroupUsers.length <project.size">
 
                     <!-- v-if="!enrolled" -->
                         <AvatarGroup>

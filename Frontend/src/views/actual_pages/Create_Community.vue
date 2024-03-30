@@ -62,7 +62,6 @@ const listofusers_forsubgrpcheckbox = computed(() => {
 
 
 var groupid_toadd=0
-const subgrpmembers= ref(null);
 const createdById= sessionStorage.getItem('userid');
 const createdByUsername= sessionStorage.getItem('username');
 //VALUES TO SUBMIT
@@ -102,18 +101,13 @@ const hidesubgrp_popup = () => {
 };
 
 const savesubgrp = () => {  
-    console.log(subgrpmembers)
   subsubmitted.value = true;
   if (subgrp.value.name && subgrp.value.name.trim() && subgrp.value.capacity) {
       const formattedSubgroup = {
       name: subgrp.value.name,
       description: subgrp.value.description,
       size: subgrp.value.capacity,
-      subGroupUsers: subgrpmembers.value!=null ? subgrpmembers.value.map(member => ({
-        userId: parseInt(member.userId),
-        username: member.name,
-        email: member.email
-      })) : []
+      subGroupUsers: []
     };
     
 
@@ -134,7 +128,6 @@ const savesubgrp = () => {
 
     subgrp_popup.value = false;
     subgrp.value = {};
-    subgrpmembers.value = [];
 
   }
 };
@@ -218,7 +211,7 @@ if(subgroup_submit.value.length==0){
 
 
   try {
-    const response = await axios.post(`${postURL}/groupcreation`, [
+    const response = await axios.post(`http://localhost:5001/groupcreation`, [
   groupdetails_submit,
   subgroup_submit_formatted,
   groupUsers
@@ -323,11 +316,6 @@ fetchUsers();
                     <DataTable :value="subgroup_submit">
                         <Column field="name" header="Name"></Column>
                         <Column field="description" header="Description"></Column>
-                        <Column field="members" header="Members">
-                            <template #body="slotProps">
-                            <div v-for="member in slotProps.data.subGroupUsers" :key="member.userId">{{ member.username }}</div>
-                            </template>
-                        </Column>
                         <Column field="size" header="Capacity"></Column>
                         <Column>
                             <template #body="slotProps">
@@ -361,31 +349,7 @@ fetchUsers();
                     </div>
 
 
-                <!--Code to add subgroup members to subgroup-->
-                    <div class="field">
-                        <label for="members">Subgroup Members</label>
-                        <MultiSelect v-model="subgrpmembers" :options="listofusers_forsubgrpcheckbox" optionLabel="name"
-                            placeholder="Select Members" :filter="true" class="w-full">
-                            <template #value="slotProps">
-                                <div class="inline-flex align-items-center py-1 px-2 bg-primary text-primary border-round mr-2"
-                                    v-for="option of slotProps.value" :key="option.userId">
-                                    <span :class="'mr-2 flag flag-' + option.userId.toLowerCase()"
-                                        style="width: 18px; height: 12px" />
-                                    <div>{{ option.name }}</div>
-                                </div>
-                                <template v-if="!slotProps.value || slotProps.value.length === 0">
-                                    <div class="p-1">Select Members</div>
-                                </template>
-                            </template>
-                            <template #option="slotProps">
-                                <div class="flex align-items-center">
-                                    <span :class="'mr-2 flag flag-' + slotProps.option.userId.toLowerCase()"
-                                        style="width: 18px; height: 12px" />
-                                    <div>{{ slotProps.option.name }}</div>
-                                </div>
-                            </template>
-                        </MultiSelect>
-                    </div>
+
 
                     <div class="field">
                         <label for="capacity">Subgroup Capacity</label>
