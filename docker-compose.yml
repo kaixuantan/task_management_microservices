@@ -10,7 +10,7 @@ services:
   
   amqp:
     build: ./SimpleMicroservices/amqp
-    image: kelynwong/amqp
+    image: esd-project/amqp
     env_file:
       - ./SimpleMicroservices/amqp/.env
     ports:
@@ -20,7 +20,7 @@ services:
   
   log:
     build: ./SimpleMicroservices/log
-    image: kelynwong/log
+    image: esd-project/log
     env_file:
       - ./SimpleMicroservices/log/.env
     ports:
@@ -32,7 +32,7 @@ services:
 
   notification:
     build: ./SimpleMicroservices/notification
-    image: kelynwong/notification
+    image: esd-project/notification
     env_file:
       - ./SimpleMicroservices/notification/.env
     ports:
@@ -46,6 +46,7 @@ services:
   # Complex Microservices
   generate-idea:
     build: ./ComplexMicroservices/GenerateIdeas
+    image: esd-project/generateideas
     ports:
       - "5000:5000"
     env_file:
@@ -59,6 +60,7 @@ services:
 
   group-creation:
     build: ./ComplexMicroservices/GroupCreation
+    image: esd-project/groupcreation
     ports:
       - "5001:5000"
     env_file:
@@ -72,6 +74,7 @@ services:
 
   enrollment:
     build: ./ComplexMicroservices/enrollment
+    image: esd-project/enrollment
     ports:
       - "5002:5000"
     env_file:
@@ -85,6 +88,7 @@ services:
   
   create-task:
     build: ./ComplexMicroservices/CreateTask
+    image: esd-project/createtask
     ports:
       - "5003:5000"
     env_file:
