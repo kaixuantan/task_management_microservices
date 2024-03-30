@@ -33,7 +33,7 @@ const smtp_password = process.env.SMTP_PASSWORD;
 const test_email = process.env.TEST_EMAIL;
 
 // Serve Swagger UI
-app.use('/', swaggerUI.serve, swaggerUI.setup(swaggerDocument));
+app.use('/api', swaggerUI.serve, swaggerUI.setup(swaggerDocument));
 
 app.get('/subgroup/:subGroupId', async (req, res) => {
     try {
@@ -249,5 +249,5 @@ function formatDate(dateString) {
 }
 
 app.listen(PORT, () => {
-    console.log(`Server is running on port http://0.0.0.0:${PORT}`);
+    console.log(`Server is running on port http://localhost:${PORT}`);
 });

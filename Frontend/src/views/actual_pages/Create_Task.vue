@@ -9,14 +9,17 @@ import { ref, computed, onMounted } from 'vue';
 
 const multiselectAssignees = ref('');
 const subGroupId = ref('');
-//TO EDIT WITH ACTUAL SUBGRPID
-subGroupId.value = 46;
-// subGroupId.value = sessionStorage.getItem('subGroupId');
-//END OF EDIT
+
+const queryString = window.location.search;
+console.log(queryString)
+const urlParams = new URLSearchParams(queryString);
+const sgid = urlParams.get('subGroupId')
+subGroupId.value = urlParams.get('subGroupId');
+console.log(subGroupId);
 
 onMounted(async () => {
     try {
-        const response = await axios.get(`http://localhost:3000/subgroup/${subGroupId.value}`); 
+        const response = await axios.get(`http://0.0.0.0:5000/subgroup/${subGroupId.value}`); 
         multiselectAssignees.value = response.data;
     } catch (error) {
         console.error('Error fetching assignees:', error);
@@ -76,7 +79,7 @@ const handleSubmit = async () => {
         // console.log(multiselectAssignee.value)
         // console.log(dueDate.value)
 
-        const response = await axios.post(`http://localhost:3000/task`, taskData);
+        const response = await axios.post(`http://0.0.0.0:5000/task`, taskData);
         
         // Handle the response
         console.log('Task added:', response.data);

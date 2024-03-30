@@ -11,7 +11,7 @@
                     placeholder="Selected community"
                     class="w-full md:w-14rem shadow-1"
                 />
-                <Button label="Add" icon="pi pi-plus" raised />
+                <Button label="Add" icon="pi pi-plus" @click="addProject()" raised />
             </div>
         </div>
         <!-- 3 cards at the top of the screen -->
@@ -168,6 +168,9 @@ export default {
         },
         viewProject(subGroupId) {
             this.$router.push({ name: 'project', query: { subGroupId: subGroupId } });
+        },
+        addProject(){
+            this.$router.push('/create-project');
         },
         async enrol(subGroupId, userId, groupId) {
             console.log(subGroupId, parseInt(userId), groupId);
