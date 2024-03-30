@@ -121,6 +121,8 @@ Base url: https://personal-rc7vnnm9.outsystemscloud.com
 - Task (https://personal-rc7vnnm9.outsystemscloud.com/TaskAPI_REST/rest/v1/)
   - [GET] 		Get all tasks			
     - /task
+  - [GET]     Get a task
+    - /task/{taskId}
   - [GET]		Get all tasks in subgroup 
     - /task/subgroup/{subGroupId}
   - [GET] Get user's tasks
