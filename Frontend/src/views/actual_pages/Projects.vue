@@ -106,7 +106,7 @@
                             severity="secondary"
                             outlined
                             class="w-full"
-                            v-if="!isUserEnrolled(project) && userrole !== 'admin'"/>
+                            v-if="isUserEnrolled(project) && userrole !== 'admin'"/>
                         <Button label="View" class="w-full" @click="viewProject(project.subGroupId)" />
                     </div>
                 </template>
