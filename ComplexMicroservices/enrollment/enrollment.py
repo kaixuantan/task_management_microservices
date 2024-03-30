@@ -110,8 +110,8 @@ class Enrollment(Resource):
 
 # Define your models
 enrollment_model = api.model('Enrollment', {
-    'userId': fields.String(required=True, description='User ID'),
-    'subGroupId': fields.String(required=True, description='SubGroup ID'),
+    'userId': fields.Integer(required=True, description='User ID'),
+    'subGroupId': fields.Integer(required=True, description='SubGroup ID'),
     'username': fields.String(required=True, description='Username'),
     'email': fields.String(required=True, description='Email'),
 })
@@ -142,10 +142,10 @@ class Enrollment(Resource):
         # 1. Call [GET] subgroup API from subgroup microservice to check if there is space in the subgroup
         try:
             subgroup_response = requests.get(f'{subgroup_microservice_base_url}/{subgroup_id}', headers={"X-SubGroup-AppId": sub_group_credentials["sub_group_app_id"], "X-SubGroup-Key": sub_group_credentials["sub_group_api_key"]})
-            if subgroup_response.json()['SubGroup']['size'] == len(subgroup_response.json()['SubGroup']['subGroupUsers']) :
-                return jsonify({'message': 'Subgroup is full'}), 400
+            if subgroup_response.json()['SubGroup']['size'] == len(subgroup_response.json()['SubGroup']['subGroupUsers']):
+                return {'message': 'Subgroup is full'}, 400
 
-            groupId = subgroup_response.json()['SubGroup']['groupId'] 
+            groupId = subgroup_response.json()['SubGroup']['groupId']
 
             # 2. Call [PUT] update subgroup API from subgroup microservice to add user into the subgroup
             update_subgroup_response = requests.put(f'{subgroup_microservice_base_url}/enrol/{subgroup_id}', json={'userId': user_id, 'subGroupId':subgroup_id, 'username': username, 'email': email}, headers={"X-SubGroup-AppId": sub_group_credentials["sub_group_app_id"], "X-SubGroup-Key": sub_group_credentials["sub_group_api_key"]})
