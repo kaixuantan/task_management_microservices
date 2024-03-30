@@ -104,7 +104,7 @@
                             severity="secondary"
                             outlined
                             class="w-full"
-                            />
+                            @click="leaveproject"/>
                         <Button label="View" class="w-full" @click="viewProject(project.subGroupId)" />
                     </div>
 
@@ -207,6 +207,32 @@ export default {
         const userId = sessionStorage.getItem("userid");
         return project.subGroupUsers.some(user => user.userId === parseInt(userId));
     },
+    async leaveproject(subGroupId) {
+        console.log(subGroupId);
+        const userId = sessionStorage.getItem("userid");
+    try {
+        console.log(subGroupId);
+        console.log(userId)
+        console.log(env.X_SubGroup_AppId)
+        console.log(env.X_SubGroup_Key)
+        const response = await axios.put(
+            `https://personal-rc7vnnm9.outsystemscloud.com/SubGroupAPI_REST/rest/v1/subgroup/unenrol/${subGroupId}`,
+            {
+                headers: {
+                    "X-SubGroup-AppId": env.X_SubGroup_AppId,
+                    "X-SubGroup-Key": env.X_SubGroup_Key,
+                    "userId":userId
+                },
+            }
+        );
+        console.log(response.data);
+        this.$toast.add({ severity: 'success', summary: 'Successful', detail: 'Left project', life: 3000 });
+        // Refresh the list of projects after leaving
+        await this.fetchGroupProjects(this.selected_community.groupId);
+    } catch (error) {
+        console.error('Error leaving project:', error);
+        this.$toast.add({ severity: 'error', summary: 'Error', detail: 'Failed to leave project', life: 3000 });
+    }},
 
     editproject(project){
         console.log(project)
