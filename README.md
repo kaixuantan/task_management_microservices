@@ -14,7 +14,7 @@ Welcome to our Task and Project Management platform, a comprehensive solution de
 1. In the root folder, build the Docker image with `docker compose build`.
 2. Start the Docker container with `docker compose up`.
 
-Your website is now live and can be accessed at `http://localhost:5173`. Enjoy browsing!
+Your website is now live and can be accessed at http://localhost:5173. Enjoy browsing!
 
 ### Swagger API Documentation for Complex Microservices
 
