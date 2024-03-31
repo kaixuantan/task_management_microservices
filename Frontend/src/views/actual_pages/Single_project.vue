@@ -473,12 +473,14 @@ export default {
         edittask(task) {
             this.task = { ...task };
             this.task.createdById = task.createdById;
-            const currentTime = new Date();
+            const currentTime = new Date(task.dueDateTime)
             const hours = currentTime.getHours().toString().padStart(2, '0'); // Ensures two digits, padding with 0 if necessary
             const minutes = currentTime.getMinutes().toString().padStart(2, '0');
             const formattedTime = `${hours}:${minutes}`;
             this.dueTime = formattedTime;
             this.editDialog = true;
+            console.log('wefweew')
+            console.log(task.dueDateTime)
             console.log(this.task)
             if (task.status === 'New') {
             this.task.status = 'new';
