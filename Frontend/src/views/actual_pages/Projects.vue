@@ -2,19 +2,36 @@
     <div class="grid">
         <Toast />
         <div class="col-12 flex justify-content-between">
-            <h2 class="mb-0 font-semibold" v-if="selected_community">All projects ({{ selected_community.name.toUpperCase() }})</h2>
+            <h2 class="mb-0 font-semibold" v-if="selected_community">All projects ({{
+                selected_community.name.toUpperCase() }})</h2>
             <h2 class="mb-0 font-semibold" v-else>Fetching projects</h2>
             <div class="flex gap-3">
-                <Dropdown
-                    v-model="selected_community"
-                    :options="communities"
-                    optionLabel="name"
-                    placeholder="Selected community"
-                    class="w-full md:w-14rem shadow-1"
-                />
-                <!-- <Button label="Add" icon="pi pi-plus" @click="addProject()" raised /> -->
+                <Dropdown v-model="selected_community" :options="communities" optionLabel="name"
+                    placeholder="Selected community" class="w-full md:w-14rem shadow-1" />
+                <Button label="Add" icon="pi pi-plus" @click="addProj = true" raised v-if="role === 'admin'"/>
             </div>
         </div>
+
+        <Dialog v-model:visible="addProj" :style="{ width: '450px' }" header="Edit Project" :modal="true"
+            class="p-fluid">
+            <div class="field">
+                <label for="name">Project Name</label>
+                <InputText id="name" v-model.trim="addProj_name" required="true" autofocus />
+            </div>
+            <div class="field">
+                <label for="description">Description</label>
+                <Textarea id="description" v-model="addProj_description" required="true" rows="3" cols="20" />
+            </div>
+            <div class="field">
+                <label for="size">Size</label>
+                <InputNumber id="Size" v-model="addProj_size" required="true" rows="3" cols="20" />
+            </div>
+            <template #footer>
+                <Button label="Cancel" icon="pi pi-times" text @click="addProj = false" />
+                <Button label="Save" icon="pi pi-check" text @click="addProject" />
+            </template>
+        </Dialog>
+
         <!-- 3 cards at the top of the screen -->
         <div class="xl:col-4" v-for="n in 3" v-if="loading">
             <div class="border-round border-1 surface-border p-4 surface-card shadow-1">
@@ -42,20 +59,13 @@
         <div class="xl:col-4" v-for="(project, idx) in grp_projects" v-else>
             <Card style="overflow: hidden" class="shadow-2">
                 <template #header>
-                    <div
-                        class="p-4 flex justify-content-between align-items-center"
-                    >
+                    <div class="p-4 flex justify-content-between align-items-center">
                         <div class="flex gap-2 align-items-center">
-                            <Avatar
-                                :label="project.name.charAt(0).toUpperCase()"
-                                class="mr-2"
-                                size="large"
-                                shape="circle"
-                                :style="{
+                            <Avatar :label="project.name.charAt(0).toUpperCase()" class="mr-2" size="large"
+                                shape="circle" :style="{
                                     backgroundColor:
                                         colors[idx % colors.length],
-                                }"
-                            />
+                                }" />
                             <div>
                                 <h5 class="mb-1 font-semibold">
                                     {{ project.name }}
@@ -66,11 +76,8 @@
                             <i class="pi pi-pencil text-500 text-xl"></i>
                         </Button>
                     </div>
-                    <img
-                        alt="user header"
-                        src="https://cdn-icons-png.freepik.com/512/4946/4946348.png"
-                        style="width: 50%; height: 50%; object-fit: contain; margin: 0 auto; display: block;"
-                    />
+                    <img alt="user header" src="https://cdn-icons-png.freepik.com/512/4946/4946348.png"
+                        style="width: 50%; height: 50%; object-fit: contain; margin: 0 auto; display: block;" />
                 </template>
                 <template #title>Members: {{ project.subGroupUsers.length }} / {{ project.size }}</template>
                 <template #content>
@@ -80,32 +87,25 @@
                     </p>
                 </template>
                 <template #footer>
-                    <div class="flex mt-1 justify-content-between" v-if="!isUserEnrolled(project) && userrole !== 'admin' && project.subGroupUsers.length <project.size">
+                    <div class="flex mt-1 justify-content-between"
+                        v-if="!isUserEnrolled(project) && userrole !== 'admin' && project.subGroupUsers.length <project.size">
 
-                    <!-- v-if="!enrolled" -->
+                        <!-- v-if="!enrolled" -->
                         <AvatarGroup>
                             <!-- can change to name as well if name is filled -->
                             <Avatar v-for="(user,idx2) in project.subGroupUsers.slice(0,3)" :key="user.userId"
-                                :label="user.username.charAt(0).toUpperCase()" 
-                                size="large"
-                                shape="circle"
-                                :style="{
+                                :label="user.username.charAt(0).toUpperCase()" size="large" shape="circle" :style="{
                                     backgroundColor:
                                         colors[idx2+2 % colors.length],
-                                }"
-                            />
-                            <Avatar :label="`+${project.subGroupUsers.length - 3}`" shape="circle" size="large" v-if="project.subGroupUsers.length > 3"/>
+                                }" />
+                            <Avatar :label="`+${project.subGroupUsers.length - 3}`" shape="circle" size="large"
+                                v-if="project.subGroupUsers.length > 3" />
                         </AvatarGroup>
                         <Button label="Enrol" @click="enrol(project.subGroupId,userId, selected_community.groupId)" />
                     </div>
 
                     <div class="flex gap-3 mt-1" v-if="isUserEnrolled(project) && userrole !== 'admin'">
-                        <Button
-                            label="Leave"
-                            severity="secondary"
-                            outlined
-                            class="w-full"
-                            @click="leaveproject"/>
+                        <Button label="Leave" severity="secondary" outlined class="w-full" @click="leaveproject" />
                         <Button label="View" class="w-full" @click="viewProject(project.subGroupId)" />
                     </div>
 
@@ -116,25 +116,27 @@
             </Card>
         </div>
     </div>
-    <Dialog v-model:visible="editDialog" :style="{ width: '450px' }" header="Edit Project" :modal="true" class="p-fluid">
-  <div class="field">
-    <label for="name">Project Name</label>
-    <InputText id="name" v-model.trim="selectedproject.name" required="true" autofocus />
-  </div>
-  <div class="field">
-    <label for="description">Description</label>
-    <Textarea id="description" v-model="selectedproject.description" required="true" rows="3" cols="20" />
-  </div>
-  <template #footer>
-    <Button label="Cancel" icon="pi pi-times" text @click="editDialog = false" />
-    <Button label="Save" icon="pi pi-check" text @click="saveproject" />
-  </template>
-</Dialog>
+    <Dialog v-model:visible="editDialog" :style="{ width: '450px' }" header="Edit Project" :modal="true"
+        class="p-fluid">
+        <div class="field">
+            <label for="name">Project Name</label>
+            <InputText id="name" v-model.trim="selectedproject.name" required="true" autofocus />
+        </div>
+        <div class="field">
+            <label for="description">Description</label>
+            <Textarea id="description" v-model="selectedproject.description" required="true" rows="3" cols="20" />
+        </div>
+        <template #footer>
+            <Button label="Cancel" icon="pi pi-times" text @click="editDialog = false" />
+            <Button label="Save" icon="pi pi-check" text @click="saveproject" />
+        </template>
+    </Dialog>
 </template>
 
 <script>
 import sharedMixin from "@/sharedMixin";
 import axios from "axios";
+import InputNumber from "primevue/inputnumber";
 import { mapState } from 'vuex';
 
 export default {
@@ -148,6 +150,10 @@ export default {
             userrole: sessionStorage.getItem('role'), 
             editDialog: false,
             selectedproject: null,
+            addProj: false,
+            addProj_name: null,
+            addProj_description: null,
+            addProj_size: null,
         };
     },
     computed: {
@@ -178,8 +184,31 @@ export default {
         viewProject(subGroupId) {
             this.$router.push({ name: 'project', query: { subGroupId: subGroupId } });
         },
-        addProject(){
-            this.$router.push('/create-project');
+        async addProject(){
+            const data = {
+                "groupId": this.$route.query.groupId,
+                "name": this.addProj_name,
+                "description": this.addProj_description,
+                "size": this.addProj_size,
+            }
+            try {
+                const response = await axios.post(
+                    "https://personal-rc7vnnm9.outsystemscloud.com/SubGroupAPI_REST/rest/v1/subgroup/", data,
+                    {
+                        headers: {
+                            "X-SubGroup-AppId": env.X_SubGroup_AppId,
+                            "X-SubGroup-Key": env.X_SubGroup_Key,
+                        },
+                    }
+                );
+                if (response.data.Result.Success) {
+                    await this.fetchGroupProjects(this.$route.query.groupId);
+                    this.addProj = false;
+                    this.$toast.add({ severity: 'success', summary: 'Successful', detail: 'Project added', life: 3000 });
+                }
+            } catch (error) {
+                console.error(error);
+            }
         },
         async enrol(subGroupId, userId, groupId) {
             console.log(subGroupId, parseInt(userId), groupId);
@@ -276,13 +305,12 @@ export default {
     );
     console.log(response.data);
     
-    // Close the edit dialog
-    this.editDialog = false;
-    
     // Refresh the list of projects
     await this.fetchGroupProjects(this.selected_community.groupId);
-    alert("Project updated successfully")
+    // alert("Project updated successfully")
     
+    this.editDialog = false;
+
     // Show a success toast message
     this.$toast.add({ severity: 'success', summary: 'Successful', detail: 'Project updated', life: 3000 });
   } 
