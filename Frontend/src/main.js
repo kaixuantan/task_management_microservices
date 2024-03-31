@@ -1,4 +1,5 @@
 import { createApp } from 'vue';
+import store from './store'
 import 'primevue/resources/themes/aura-light-blue/theme.css'
 import App from './App.vue';
 import router from './router';
@@ -116,6 +117,7 @@ import '@/assets/styles.scss';
 
 const app = createApp(App);
 
+app.use(store);
 app.use(router);
 app.use(PrimeVue, { ripple: true });
 app.use(ToastService);

@@ -134,6 +134,7 @@
 <script>
 import sharedMixin from "@/sharedMixin";
 import axios from "axios";
+import { mapState } from 'vuex';
 
 export default {
     mixins: [sharedMixin],
@@ -147,6 +148,11 @@ export default {
             editDialog: false,
             selectedproject: null,
         };
+    },
+    computed: {
+        ...mapState([
+        'first_user_project'
+    ])
     },
     methods: {
         async fetchGroupProjects(groupId) {
@@ -198,6 +204,9 @@ export default {
                 );
                 console.log(response.data);
                 await this.fetchGroupProjects(groupId);
+                if (this.first_user_project === null) {
+                    this.$store.commit('setFirstUserProject', subGroupId);
+                }
                 alert("Enrolled successfully")
             } catch (error) {
                 console.error(error);

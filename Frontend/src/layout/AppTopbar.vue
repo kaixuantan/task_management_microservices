@@ -113,6 +113,7 @@ export default {
     methods: {
         logout() {
             sessionStorage.clear();
+            this.$store.commit('RESET_STATE');
             this.$router.push({ name: 'login' });
         },
     },
