@@ -194,7 +194,7 @@
                     class="flex justify-content-between align-items-center mb-3"
                 >
                     <h3 class="font-semibold m-0">About</h3>
-                    <Button text rounded @click="editproject(project)">
+                    <Button text rounded @click="editproject">
                         <i class="pi pi-pencil text-500 text-xl"></i>
                     </Button>
                 </div>
@@ -277,6 +277,25 @@
     <Button label="Save" icon="pi pi-check" text @click="savetask" />
   </template>
 </Dialog>
+
+<Dialog v-model:visible="editprojDialog" :style="{ width: '450px' }" header="Edit Project" :modal="true" class="p-fluid">
+    <div class="field">
+        <label for="name">Project Name</label>
+        <InputText id="name" v-model.trim="newname" required="true" autofocus />
+    </div>
+    <div class="field">
+        <label for="description">Description</label>
+        <Textarea id="description" v-model="newdesc" required="true" rows="3" cols="20" />
+    </div>
+    <div class="field">
+        <label for="capacity">Capacity</label>
+        <InputText type="number" id="capacity" v-model="newcapacity" required="true" rows="3" cols="20" />
+    </div>
+    <template #footer>
+        <Button label="Cancel" icon="pi pi-times" text @click="editprojDialog = false" />
+        <Button label="Save" icon="pi pi-check" text @click="saveproject" />
+    </template>
+</Dialog>
 </template>
 
 <script>
@@ -302,6 +321,10 @@ export default {
             selectedMembers: [],
             projectMembers: [],
             selectedStatus: null,
+            newname: "",
+            newdesc: "",
+            newcapacity: "",
+            projtoedit:null,
             statusOptions: [
             { label: 'New', value: 'new' },
             { label: 'In Progress', value: 'in_progress' },
@@ -448,18 +471,71 @@ export default {
         
 
         },
-        async editproject(project) {
-            this.selected_project = { ...project };
+         editproject(project) {
+            this.projtoedit = { ...project };
+            this.newname = this.selected_project.name;
+            this.newdesc = this.selected_project.description;
+            this.newcapacity = this.selected_project.size;
             this.editprojDialog = true;
-            console.log(this.selected_project);
         },
+        
+        
+        async saveproject() {
+    try {
+        // Update the project
+        console.log(this.newname, this.newdesc, this.newcapacity)
+        console.log(this.selected_project.groupId)
+        console.log(this.selected_project.subGroupId)
+        console.log(this.selected_project.subGroupUsers)
+        if(this.newcapacity<1 || this.projectMembers.length>this.newcapacity){
+            this.$toast.add({ severity: 'error', summary: 'Error', detail: 'Capacity cannot be less than number of existing members or 0', life: 3000 });
+            return;
+        }
+        let response = await axios.put(
+            `${env.BASE_URL}/SubGroupAPI_REST/rest/v1/subgroup/${this.selected_project.subGroupId}`,
+            {
+                name: this.newname,
+                groupId: this.selected_project.groupId,
+                description: this.newdesc,
+                size: this.newcapacity,
+                subGroupUsers: this.selected_project.subGroupUsers,
+            },
+            {
+                headers: {
+                    "X-SubGroup-AppId": env.X_SubGroup_AppId,
+                    "X-SubGroup-Key": env.X_SubGroup_Key,
+                },
+            }
+        );
+        console.log(response.data);
+
+        // Close the edit dialog
+        this.editprojDialog = false;
+
+        // Refresh the project details
+        await this.fetchUserProjects();
+        for (const proj of this.user_projects) {
+            if (proj.subGroupId == this.$route.query.subGroupId) {
+                this.selected_project = proj;
+                break;
+            }
+        }
+
+        // Show a success toast message
+        this.$toast.add({ severity: 'success', summary: 'Successful', detail: 'Project updated', life: 3000 });
+    } catch (error) {
+        console.error('Error updating project:', error);
+        // Show an error toast message
+        this.$toast.add({ severity: 'error', summary: 'Error', detail: 'Failed to update project', life: 3000 });
+    }
+},
        async savetask(){
             try {
+
                 // Update the task
                 this.task.assignedUsers = this.selectedMembers;
                 console.log(this.task)
-                
-                return
+
                 let response = await axios.put(
                     `${env.BASE_URL}/TaskAPI_REST/rest/v1/task/${this.task.taskId}`,
                     {
