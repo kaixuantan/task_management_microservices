@@ -23,6 +23,9 @@ export default {
         userId() {
             return window.sessionStorage.getItem('userid');
         },
+        username() {
+            return window.sessionStorage.getItem("username");
+        }
     },
     methods: {
         async fetchUserGroups() {

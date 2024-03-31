@@ -76,6 +76,15 @@ const isOutsideClicked = (event) => {
         </button>
 
         <div class="layout-topbar-menu" :class="topbarMenuClasses">
+            <Avatar    
+                :label="formatted_username"
+                class="mr-2"
+                size="large"
+                shape="circle"
+                :style="{
+                    backgroundColor: 'rgb(222, 233, 252)',
+                }"
+            />
             <button @click="logout()" class="p-link layout-topbar-button">
                 <i class="pi pi-sign-out"></i>
                 <span>Logout</span>
@@ -87,7 +96,20 @@ const isOutsideClicked = (event) => {
 <style lang="scss" scoped></style>
 
 <script>
+import sharedMixin from "@/sharedMixin";
+
 export default {
+    mixins: [sharedMixin],
+    computed: {
+        formatted_username() {
+            const words = this.username.split(' ');
+            if (words.length === 1) {
+                return words[0].substring(0, 2).toUpperCase();
+            } else {
+                return words.slice(1).map(word => word[0].toUpperCase()).join('');
+            }
+        },
+    },
     methods: {
         logout() {
             sessionStorage.clear();

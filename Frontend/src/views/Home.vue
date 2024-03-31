@@ -18,6 +18,9 @@ const calAttributes = ref([
         <div class="col-8">
             <div class="grid">
                 <!-- 3 cards at the top of the screen -->
+                <div class="col-12">
+                    <h2 class="mb-0 font-semibold">Welcome {{ username.toUpperCase() }}!</h2>
+                </div>
                 <div class="col-12 lg:col-6 xl:col-4">
                     <div class="card mb-0 bg-orange-400 shadow-3">
                         <div
@@ -199,7 +202,7 @@ const calAttributes = ref([
                     <Avatar
                         v-for="(community, index) in communities.slice(0, 7)"
                         :key="index"
-                        :label="community.charAt(0)"
+                        :label="community.name.charAt(0).toUpperCase()"
                         class="mr-2"
                         size="large"
                         shape="circle"
@@ -210,7 +213,7 @@ const calAttributes = ref([
                     />
                      <Avatar
                         v-if="communities.length > 7"
-                        :label="`${communities.length - 7}`"
+                        :label="`+${communities.length - 7}`"
                         class="mr-2"
                         size="large"
                         shape="circle"
