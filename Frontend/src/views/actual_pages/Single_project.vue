@@ -513,13 +513,22 @@ export default {
         this.editprojDialog = false;
 
         // Refresh the project details
-        await this.fetchUserProjects();
-        for (const proj of this.user_projects) {
-            if (proj.subGroupId == this.$route.query.subGroupId) {
-                this.selected_project = proj;
-                break;
-            }
-        }
+    
+        if (this.role === "user") {
+                    await this.fetchUserProjects();
+                    for (const proj of this.user_projects) {
+                        if (proj.subGroupId == this.selected_project.subGroupId) {
+                            this.selected_project = proj;
+                            this.projectMembers= this.selected_project.subGroupUsers;
+                            console.log(this.selected_project);
+                            console.log(this.selected_project.subGroupUsers)
+                            break;
+                        }
+                    }
+                }
+       
+        else{
+            this.fetchProject();}
 
         // Show a success toast message
         this.$toast.add({ severity: 'success', summary: 'Successful', detail: 'Project updated', life: 3000 });
