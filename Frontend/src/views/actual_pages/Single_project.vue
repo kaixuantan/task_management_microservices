@@ -581,6 +581,12 @@ export default {
                 const utcDateTime = new Date(selectedDateTime.getTime() - (selectedDateTime.getTimezoneOffset() * 60000));
                 console.log(utcDateTime)
                 const dueDateTime = utcDateTime.toISOString();
+                console.log(dueDateTime)
+
+                const currentDateTime = new Date();
+                const utcCurrentDateTime = new Date(currentDateTime.getTime() - (currentDateTime.getTimezoneOffset() * 60000));
+                const lastUpdatedDateTime = utcCurrentDateTime.toISOString();
+                console.log(lastUpdatedDateTime);
 
                 console.log('Submitting task edit:' , this.task.taskId, this.task.name, this.task.description, this.task.subGroupId, this.task.createdById, this.task.createdByUsername, this.task.createdDateTime, this.task.lastUpdatedDateTime, this.task.lastUpdatedById, this.task.lastUpdatedUsername, this.task.dueDateTime, this.task.status, this.selectedMembers)
                 return
@@ -597,10 +603,10 @@ export default {
                         assignorUserId: user_id,
                         assignorUsername: username,
                         createdDateTime: this.task.createdDateTime,
-                        lastUpdatedDateTime: this.task.lastUpdatedDateTime,
+                        lastUpdatedDateTime: lastUpdatedDateTime,
                         lastUpdatedById: user_id,
                         lastUpdatedUsername: username, 
-                        dueDateTime: this.task.dueDateTime,
+                        dueDateTime: dueDateTime,
                         status: this.task.status,
                         assignedUsers: this.selectedMembers,
                     },
