@@ -1,5 +1,6 @@
 <template>
     <div class="grid">
+        <Toast />
         <div class="col-12 flex justify-content-between">
             <h2 class="mb-0 font-semibold" v-if="selected_community">All projects ({{ selected_community.name.toUpperCase() }})</h2>
             <h2 class="mb-0 font-semibold" v-else>Fetching projects</h2>
@@ -11,7 +12,7 @@
                     placeholder="Selected community"
                     class="w-full md:w-14rem shadow-1"
                 />
-                <Button label="Add" icon="pi pi-plus" @click="addProject()" raised />
+                <!-- <Button label="Add" icon="pi pi-plus" @click="addProject()" raised /> -->
             </div>
         </div>
         <!-- 3 cards at the top of the screen -->
@@ -209,8 +210,7 @@ export default {
                 }
                 alert("Enrolled successfully")
             } catch (error) {
-                toast
-                console.error(error);
+                this.$toast.add({ severity: 'error', summary: 'Error', detail: 'Failed to enrol', life: 3000 });
             }
         },
         isUserEnrolled(project) {
