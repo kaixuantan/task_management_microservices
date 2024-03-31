@@ -53,7 +53,7 @@
                                     
                                 </div>
                                 <div class="flex justify-content-end">
-                                    <Button
+                                    <Button @click="edittask(task)"
                                         label="View"
                                         icon="pi pi-pencil"
                                         outlined
@@ -214,6 +214,68 @@
         </div>
         <!-- 3 cards at the top of the screen -->
     </div>
+
+
+    <Dialog v-model:visible="editDialog" :style="{ width: '450px' }" header="Edit Community" :modal="true" class="p-fluid">
+  <div class="field">
+    <label for="name">Task Name</label>
+    <InputText id="name" v-model.trim="task.name" required="true" autofocus :disabled="!isCreatedByUser" />
+  </div>
+  <div class="field">
+    <label for="description">Task Description</label>
+    <Textarea id="description" v-model="task.description" required="true" rows="3" cols="20" :disabled="!isCreatedByUser" />
+  </div>
+
+
+  <div class="field">
+    <label for="assignedUsers">Assigned Members</label>
+    <MultiSelect
+    v-model="selectedMembers"
+    :options="projectMembers"
+    optionLabel="username"
+    placeholder="Select Members"
+    :filter="true"
+    class="w-full"
+>
+  <template #value="slotProps">
+    <div
+      class="inline-flex align-items-center py-1 px-2 bg-primary text-primary border-round mr-2"
+      v-for="member in slotProps.value"
+      :key="member.userId"
+    >
+      <div>{{ member.username}}</div>
+    </div>
+    <template v-if="!slotProps.value || slotProps.value.length === 0">
+      <div class="p-1">Select Members</div>
+    </template>
+  </template>
+  <template #option="slotProps">
+    <div class="flex align-items-center">
+      <div>{{ slotProps.option.username }}</div>
+    </div>
+  </template>
+</MultiSelect>
+
+<div class="field">
+    <label for="status">Status</label>
+    <Dropdown
+        id="status"
+        v-model="task.status"
+        :options="statusOptions"
+        optionLabel="label"
+        optionValue="value"
+        placeholder="Select Status"
+        class="w-full"
+    />
+</div>
+  </div>
+
+
+  <template #footer>
+    <Button label="Cancel" icon="pi pi-times" text @click="editDialog = false" />
+    <Button label="Save" icon="pi pi-check" text @click="savetask" />
+  </template>
+</Dialog>
 </template>
 
 <script>
@@ -234,11 +296,24 @@ export default {
             tasks_new: [],
             tasks_completed: [],
             gemini_response: "",
+            editDialog: false,
+            task: {},
+            selectedMembers: [],
+            projectMembers: [],
+            selectedStatus: null,
+            statusOptions: [
+            { label: 'New', value: 'new' },
+            { label: 'In Progress', value: 'in_progress' },
+            { label: 'Completed', value: 'completed' },
+        ],
+
         };
     },
     mounted() {
         window.scrollTo(0, 0);
+
     },
+    
     methods: {
         async fetchProjectTasks(subGroupId) {
             try {
@@ -355,8 +430,68 @@ export default {
             } catch (error) {
                 console.error(error);
             }
+        },
+        edittask(task) {
+            this.task = { ...task };
+            this.task.createdById = task.createdById;
+            this.editDialog = true;
+            console.log(this.task)
+            if (task.status === 'New') {
+            this.task.status = 'new';
+        } else if (task.status === 'In Progress') {
+            this.task.status = 'in_progress';
+        } else if (task.status === 'Completed') {
+            this.task.status = 'completed';
         }
+        
+
+        },
+       async savetask(){
+            try {
+                // Update the task
+                this.task.assignedUsers = this.selectedMembers;
+                console.log(this.task)
+                
+                return
+                let response = await axios.put(
+                    `${env.BASE_URL}/TaskAPI_REST/rest/v1/task/${this.task.taskId}`,
+                    {
+                        name: this.task.name,
+                        description: this.task.description,
+                        dueDateTime: this.task.dueDateTime,
+                        subGroupId: this.task.subGroupId,
+                        assignedUsers: this.selectedMembers,
+                    },
+                    {
+                        headers: {
+                            "X-Task-AppId": env.X_Task_AppId,
+                            "X-Task-Key": env.X_Task_Key,
+                        },
+                    }
+                );
+                console.log(response.data);
+                
+                // Close the edit dialog
+                this.editDialog = false;
+                
+                // Refresh the list of tasks
+                await this.fetchProjectTasks(this.$route.query.subGroupId);
+                
+                // Show a success toast message
+                this.$toast.add({ severity: 'success', summary: 'Successful', detail: 'Task updated', life: 3000 });
+            } 
+            catch (error) {
+                console.error('Error updating task:', error);
+                // Show an error toast message
+                this.$toast.add({ severity: 'error', summary: 'Error', detail: 'Failed to update task', life: 3000 });
+            }
+        },
     },
+    computed: {
+    isCreatedByUser() {
+        return this.task.createdById === parseInt(sessionStorage.getItem('userId'));
+    },
+},
     watch: {
         "$route.query.subGroupId": {
             immediate: true,
@@ -366,6 +501,9 @@ export default {
                 for (const proj of this.user_projects) {
                     if (proj.subGroupId == newVal) {
                         this.selected_project = proj;
+                        this.projectMembers= this.selected_project.subGroupUsers;
+                        console.log(this.selected_project);
+                        console.log(this.selected_project.subGroupUsers)
                         break;
                     }
                 }

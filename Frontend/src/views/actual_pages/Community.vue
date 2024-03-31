@@ -43,8 +43,8 @@ console.log(userole)
                                 <!-- <p class="m-0 text-500">Organisation</p> -->
                             </div>
                         </div>
-                        <Button text @click="editcommunity(community)">
-                            <i class="pi pi-pencil text-500 text-xl" v-if="userole == 'admin'"></i>
+                        <Button v-if="userole == 'admin'" text @click="editcommunity(community)" >
+                            <i class="pi pi-pencil text-500 text-xl"></i>
                         </Button>
                     </div>
                     <img alt="user header" src="https://cdn-icons-png.freepik.com/512/2592/2592465.png" style="width: 50%; height: 50%; object-fit: contain; margin: 0 auto; display: block;" />
@@ -67,6 +67,8 @@ console.log(userole)
             </Card>
         </div>
     </div>
+
+
     <Dialog v-model:visible="editDialog" :style="{ width: '450px' }" header="Edit Community" :modal="true" class="p-fluid">
   <div class="field">
     <label for="name">Community Name</label>
