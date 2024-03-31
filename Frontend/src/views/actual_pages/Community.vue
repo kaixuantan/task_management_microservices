@@ -51,7 +51,7 @@ console.log(userole)
                 </template>
                 <template #title>Community Size: {{ community.size }}</template>
                 <template #subtitle>
-                    <span class="block">Community Description:</span> 
+                    <span class="block mb-1">Community Description:</span> 
                     {{ community.description }} 
                 </template>
                 <!-- <template #content>

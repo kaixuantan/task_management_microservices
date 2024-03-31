@@ -74,7 +74,7 @@
                 <template #title>Members: {{ project.subGroupUsers.length }} / {{ project.size }}</template>
                 <template #content>
                     <p class="m-0">
-                        <span class="block">Project description:</span>
+                        <span class="block mb-1">Project description:</span>
                         {{ project.description }}
                     </p>
                 </template>
@@ -95,7 +95,7 @@
                             />
                             <Avatar :label="`+${project.subGroupUsers.length - 3}`" shape="circle" size="large" v-if="project.subGroupUsers.length > 3"/>
                         </AvatarGroup>
-                        <Button label="Enrol" class="w-full" @click="enrol(project.subGroupId,userId, selected_community.groupId)" />
+                        <Button label="Enrol" @click="enrol(project.subGroupId,userId, selected_community.groupId)" />
                     </div>
 
                     <div class="flex gap-3 mt-1" v-if="isUserEnrolled(project) && userrole !== 'admin'">
