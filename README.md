@@ -29,7 +29,7 @@ Please note: This documentation is only accessible once the Docker containers ar
 | Complex Microservices          | Swagger Docs URL                           |
 |-----------------|-------------------------------|
 | Generate Ideas  | http://localhost:5000         |
-| Group Creation  | http://localhost:5000/apidocs |
+| Group Creation  | http://localhost:5001/apidocs |
 | Enrollment      | http://localhost:5002         |
 | Create Tasks    | http://localhost:5003/api     |
 
