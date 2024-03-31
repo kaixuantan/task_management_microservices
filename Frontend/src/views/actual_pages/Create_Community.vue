@@ -227,9 +227,8 @@ if(subgroup_submit.value.length==0){
 });
 
     console.log('Response:', response.data);
-    alert('Community Created Successfully', () => {
-      router.push('/community');
-    });
+    router.push('/community');
+    alert('Community Created Successfully');
   } catch (error) {
     console.error('Error:', error);
     alert('Error creating community', error.message);
