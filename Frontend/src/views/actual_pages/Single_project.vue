@@ -220,11 +220,11 @@
     <Dialog v-model:visible="editDialog" :style="{ width: '450px' }" header="Edit Community" :modal="true" class="p-fluid">
   <div class="field">
     <label for="name">Task Name</label>
-    <InputText id="name" v-model.trim="task.name" required="true" autofocus :disabled="!isCreatedByUser" />
+    <InputText id="name" v-model.trim="task.name" :required="true" autofocus :disabled="!isCreatedByUser" />
   </div>
   <div class="field">
     <label for="description">Task Description</label>
-    <Textarea id="description" v-model="task.description" required="true" rows="3" cols="20" :disabled="!isCreatedByUser" />
+    <Textarea id="description" v-model="task.description" :required="true" rows="3" cols="20" :disabled="!isCreatedByUser" />
   </div>
 
 
@@ -237,6 +237,7 @@
     placeholder="Select Members"
     :filter="true"
     class="w-full"
+    :required="true"
 >
   <template #value="slotProps">
     <div
@@ -281,15 +282,15 @@
 <Dialog v-model:visible="editprojDialog" :style="{ width: '450px' }" header="Edit Project" :modal="true" class="p-fluid">
     <div class="field">
         <label for="name">Project Name</label>
-        <InputText id="name" v-model.trim="newname" required="true" autofocus />
+        <InputText id="name" v-model.trim="newname" :required="true" autofocus />
     </div>
     <div class="field">
         <label for="description">Description</label>
-        <Textarea id="description" v-model="newdesc" required="true" rows="3" cols="20" />
+        <Textarea id="description" v-model="newdesc" :required="true" rows="3" cols="20" />
     </div>
     <div class="field">
         <label for="capacity">Capacity</label>
-        <InputText type="number" id="capacity" v-model="newcapacity" required="true" rows="3" cols="20" />
+        <InputText type="number" id="capacity" v-model="newcapacity" :required="true" rows="3" cols="20" />
     </div>
     <template #footer>
         <Button label="Cancel" icon="pi pi-times" text @click="editprojDialog = false" />
@@ -484,6 +485,10 @@ export default {
         async saveproject() {
     try {
         // Update the project
+        if(this.newname === "" || this.newdesc === "" || this.newcapacity === "") {
+            this.$toast.add({ severity: 'error', summary: 'Error', detail: 'Please fill in all fields', life: 3000 });
+            return;
+        }
         console.log(this.newname, this.newdesc, this.newcapacity)
         console.log(this.selected_project.groupId)
         console.log(this.selected_project.subGroupId)
@@ -541,7 +546,10 @@ export default {
 },
        async savetask(){
             try {
-
+                if(this.task.name === "" || this.task.description === "" || this.task.status === "" || this.task.dueDateTime === "" || this.selectedMembers.length === 0) {
+                    this.$toast.add({ severity: 'error', summary: 'Error', detail: 'Please fill in all fields', life: 3000 });
+                    return;
+                }
                 // Update the task
                 this.task.assignedUsers = this.selectedMembers;
                 console.log(this.task.createdById)
