@@ -142,6 +142,12 @@ def group_creation():
 
     if request.is_json:
         try:
+            # Connect to RabbitMQ
+            connection = pika.BlockingConnection(pika.ConnectionParameters
+                                                (host=rabbitmq_host, port=rabbitmq_port,
+                                                heartbeat=3600, blocked_connection_timeout=3600))
+            channel = connection.channel()
+            
             group_info = request.get_json()[0] #only name is mandatory
             print("\nReceived a group_description in JSON:", group_info)
             subgroup_info = request.get_json()[1] #only name is mandatory
@@ -150,7 +156,10 @@ def group_creation():
             print("\nReceived a list of usersId in JSON:", users_id_list) 
 
             # Send group info 
-            result = processGroupCreation(group_info,subgroup_info,users_id_list)
+            result = processGroupCreation(group_info,subgroup_info,users_id_list,channel)
+            
+            # Close the connection
+            connection.close()
             return jsonify(result), result["code"]
 
         except Exception as e:
@@ -171,7 +180,7 @@ def group_creation():
         "message": "Invalid JSON input: " + str(request.get_data())
     }), 400
 
-def processGroupCreation(group_info,subgroup_info,users_id_list):
+def processGroupCreation(group_info, subgroup_info, users_id_list, channel):
 
     # Send the group info
     # Invoke the group microservice
@@ -194,13 +203,6 @@ def processGroupCreation(group_info,subgroup_info,users_id_list):
     group = group_dict["Group"]
     # print(group)
 
-    
-    # Connect to RabbitMQ
-    connection = pika.BlockingConnection(pika.ConnectionParameters
-                                        (host=rabbitmq_host, port=rabbitmq_port,
-                                        heartbeat=3600, blocked_connection_timeout=3600))
-    channel = connection.channel()
-
     admin_username = group["createdByUsername"]
     admin_userId = group["createdById"]
     # Define the message
@@ -221,23 +223,22 @@ def processGroupCreation(group_info,subgroup_info,users_id_list):
 
     print(f"Message sent to the exchange '{rabbitmq_exchange}' with routing key '{rabbitmq_routing_key_log}'.")
 
-    # Close the connection
-    connection.close()
-
 
     # create new subgroup in group 
     # Invoke the subgroup microservice
     subgroup_namelist = []
     subgroup_list = []
     
-    for i in range(len(subgroup_info)): 
+    subgroup_info = [{**subgrp, 'groupId': groupId} for subgrp in subgroup_info]
+    
+    for subgrp in subgroup_info: 
         print('\n\n-----Invoking subgroup microservice-----')
         subgroup_headers = {'X-SubGroup-AppId': request.headers.get('X-SubGroup-AppId'), "X-SubGroup-Key": request.headers.get('X-SubGroup-Key')}
         # create subgroup
-        print(subgroup_info[i])
-        print(groupId)
-        subgroup_info[i]['groupId'] = groupId  # Add the groupId directly to the subgroup dictionary
-        subgroup_result = invoke_http(subgroup_URL, method="POST", json=subgroup_info[i], headers=subgroup_headers)
+        # print(subgrp)
+        # print(groupId)
+        # subgrp['groupId'] = groupId  # Add the groupId directly to the subgroup dictionary
+        subgroup_result = invoke_http(subgroup_URL, method="POST", json=subgrp, headers=subgroup_headers)
         # print(subgroup_result)
         subgroup_result_status = subgroup_result["Result"]
         subGroupId = subgroup_result["SubGroupId"]
@@ -251,12 +252,6 @@ def processGroupCreation(group_info,subgroup_info,users_id_list):
         subgroup_name = subgroup["name"]
         subgroup_namelist.append(subgroup_name)
         
-
-    # Connect to RabbitMQ
-    connection = pika.BlockingConnection(pika.ConnectionParameters
-                                        (host=rabbitmq_host, port=rabbitmq_port,
-                                        heartbeat=3600, blocked_connection_timeout=3600))
-    channel = connection.channel()
 
     # Define the message
     message = {
@@ -276,12 +271,9 @@ def processGroupCreation(group_info,subgroup_info,users_id_list):
 
     print(f"Message sent to the exchange '{rabbitmq_exchange}' with routing key '{rabbitmq_routing_key_log}'.")
 
-    # Close the connection
-    connection.close()
-
 
     #assign users to group
-    assigned_group = processUserAssignment(group,users_id_list,subgroup_namelist)
+    assigned_group = processUserAssignment(group,users_id_list,subgroup_namelist, channel)
     updated_group_result_status = invoke_http(unique_group_URL, method="PUT", json=assigned_group, headers=group_headers)
     print("updated_group_result_status: ", updated_group_result_status)
 
@@ -295,7 +287,7 @@ def processGroupCreation(group_info,subgroup_info,users_id_list):
     }
 
 # User Group Assignment complex microservice
-def processUserAssignment(group,user_id_list,subgroup_namelist):
+def processUserAssignment(group,user_id_list,subgroup_namelist, channel):
     groupId = group['groupId']
     groupname = group['name']
     users_assigned = [] # list of users assigned
@@ -317,12 +309,6 @@ def processUserAssignment(group,user_id_list,subgroup_namelist):
             users_assigned.append(assignee)
 
             user_email = user["email"]
-
-            # Connect to RabbitMQ
-            connection = pika.BlockingConnection(pika.ConnectionParameters
-                                                (host=rabbitmq_host, port=rabbitmq_port,
-                                                heartbeat=3600, blocked_connection_timeout=3600))
-            channel = connection.channel()
 
             subgroup_string = ""
             for i in range(len(subgroup_namelist)-1):
@@ -350,9 +336,6 @@ def processUserAssignment(group,user_id_list,subgroup_namelist):
 
             print(f"Message sent to the exchange '{rabbitmq_exchange}' with routing key '{rabbitmq_routing_key_notif}'.")
 
-            # Close the connection
-            connection.close()
-
     group_headers = {'X-Group-AppId': request.headers.get('X-Group-AppId'), "X-Group-Key": request.headers.get('X-Group-Key')}
     assign_users_URL = group_URL + "/assign/" + str(groupId)
     assigned_user_status = invoke_http(assign_users_URL, method="PUT", json=users_assigned, headers=group_headers) 
@@ -363,12 +346,6 @@ def processUserAssignment(group,user_id_list,subgroup_namelist):
     new_group_dict = invoke_http(unique_group_URL, method="GET", headers=group_headers)
     group = new_group_dict["Group"]
     print("new group: ", group, '\n')
-    
-    # Connect to RabbitMQ
-    connection = pika.BlockingConnection(pika.ConnectionParameters
-                                        (host=rabbitmq_host, port=rabbitmq_port,
-                                        heartbeat=3600, blocked_connection_timeout=3600))
-    channel = connection.channel()
 
     admin_username = group["createdByUsername"]
     admin_userId = group["createdById"]
@@ -389,9 +366,6 @@ def processUserAssignment(group,user_id_list,subgroup_namelist):
     )
 
     print(f"Message sent to the exchange '{rabbitmq_exchange}' with routing key '{rabbitmq_routing_key_log}'.")
-
-    # Close the connection
-    connection.close()
 
     return group
         
