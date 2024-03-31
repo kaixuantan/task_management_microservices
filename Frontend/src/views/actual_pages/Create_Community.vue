@@ -7,10 +7,8 @@ import DataTable from 'primevue/datatable';
 import Column from 'primevue/column';
 import Button from 'primevue/button';
 import { watch } from 'vue';
-import router from '../../router';
 
-
-
+const router = useRouter(); 
 
 const baseURL = 'https://personal-rc7vnnm9.outsystemscloud.com';
 const postURL = 'http://localhost:5001';
