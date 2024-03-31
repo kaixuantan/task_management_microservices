@@ -352,6 +352,7 @@ export default {
                     }
                 );
                 this.proj_tasks = response.data.TaskAPI;
+                console.log(this.proj_tasks);
             } catch (error) {
                 console.error(error);
             }
@@ -543,15 +544,30 @@ export default {
 
                 // Update the task
                 this.task.assignedUsers = this.selectedMembers;
-                console.log(this.task)
+                console.log(this.task.createdById)
+                const user_id = parseInt(sessionStorage.getItem('userid'));
+                const username = sessionStorage.getItem('username');
 
+                console.log('Submitting task edit:' , this.task.taskId, this.task.name, this.task.description, this.task.subGroupId, this.task.createdById, this.task.createdByUsername, this.task.createdDateTime, this.task.lastUpdatedDateTime, this.task.lastUpdatedById, this.task.lastUpdatedUsername, this.task.dueDateTime, this.task.status, this.selectedMembers)
+                return
                 let response = await axios.put(
                     `${env.BASE_URL}/TaskAPI_REST/rest/v1/task/${this.task.taskId}`,
-                    {
+                    {   
+                        taskId: this.task.taskId,
                         name: this.task.name,
                         description: this.task.description,
-                        dueDateTime: this.task.dueDateTime,
                         subGroupId: this.task.subGroupId,
+                        SubGroupName: '',
+                        createdById: this.task.createdById,
+                        createdByUsername: this.task.createdByUsername,
+                        assignorUserId: user_id,
+                        assignorUsername: username,
+                        createdDateTime: this.task.createdDateTime,
+                        lastUpdatedDateTime: this.task.lastUpdatedDateTime,
+                        lastUpdatedById: user_id,
+                        lastUpdatedUsername: username, 
+                        dueDateTime: this.task.dueDateTime,
+                        status: this.task.status,
                         assignedUsers: this.selectedMembers,
                     },
                     {
@@ -601,7 +617,7 @@ export default {
     },
     computed: {
     isCreatedByUser() {
-        return this.task.createdById === parseInt(sessionStorage.getItem('userId'));
+        return this.task.createdById === parseInt(sessionStorage.getItem('userid'));
     },
 },
     watch: {
