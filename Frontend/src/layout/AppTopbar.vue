@@ -105,6 +105,8 @@ export default {
             const words = this.username.split(' ');
             if (words.length === 1) {
                 return words[0].substring(0, 2).toUpperCase();
+            } else if (words.length === 2) {
+                return words.map(word => word[0].toUpperCase()).join('');
             } else {
                 return words.slice(1).map(word => word[0].toUpperCase()).join('');
             }
