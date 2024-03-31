@@ -258,7 +258,7 @@
   </template>
 </MultiSelect>
 
-<div class="field">
+<div class="field my-3">
     <label for="status">Status</label>
     <Dropdown
         id="status"
@@ -270,6 +270,16 @@
         class="w-full"
     />
 </div>
+<div>
+<div class="datetime">
+                <label for="date">Due Date</label>
+                <div class="w49 mb-3" id="date">
+                    <Calendar v-model="dueDate" :inputStyle="{ width: '100%' }" :showIcon="true" class="w-full" />
+                </div>
+                <label for="inputTime">Due Time</label>
+                <input type="time" id="inputTime" class="p-inputtext p-component w49" v-model="dueTime">
+            </div>
+        </div>
   </div>
 
 
@@ -309,6 +319,8 @@ export default {
     mixins: [sharedMixin],
     data() {
         return {
+            dueDate: new Date(),
+            dueTime: "00:00",
             selected_project: null,
             enrolled: false,
             loading: true,
@@ -461,6 +473,11 @@ export default {
         edittask(task) {
             this.task = { ...task };
             this.task.createdById = task.createdById;
+            const currentTime = new Date();
+            const hours = currentTime.getHours().toString().padStart(2, '0'); // Ensures two digits, padding with 0 if necessary
+            const minutes = currentTime.getMinutes().toString().padStart(2, '0');
+            const formattedTime = `${hours}:${minutes}`;
+            this.dueTime = formattedTime;
             this.editDialog = true;
             console.log(this.task)
             if (task.status === 'New') {
@@ -550,11 +567,20 @@ export default {
                     this.$toast.add({ severity: 'error', summary: 'Error', detail: 'Please fill in all fields', life: 3000 });
                     return;
                 }
-                // Update the task
                 this.task.assignedUsers = this.selectedMembers;
                 console.log(this.task.createdById)
                 const user_id = parseInt(sessionStorage.getItem('userid'));
                 const username = sessionStorage.getItem('username');
+                const selectedDateTime = new Date(this.dueDate);
+                const selectedTime = this.dueTime.split(':');
+                selectedDateTime.setHours(selectedTime[0]);
+                selectedDateTime.setMinutes(selectedTime[1]);
+                selectedDateTime.setSeconds(0); 
+                selectedDateTime.setMilliseconds(0); 
+                console.log(selectedDateTime)
+                const utcDateTime = new Date(selectedDateTime.getTime() - (selectedDateTime.getTimezoneOffset() * 60000));
+                console.log(utcDateTime)
+                const dueDateTime = utcDateTime.toISOString();
 
                 console.log('Submitting task edit:' , this.task.taskId, this.task.name, this.task.description, this.task.subGroupId, this.task.createdById, this.task.createdByUsername, this.task.createdDateTime, this.task.lastUpdatedDateTime, this.task.lastUpdatedById, this.task.lastUpdatedUsername, this.task.dueDateTime, this.task.status, this.selectedMembers)
                 return
