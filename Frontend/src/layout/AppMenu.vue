@@ -53,14 +53,15 @@ export default {
         },
     },
     async created() {
-        await this.fetchUserProjects();
-        if (this.user_projects && this.user_projects.length > 0) {
-            const first_user_project = this.user_projects[0].subGroupId;
-            this.$store.commit('setFirstUserProject', first_user_project);
-        } else {
-            console.log('No user projects found');
+        if (this.role === 'user') {
+            await this.fetchUserProjects();
+            if (this.user_projects && this.user_projects.length > 0) {
+                const first_user_project = this.user_projects[0].subGroupId;
+                this.$store.commit('setFirstUserProject', first_user_project);
+            } else {
+                console.log('No user projects found');
+            }
         }
-        
     }
 }
 </script>

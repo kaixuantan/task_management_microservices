@@ -5,6 +5,7 @@
             <h2 class="mb-0 font-semibold" v-if="selected_project">{{ selected_project.name }}</h2>
             <h2 class="mb-0 font-semibold" v-else>Fetching project...</h2>
             <Dropdown
+                v-if = "role === 'user'"
                 v-model="selected_project"
                 :options="user_projects"
                 optionLabel="name"
@@ -492,6 +493,26 @@ export default {
                 this.$toast.add({ severity: 'error', summary: 'Error', detail: 'Failed to update task', life: 3000 });
             }
         },
+        async fetchProject() {
+            try {
+                let response = await axios.get(
+                    `${env.BASE_URL}/SubGroupAPI_REST/rest/v1/subgroup/${this.$route.query.subGroupId}`,
+                    {
+                        headers: {
+                            "X-SubGroup-AppId": env.X_SubGroup_AppId,
+                            "X-SubGroup-Key": env.X_SubGroup_Key,
+                        },
+                    }
+                );
+                if (response.data.Result.Success !== true) {
+                    console.error("Error fetching project");
+                } else {
+                    this.selected_project = response.data.SubGroup
+                }
+            } catch (error) {
+                console.error(error);
+            }
+        },
     },
     computed: {
     isCreatedByUser() {
@@ -503,16 +524,21 @@ export default {
             immediate: true,
             async handler(newVal) {
                 this.loading = true;
-                await this.fetchUserProjects();
-                for (const proj of this.user_projects) {
-                    if (proj.subGroupId == newVal) {
-                        this.selected_project = proj;
-                        this.projectMembers= this.selected_project.subGroupUsers;
-                        console.log(this.selected_project);
-                        console.log(this.selected_project.subGroupUsers)
-                        break;
+                if (this.role === "user") {
+                    await this.fetchUserProjects();
+                    for (const proj of this.user_projects) {
+                        if (proj.subGroupId == newVal) {
+                            this.selected_project = proj;
+                            this.projectMembers= this.selected_project.subGroupUsers;
+                            console.log(this.selected_project);
+                            console.log(this.selected_project.subGroupUsers)
+                            break;
+                        }
                     }
+                } else if (this.role === "admin") {
+                    await this.fetchProject();
                 }
+                
                 await this.fetchProjectTasks(this.$route.query.subGroupId);
                 await this.fetch_gemini_response();
                 this.tasks_in_progress = [];

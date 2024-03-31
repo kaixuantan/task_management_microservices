@@ -25,6 +25,9 @@ export default {
         },
         username() {
             return window.sessionStorage.getItem("username");
+        },
+        role() {
+            return window.sessionStorage.getItem("role");
         }
     },
     methods: {
