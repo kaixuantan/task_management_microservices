@@ -40,9 +40,9 @@
                                     {{ task.description }}
                                 </div>
                                 <div class="mb-2">
-                                    <span class="font-semibold">Due: </span
+                                    <span class="font-semibold">Due On: </span
                                     ><span>{{
-                                        this.formatDate(task.dueDateTime)
+                                        formatDate(task.dueDateTime)
                                     }}</span>
                                 </div>
                                 <div class="mb-3">
@@ -55,7 +55,7 @@
                                 </div>
                                 <div class="flex justify-content-end">
                                     <Button @click="edittask(task)"
-                                        label="View"
+                                        label="Edit"
                                         icon="pi pi-pencil"
                                         outlined
                                     />
@@ -85,9 +85,9 @@
                                     {{ task.description }}
                                 </div>
                                 <div class="mb-2">
-                                    <span class="font-semibold">Due: </span
+                                    <span class="font-semibold">Due On: </span
                                     ><span>{{
-                                        this.formatDate(task.dueDateTime)
+                                        formatDate(task.dueDateTime)
                                     }}</span>
                                 </div>
                                 <div class="mb-3">
@@ -101,7 +101,7 @@
                                 </div>
                                 <div class="flex justify-content-end">
                                     <Button
-                                        label="View"
+                                        label="Edit"
                                         icon="pi pi-pencil"
                                         outlined
                                     />
@@ -128,9 +128,9 @@
                                     {{ task.description }}
                                 </div>
                                 <div class="mb-2">
-                                    <span class="font-semibold">Due: </span
+                                    <span class="font-semibold">Due On: </span
                                     ><span>{{
-                                        this.formatDate(task.dueDateTime)
+                                        formatDate(task.dueDateTime)
                                     }}</span>
                                 </div>
                                 <div class="mb-3">
@@ -144,7 +144,7 @@
                                 </div>
                                 <div class="flex justify-content-end">
                                     <Button
-                                        label="View"
+                                        label="Edit"
                                         icon="pi pi-pencil"
                                         outlined
                                     />
@@ -216,97 +216,91 @@
         <!-- 3 cards at the top of the screen -->
     </div>
 
-
     <Dialog v-model:visible="editDialog" :style="{ width: '450px' }" header="Edit Community" :modal="true" class="p-fluid">
-  <div class="field">
-    <label for="name">Task Name</label>
-    <InputText id="name" v-model.trim="task.name" :required="true" autofocus :disabled="!isCreatedByUser" />
-  </div>
-  <div class="field">
-    <label for="description">Task Description</label>
-    <Textarea id="description" v-model="task.description" :required="true" rows="3" cols="20" :disabled="!isCreatedByUser" />
-  </div>
-
-
-  <div class="field">
-    <label for="assignedUsers">Assigned Members</label>
-    <MultiSelect
-    v-model="selectedMembers"
-    :options="projectMembers"
-    optionLabel="username"
-    placeholder="Select Members"
-    :filter="true"
-    class="w-full"
-    :required="true"
->
-  <template #value="slotProps">
-    <div
-      class="inline-flex align-items-center py-1 px-2 bg-primary text-primary border-round mr-2"
-      v-for="member in slotProps.value"
-      :key="member.userId"
-    >
-      <div>{{ member.username}}</div>
-    </div>
-    <template v-if="!slotProps.value || slotProps.value.length === 0">
-      <div class="p-1">Select Members</div>
-    </template>
-  </template>
-  <template #option="slotProps">
-    <div class="flex align-items-center">
-      <div>{{ slotProps.option.username }}</div>
-    </div>
-  </template>
-</MultiSelect>
-
-<div class="field my-3">
-    <label for="status">Status</label>
-    <Dropdown
-        id="status"
-        v-model="task.status"
-        :options="statusOptions"
-        optionLabel="label"
-        optionValue="value"
-        placeholder="Select Status"
-        class="w-full"
-    />
-</div>
-<div>
-<div class="datetime">
-                <label for="date">Due Date</label>
-                <div class="w49 mb-3" id="date">
-                    <Calendar v-model="dueDate" :inputStyle="{ width: '100%' }" :showIcon="true" class="w-full" />
+        <div class="field">
+            <label for="name">Task Name</label>
+            <InputText id="name" v-model.trim="task.name" :required="true" autofocus :disabled="!isCreatedByUser" />
+        </div>
+        <div class="field">
+            <label for="description">Task Description</label>
+            <Textarea id="description" v-model="task.description" :required="true" rows="3" cols="20" :disabled="!isCreatedByUser" />
+        </div>
+        <div class="field">
+            <label for="assignedUsers">Assigned Members</label>
+            <MultiSelect
+                v-model="selectedMembers"
+                :options="projectMembers"
+                optionLabel="username"
+                placeholder="Select Members"
+                :filter="true"
+                class="w-full"
+                :required="true"
+            >
+                <template #value="slotProps">
+                    <div
+                    class="inline-flex align-items-center py-1 px-2 bg-primary text-primary border-round mr-2"
+                    v-for="member in slotProps.value"
+                    :key="member.userId"
+                    >
+                    <div>{{ member.username}}</div>
+                    </div>
+                    <template v-if="!slotProps.value || slotProps.value.length === 0">
+                    <div class="p-1">Select Members</div>
+                    </template>
+                </template>
+                <template #option="slotProps">
+                    <div class="flex align-items-center">
+                    <div>{{ slotProps.option.username }}</div>
+                    </div>
+                </template>
+            </MultiSelect>
+            <div class="field my-3">
+                <label for="status">Status</label>
+                <Dropdown
+                    id="status"
+                    v-model="task.status"
+                    :options="statusOptions"
+                    optionLabel="label"
+                    optionValue="value"
+                    placeholder="Select Status"
+                    class="w-full"
+                />
+            </div>
+            <div>
+                <div class="datetime">
+                    <label for="date">Due Date</label>
+                    <div class="w49 mb-3" id="date">
+                        <Calendar v-model="dueDate" :inputStyle="{ width: '100%' }" :showIcon="true" class="w-full" />
+                    </div>
+                    <label for="inputTime">Due Time</label>
+                    <input type="time" id="inputTime" class="p-inputtext p-component w49" v-model="dueTime">
                 </div>
-                <label for="inputTime">Due Time</label>
-                <input type="time" id="inputTime" class="p-inputtext p-component w49" v-model="dueTime">
             </div>
         </div>
-  </div>
+        <template #footer>
+            <Button label="Cancel" icon="pi pi-times" text @click="editDialog = false" />
+            <Button label="Save" icon="pi pi-check" text @click="savetask" />
+        </template>
+    </Dialog>
 
-
-  <template #footer>
-    <Button label="Cancel" icon="pi pi-times" text @click="editDialog = false" />
-    <Button label="Save" icon="pi pi-check" text @click="savetask" />
-  </template>
-</Dialog>
-
-<Dialog v-model:visible="editprojDialog" :style="{ width: '450px' }" header="Edit Project" :modal="true" class="p-fluid">
-    <div class="field">
-        <label for="name">Project Name</label>
-        <InputText id="name" v-model.trim="newname" :required="true" autofocus />
-    </div>
-    <div class="field">
-        <label for="description">Description</label>
-        <Textarea id="description" v-model="newdesc" :required="true" rows="3" cols="20" />
-    </div>
-    <div class="field">
-        <label for="capacity">Capacity</label>
-        <InputText type="number" id="capacity" v-model="newcapacity" :required="true" rows="3" cols="20" />
-    </div>
-    <template #footer>
-        <Button label="Cancel" icon="pi pi-times" text @click="editprojDialog = false" />
-        <Button label="Save" icon="pi pi-check" text @click="saveproject" />
-    </template>
-</Dialog>
+    <Dialog v-model:visible="editprojDialog" :style="{ width: '450px' }" header="Edit Project" :modal="true" class="p-fluid">
+        <div class="field">
+            <label for="name">Project Name</label>
+            <InputText id="name" v-model.trim="newname" :required="true" autofocus />
+        </div>
+        <div class="field">
+            <label for="description">Description</label>
+            <Textarea id="description" v-model="newdesc" :required="true" rows="3" cols="20" />
+        </div>
+        <div class="field">
+            <label for="capacity">Capacity</label>
+            <InputText type="number" id="capacity" v-model="newcapacity" :required="true" rows="3" cols="20" />
+        </div>
+        <template #footer>
+            <Button label="Cancel" icon="pi pi-times" text @click="editprojDialog = false" />
+            <Button label="Save" icon="pi pi-check" text @click="saveproject" />
+        </template>
+    </Dialog>
 </template>
 
 <script>
@@ -339,9 +333,9 @@ export default {
             newcapacity: "",
             projtoedit:null,
             statusOptions: [
-            { label: 'New', value: 'new' },
-            { label: 'In Progress', value: 'in_progress' },
-            { label: 'Completed', value: 'completed' },
+            { label: 'New', value: 'New' },
+            { label: 'In Progress', value: 'In Progress' },
+            { label: 'Completed', value: 'Completed' },
         ],
             editprojDialog: false,
 
@@ -369,6 +363,25 @@ export default {
             } catch (error) {
                 console.error(error);
             }
+        },
+        formatDate(dateString) {
+            // Convert the input date string to a Date object
+            const inputDate = new Date(dateString);
+
+            // Format the date in the desired format
+            const options = {
+                day: '2-digit',
+                month: 'long',
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit',
+                hour12: true,
+                timeZone: 'Asia/Singapore' // Specify the time zone
+            };
+            const timeZoneOffset = -8 * 60; // Convert hours to minutes
+            const adjustedDate = new Date(inputDate.getTime() + timeZoneOffset * 60 * 1000);
+
+            return adjustedDate.toLocaleString('en-SG', options);
         },
         redirectToCreateTask(subGroupId) {
             this.$router.push({
@@ -473,22 +486,28 @@ export default {
         edittask(task) {
             this.task = { ...task };
             this.task.createdById = task.createdById;
-            const currentTime = new Date();
-            const hours = currentTime.getHours().toString().padStart(2, '0'); // Ensures two digits, padding with 0 if necessary
-            const minutes = currentTime.getMinutes().toString().padStart(2, '0');
-            const formattedTime = `${hours}:${minutes}`;
+            const currentTime = new Date(task.dueDateTime);
+            const options = {
+                hour: '2-digit',
+                minute: '2-digit',
+                hour12: false, // Use 24-hour format
+                timeZone: 'Asia/Singapore' // Specify the time zone
+            };
+            const timeZoneOffset = -8 * 60; // Convert hours to minutes
+            const adjustedDate = new Date(currentTime.getTime() + timeZoneOffset * 60 * 1000);
+            const formattedTime = adjustedDate.toLocaleString('en-US', options);
+            console.log(`Time: ${formattedTime}`);
             this.dueTime = formattedTime;
             this.editDialog = true;
+            // this.selectedMembers = task.assignedUsers;
             console.log(this.task)
-            if (task.status === 'New') {
-            this.task.status = 'new';
-        } else if (task.status === 'In Progress') {
-            this.task.status = 'in_progress';
-        } else if (task.status === 'Completed') {
-            this.task.status = 'completed';
-        }
-        
-
+            // if (task.status === 'New') {
+            //     this.task.status = 'new';
+            // } else if (task.status === 'In Progress') {
+            //     this.task.status = 'in_progress';
+            // } else if (task.status === 'Completed') {
+            //     this.task.status = 'completed';
+            // }
         },
          editproject(project) {
             this.projtoedit = { ...project };
@@ -589,13 +608,13 @@ export default {
                 console.log(lastUpdatedDateTime);
 
                 console.log('Submitting task edit:' , this.task.taskId, this.task.name, this.task.description, this.task.subGroupId, this.task.createdById, this.task.createdByUsername, this.task.createdDateTime, this.task.lastUpdatedDateTime, this.task.lastUpdatedById, this.task.lastUpdatedUsername, this.task.dueDateTime, this.task.status, this.selectedMembers)
-                return
+
                 let response = await axios.put(
-                    `${env.BASE_URL}/TaskAPI_REST/rest/v1/task/${this.task.taskId}`,
+                    `http://localhost:5000/task/${this.task.taskId}`,
                     {   
                         taskId: this.task.taskId,
-                        name: this.task.name,
-                        description: this.task.description,
+                        taskName: this.task.name,
+                        taskDesc: this.task.description,
                         subGroupId: this.task.subGroupId,
                         SubGroupName: '',
                         createdById: this.task.createdById,
@@ -608,7 +627,7 @@ export default {
                         lastUpdatedUsername: username, 
                         dueDateTime: dueDateTime,
                         status: this.task.status,
-                        assignedUsers: this.selectedMembers,
+                        assignedTo: this.selectedMembers,
                     },
                     {
                         headers: {

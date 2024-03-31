@@ -64,8 +64,8 @@ const handleSubmit = async () => {
             "taskDesc": taskdesc.value,
             "dueDateTime": dueDateTime,
             "subGroupId": subGroupId.value,
-            "userId": userId.value,
-            "username": username.value,
+            "assignorUserId": userId.value,
+            "assignorUsername": username.value,
             "assignedTo": multiselectAssignee.value,
         }
 
@@ -195,6 +195,6 @@ const handleSubmit = async () => {
 export default {
     components: {
         Button,
-    },
+    }
 }
 </script>
