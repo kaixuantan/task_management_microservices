@@ -209,6 +209,7 @@ export default {
                 }
                 alert("Enrolled successfully")
             } catch (error) {
+                toast
                 console.error(error);
             }
         },
@@ -288,7 +289,9 @@ export default {
   catch (error) {
     console.error('Error updating Project:', error);
     // Show an error toast message
-    this.$toast.add({ severity: 'error', summary: 'Error', detail: 'Failed to update Project', life: 3000 });
+    this.$toast.add({ severity: 'error', summary: 'Error', detail: 'Failed to enrol', life: 3000 });
+    await this.fetchGroupProjects(this.selected_community.groupId);
+
   }
 },
     },

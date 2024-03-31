@@ -193,7 +193,7 @@
                     class="flex justify-content-between align-items-center mb-3"
                 >
                     <h3 class="font-semibold m-0">About</h3>
-                    <Button text rounded>
+                    <Button text rounded @click="editproject(project)">
                         <i class="pi pi-pencil text-500 text-xl"></i>
                     </Button>
                 </div>
@@ -306,6 +306,7 @@ export default {
             { label: 'In Progress', value: 'in_progress' },
             { label: 'Completed', value: 'completed' },
         ],
+            editprojDialog: false,
 
         };
     },
@@ -445,6 +446,11 @@ export default {
         }
         
 
+        },
+        async editproject(project) {
+            this.selected_project = { ...project };
+            this.editprojDialog = true;
+            console.log(this.selected_project);
         },
        async savetask(){
             try {
