@@ -236,6 +236,9 @@ export default {
             gemini_response: "",
         };
     },
+    mounted() {
+        window.scrollTo(0, 0);
+    },
     methods: {
         async fetchProjectTasks(subGroupId) {
             try {

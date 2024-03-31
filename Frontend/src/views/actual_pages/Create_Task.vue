@@ -1,20 +1,18 @@
 <script setup>
-import { useLayout } from '@/layout/composables/layout';
 import { useToast } from 'primevue/usetoast';
-import AppConfig from '@/layout/AppConfig.vue';
 import axios from 'axios';
 import { useRouter } from 'vue-router';
 import Button from 'primevue/button';
 import { ref, computed, onMounted } from 'vue';
 
-const multiselectAssignees = ref('');
+const multiselectAssignees = ref([]);
 const subGroupId = ref('');
 
 const queryString = window.location.search;
 const urlParams = new URLSearchParams(queryString);
 subGroupId.value = urlParams.get('subGroupId');
 console.log(subGroupId.value);
-
+const router = useRouter(); 
 onMounted(async () => {
     try {
         const response = await axios.get(`http://localhost:5003/subgroup/${subGroupId.value}`); 
@@ -82,7 +80,7 @@ const handleSubmit = async () => {
         // Handle the response
         console.log('Task added:', response.data);
         alert('Task has been created successfully.'); // Show alert message
-        router.push('/'); // Redirect to the home page
+        router.push({ name: 'project', query: { subGroupId: urlParams.get('subGroupId') } }); // Redirect to the home page with a query parameter        
         return response.data;
         
     } catch (error) {
