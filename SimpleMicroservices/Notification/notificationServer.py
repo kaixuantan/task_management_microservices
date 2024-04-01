@@ -70,9 +70,13 @@ def callback(ch, method, properties, body):
     Callback function for RabbitMQ consumer
     """
     notification = json.loads(body.decode('utf-8'))
-    recipient = notification["recipient"]
-    subject = notification["subject"]
-    body = notification["body"]
+    try:
+        recipient = notification["recipient"]
+        subject = notification["subject"]
+        body = notification["body"]
+    except Exception as e:
+        ch.basic_ack(delivery_tag=method.delivery_tag)
+        return
 
     # Send the email
     send_email(recipient, subject, body)

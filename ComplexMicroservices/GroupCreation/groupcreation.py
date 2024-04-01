@@ -155,8 +155,14 @@ def group_creation():
             users_id_list = request.get_json()[2] #list of userId
             print("\nReceived a list of usersId in JSON:", users_id_list) 
 
-            # Send group info 
-            result = processGroupCreation(group_info,subgroup_info,users_id_list,channel)
+            # Send group info
+            if len(users_id_list) <= int(group_info['size']):
+                result = processGroupCreation(group_info,subgroup_info,users_id_list,channel)
+            else:
+                result = {
+                    "code": 400,
+                    "message": "Number of users assigned exceeds group size"
+                }
             
             # Close the connection
             connection.close()
@@ -274,24 +280,30 @@ def processGroupCreation(group_info, subgroup_info, users_id_list, channel):
 
     #assign users to group
     assigned_group = processUserAssignment(group,users_id_list,subgroup_namelist, channel)
-    updated_group_result_status = invoke_http(unique_group_URL, method="PUT", json=assigned_group, headers=group_headers)
-    print("updated_group_result_status: ", updated_group_result_status)
+    if assigned_group:
+        updated_group_result_status = invoke_http(unique_group_URL, method="PUT", json=assigned_group, headers=group_headers)
+        print("updated_group_result_status: ", updated_group_result_status)
 
-    # Return created group, subgroup, assigned_group
-    return {
-        "code": 201,
-        "data": {
-            "subgroup_result": subgroup_list,
-            "final_group_result": assigned_group
+        # Return created group, subgroup, assigned_group
+        return {
+            "code": 201,
+            "data": {
+                "subgroup_result": subgroup_list,
+                "final_group_result": assigned_group
+            }
         }
-    }
+    else:
+        return {
+            "code": 400,
+            "message": "Number of users assigned exceeds group size"
+        }
 
 # User Group Assignment complex microservice
 def processUserAssignment(group,user_id_list,subgroup_namelist, channel):
     groupId = group['groupId']
     groupname = group['name']
     users_assigned = [] # list of users assigned
-    if len(user_id_list) <= group['size']:
+    if len(user_id_list) <= int(group['size']):
         for id in user_id_list:
             # print(id)
             user_headers = {'X-User-AppId': request.headers.get('X-User-AppId'), "X-User-Key": request.headers.get('X-User-Key')}
@@ -336,38 +348,41 @@ def processUserAssignment(group,user_id_list,subgroup_namelist, channel):
 
             print(f"Message sent to the exchange '{rabbitmq_exchange}' with routing key '{rabbitmq_routing_key_notif}'.")
 
-    group_headers = {'X-Group-AppId': request.headers.get('X-Group-AppId'), "X-Group-Key": request.headers.get('X-Group-Key')}
-    assign_users_URL = group_URL + "/assign/" + str(groupId)
-    assigned_user_status = invoke_http(assign_users_URL, method="PUT", json=users_assigned, headers=group_headers) 
-    print("assigned_user_status: ", assigned_user_status)
+        group_headers = {'X-Group-AppId': request.headers.get('X-Group-AppId'), "X-Group-Key": request.headers.get('X-Group-Key')}
+        assign_users_URL = group_URL + "/assign/" + str(groupId)
+        assigned_user_status = invoke_http(assign_users_URL, method="PUT", json=users_assigned, headers=group_headers) 
+        print("assigned_user_status: ", assigned_user_status)
 
-    # get new group
-    unique_group_URL = group_URL + str(groupId) 
-    new_group_dict = invoke_http(unique_group_URL, method="GET", headers=group_headers)
-    group = new_group_dict["Group"]
-    print("new group: ", group, '\n')
+        # get new group
+        unique_group_URL = group_URL + str(groupId) 
+        new_group_dict = invoke_http(unique_group_URL, method="GET", headers=group_headers)
+        group = new_group_dict["Group"]
+        print("new group: ", group, '\n')
 
-    admin_username = group["createdByUsername"]
-    admin_userId = group["createdById"]
-    # Define the message
-    message = {
-        "log type": "Create group",
-        "description": f"{admin_username} ({admin_userId}) created a group {group}",
-    }
+        admin_username = group["createdByUsername"]
+        admin_userId = group["createdById"]
+        # Define the message
+        message = {
+            "log type": "Create group",
+            "description": f"{admin_username} ({admin_userId}) created a group {group}",
+        }
 
-    # Send the message to the exchange
-    channel.basic_publish(
-        exchange=rabbitmq_exchange,
-        routing_key=rabbitmq_routing_key_log,
-        body=json.dumps(message),
-        properties=pika.BasicProperties(
-            delivery_mode=2, # make message persistent
+        # Send the message to the exchange
+        channel.basic_publish(
+            exchange=rabbitmq_exchange,
+            routing_key=rabbitmq_routing_key_log,
+            body=json.dumps(message),
+            properties=pika.BasicProperties(
+                delivery_mode=2, # make message persistent
+            )
         )
-    )
 
-    print(f"Message sent to the exchange '{rabbitmq_exchange}' with routing key '{rabbitmq_routing_key_log}'.")
+        print(f"Message sent to the exchange '{rabbitmq_exchange}' with routing key '{rabbitmq_routing_key_log}'.")
 
-    return group
+        return group
+    
+    else:
+        return None
         
 
 # Execute this program if it is run as a main script (not by 'import')

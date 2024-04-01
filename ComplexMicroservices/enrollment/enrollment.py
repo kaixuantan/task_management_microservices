@@ -1,6 +1,7 @@
 from flask import Flask, request, jsonify
 from flask_restx import Api, Resource, fields
 from flask_cors import CORS
+from get_creator_email import get_creator_email
 import requests
 
 import os
@@ -189,6 +190,7 @@ class Enrollment(Resource):
                     count += 1
             if count == len(group_subgroup_response.json()['GroupSubGroup']['subGroups']):
                 # channel.basic_publish(exchange=exchangename, routing_key=routing_keys[0], body="All users in group have been enrolled")
+                grp_name, creator_email = get_creator_email(groupId)
 
                 # Connect to RabbitMQ
                 connection = pika.BlockingConnection(pika.ConnectionParameters
@@ -196,10 +198,14 @@ class Enrollment(Resource):
                                 heartbeat=3600, blocked_connection_timeout=3600))
                 channel = connection.channel()
 
+                subject = f"[TaskMaster] All projects in community {grp_name} are full."
+                body = f"Hello {email}," + f"\n\nAll projects in {grp_name} are currently full. If you want more users to be involved in projects within the community you have created, please add a new project. Thank you. \n\nBest regards,\nTaskMaster"
+                
                 # Defining message 
                 message = {
-                    "log type": "Users enrolled", 
-                    "description": "All users in group have been enrolled"
+                    "recipient": creator_email,
+                    "subject": subject,
+                    "body": body
                 }
 
                 # Send message to exchange
@@ -225,6 +231,6 @@ class Enrollment(Resource):
 
         except:
             return {'message': 'User enrollment failed'}, 400
-    
+
 if __name__ == '__main__':
     app.run(host="0.0.0.0", port=5000, debug=True)
