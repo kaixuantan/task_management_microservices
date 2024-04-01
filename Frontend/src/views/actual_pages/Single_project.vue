@@ -100,7 +100,7 @@
                                     
                                 </div>
                                 <div class="flex justify-content-end">
-                                    <Button
+                                    <Button @click="edittask(task)"
                                         label="Edit"
                                         icon="pi pi-pencil"
                                         outlined
@@ -143,7 +143,7 @@
                                     
                                 </div>
                                 <div class="flex justify-content-end">
-                                    <Button
+                                    <Button @click="edittask(task)"
                                         label="Edit"
                                         icon="pi pi-pencil"
                                         outlined
@@ -267,15 +267,15 @@
                 />
             </div>
             <div>
-                <div class="datetime">
-                    <label for="date">Due Date</label>
-                    <div class="w49 mb-3" id="date">
-                        <Calendar v-model="dueDate" :inputStyle="{ width: '100%' }" :showIcon="true" class="w-full" />
-                    </div>
-                    <label for="inputTime">Due Time</label>
-                    <input type="time" id="inputTime" class="p-inputtext p-component w49" v-model="dueTime">
-                </div>
-            </div>
+  <div class="datetime">
+    <label for="date">Due Date</label>
+    <div class="mb-3" id="date">
+      <Calendar v-model="dueDate" :inputStyle="{ width: '100%' }" :showIcon="true" class="w-full" />
+    </div>
+    <label for="inputTime">Due Time</label>
+    <input type="time" id="inputTime" class="p-inputtext p-component w-full" v-model="dueTime">
+  </div>
+</div>
         </div>
         <template #footer>
             <Button label="Cancel" icon="pi pi-times" text @click="editDialog = false" />

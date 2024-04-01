@@ -39,7 +39,6 @@ Base url: https://personal-rc7vnnm9.outsystemscloud.com
 - Task          /TaskAPI_REST/rest/v1
 - Log           /LogAPI_REST/rest/v1
 - Document      /DocAPI_REST/rest/v1
-- Comment       /CommentAPI_REST/rest/v1
 
 ## Authentication
 - Each simple microservice API has its own authentication headers to be included
@@ -67,10 +66,6 @@ Base url: https://personal-rc7vnnm9.outsystemscloud.com
     - `Headers`
     - "X-Doc-AppId" = [docAppId]
     - "X-Doc-Key" = [docAPIKey]
-  - Document
-    - `Headers`
-    - "X-Comment-AppId" = [commentAppId]
-    - "X-Comment-Key" = [commentAPIKey]
 
 ## Endpoints
 - User (https://personal-rc7vnnm9.outsystemscloud.com/UserAPI_REST/rest/v1/)
@@ -168,7 +163,7 @@ Base url: https://personal-rc7vnnm9.outsystemscloud.com
   - [PUT] 		Update document	        	
     - /doc/{docId}
   - [DELETE] 	Delete document 			
-    - /doc/{docId}		
+    - /doc/{docId}
 
 ## Database schema
 - User

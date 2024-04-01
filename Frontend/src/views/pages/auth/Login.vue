@@ -16,6 +16,30 @@ const baseURL = 'https://personal-rc7vnnm9.outsystemscloud.com';
 const userAppId = env.X_User_AppId 
 const userAppKey = env.X_User_Key
 
+const fetchUserData = async (userId) => {
+            try{
+                console.log(userId)
+                let response = await axios.get(
+                    `${env.BASE_URL}/UserAPI_REST/rest/v1/user/${userId}/`,
+                    {
+                        headers: {
+                            "X-User-AppId": env.X_User_AppId,
+                            "X-User-Key": env.X_User_Key,
+                        },
+                    }
+                );
+                if (response.data.Result.Success !== true) {
+                    console.error("Error fetching user groups");
+                } else {
+                    sessionStorage.setItem('email', response.data.User.email)
+                    sessionStorage.setItem('role', response.data.User.role)
+                }
+            }
+            catch(error){
+                console.error(error);
+            }
+        }
+
 const handleSubmit = async () => {
   try {
     // Validate the form
@@ -44,7 +68,7 @@ const handleSubmit = async () => {
     sessionStorage.setItem('userid', user_id);
     sessionStorage.setItem('username', username.value);
     sessionStorage.setItem('yourKey', env.JWT_SECRET);
-    console.log(user_id);
+    await fetchUserData(user_id);
     router.push('/'); 
     }
 
