@@ -105,7 +105,7 @@
                     </div>
 
                     <div class="flex gap-3 mt-1" v-if="isUserEnrolled(project) && userrole !== 'admin'">
-                        <Button label="Leave" severity="secondary" outlined class="w-full" @click="leaveproject" />
+                        <Button label="Leave" severity="secondary" outlined class="w-full" @click="leaveproject(project.subGroupId)" />
                         <Button label="View" class="w-full" @click="viewProject(project.subGroupId)" />
                     </div>
 
