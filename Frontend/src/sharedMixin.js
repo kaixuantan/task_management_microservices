@@ -23,6 +23,12 @@ export default {
         userId() {
             return window.sessionStorage.getItem('userid');
         },
+        username() {
+            return window.sessionStorage.getItem("username");
+        },
+        role() {
+            return window.sessionStorage.getItem("role");
+        }
     },
     methods: {
         async fetchUserGroups() {

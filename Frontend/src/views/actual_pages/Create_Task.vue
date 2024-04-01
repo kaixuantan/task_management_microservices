@@ -1,22 +1,21 @@
 <script setup>
-import { useLayout } from '@/layout/composables/layout';
 import { useToast } from 'primevue/usetoast';
-import AppConfig from '@/layout/AppConfig.vue';
 import axios from 'axios';
 import { useRouter } from 'vue-router';
 import Button from 'primevue/button';
 import { ref, computed, onMounted } from 'vue';
 
-const multiselectAssignees = ref('');
+const multiselectAssignees = ref([]);
 const subGroupId = ref('');
-//TO EDIT WITH ACTUAL SUBGRPID
-subGroupId.value = 46;
-// subGroupId.value = sessionStorage.getItem('subGroupId');
-//END OF EDIT
 
+const queryString = window.location.search;
+const urlParams = new URLSearchParams(queryString);
+subGroupId.value = urlParams.get('subGroupId');
+console.log(subGroupId.value);
+const router = useRouter(); 
 onMounted(async () => {
     try {
-        const response = await axios.get(`http://localhost:3000/subgroup/${subGroupId.value}`); 
+        const response = await axios.get(`http://localhost:5003/subgroup/${subGroupId.value}`); 
         multiselectAssignees.value = response.data;
     } catch (error) {
         console.error('Error fetching assignees:', error);
@@ -65,8 +64,8 @@ const handleSubmit = async () => {
             "taskDesc": taskdesc.value,
             "dueDateTime": dueDateTime,
             "subGroupId": subGroupId.value,
-            "userId": userId.value,
-            "username": username.value,
+            "assignorUserId": userId.value,
+            "assignorUsername": username.value,
             "assignedTo": multiselectAssignee.value,
         }
 
@@ -76,12 +75,12 @@ const handleSubmit = async () => {
         // console.log(multiselectAssignee.value)
         // console.log(dueDate.value)
 
-        const response = await axios.post(`http://localhost:3000/task`, taskData);
+        const response = await axios.post(`http://localhost:5003/task`, taskData);
         
         // Handle the response
         console.log('Task added:', response.data);
         alert('Task has been created successfully.'); // Show alert message
-        router.push('/'); // Redirect to the home page
+        router.push({ name: 'project', query: { subGroupId: urlParams.get('subGroupId') } }); // Redirect to the home page with a query parameter        
         return response.data;
         
     } catch (error) {
@@ -165,7 +164,7 @@ const handleSubmit = async () => {
                         </div>
                     </template>
                 </MultiSelect>
-                <div>{{ multiselectAssignee}}</div>
+                <!-- <div>{{ multiselectAssignee}}</div> -->
             </div>
         </div>
         <div class="col-12 md:col-6">
@@ -196,6 +195,6 @@ const handleSubmit = async () => {
 export default {
     components: {
         Button,
-    },
+    }
 }
 </script>

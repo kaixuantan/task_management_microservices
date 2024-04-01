@@ -1,52 +1,9 @@
 <script setup>
 import { ref } from "vue";
 import { useLayout } from "@/layout/composables/layout";
+import { useRouter } from 'vue-router';
 
-const activities = ref(
-    [
-        {
-            status: "Ben Simmons",
-            date: "15/10/2020 10:30",
-            task_id: "121",
-            task_desc: "fix the bug on the homepage",
-            project: "Project Meelo",
-            image: "/images/avatars/panda.png",
-        },
-        {
-            status: "John Tan",
-            date: "15/10/2020 14:00",
-            task_id: "2",
-            task_desc: "added paragraph",
-            project: "Project Kivu",
-            image: "/images/avatars/fox.png",
-        },
-        {
-            status: "Paul Lynette",
-            date: "15/10/2020 16:15",
-            task_id: "10",
-            task_desc: "deleted old design",
-            project: "Project Hapara",
-            image: "/images/avatars/woman.png",
-        },
-    ].reverse()
-);
-const projects = ref([
-    {
-        name: "Project Meelo",
-        description: "create real estate landing page",
-        icon: "pi pi-apple",
-    },
-    {
-        name: "Project Kivu",
-        description: "complete leadership assignment",
-        icon: "pi pi-bitcoin",
-    },
-    {
-        name: "Project Hapara",
-        description: "design a new logo for the company",
-        icon: "pi pi-bolt",
-    },
-]);
+const router = useRouter(); 
 
 const calAttributes = ref([
     {
@@ -61,6 +18,9 @@ const calAttributes = ref([
         <div class="col-8">
             <div class="grid">
                 <!-- 3 cards at the top of the screen -->
+                <div class="col-12">
+                    <h2 class="mb-0 font-semibold">Welcome {{ username.toUpperCase() }}!</h2>
+                </div>
                 <div class="col-12 lg:col-6 xl:col-4">
                     <div class="card mb-0 bg-orange-400 shadow-3">
                         <div
@@ -217,47 +177,47 @@ const calAttributes = ref([
         <div class="col-4">
             <Panel>
                 <h5>Communities</h5>
-                <div class="flex-auto" v-if="sideMenuActive">
-                    <a v-for="(community, index) in communities.slice(0, 5)" :key="index" :href="`/projects?groupId=${community.groupId}`">
-                        <Avatar
-                            :label="community.name.charAt(0).toUpperCase()"
-                            class="mr-2"
-                            size="large"
-                            shape="circle"
-                            :style="{
-                                backgroundColor: colors[index % colors.length],
-                            }"
-                        />
-                    </a>
-                    <a v-if="communities.length > 5" :href="`/community`">
-                        <Avatar
-                            :label="`+${communities.length - 5}`"
-                            class="mr-2"
-                            size="large"
-                            shape="circle"
-                        />
-                    </a>
+                <div class="flex-auto" v-if="sideMenuActive" style="cursor: pointer !important">
+                    <Avatar
+                        v-for="(community, index) in communities.slice(0, 5)"
+                        :key="index"
+                        :label="community.name.charAt(0).toUpperCase()"
+                        class="mr-2"
+                        size="large"
+                        shape="circle"
+                        :style="{
+                            backgroundColor: colors[index % colors.length]
+                        }"
+                        @click="communitygrp(community.groupId)"
+                    />
+                    <Avatar
+                        v-if="communities.length > 5"
+                        :label="`+${communities.length - 5}`"
+                        class="mr-2"
+                        size="large"
+                        shape="circle"
+                    />
                 </div>
                 <div v-else>
-                    <a v-for="(community, index) in communities.slice(0, 7)" :key="index" :href="`/projects?groupId=${community.groupId}`">
-                        <Avatar
-                            :label="community.charAt(0)"
-                            class="mr-2"
-                            size="large"
-                            shape="circle"
-                            :style="{
-                                backgroundColor: colors[index % colors.length],
-                            }"
-                        />
-                    </a>
-                    <a v-if="communities.length > 7" :href="`/community`">
-                        <Avatar
-                            :label="`+${communities.length - 7}`"
-                            class="mr-2"
-                            size="large"
-                            shape="circle"
-                        />
-                    </a>
+                    <Avatar
+                        v-for="(community, index) in communities.slice(0, 7)"
+                        :key="index"
+                        :label="community.name.charAt(0).toUpperCase()"
+                        class="mr-2"
+                        size="large"
+                        shape="circle"
+                        :style="{
+                            backgroundColor: colors[index % colors.length]
+                        }"
+                        @click="communitygrp(community.groupId)"
+                    />
+                     <Avatar
+                        v-if="communities.length > 7"
+                        :label="`+${communities.length - 7}`"
+                        class="mr-2"
+                        size="large"
+                        shape="circle"
+                     />
                 </div>
 
                 <Divider />
@@ -340,7 +300,9 @@ export default {
         };
     },
     methods: {
-
+        communitygrp(grpid) {
+            this.$router.push({ name: 'projects', query: { groupId: grpid } });
+        }
     },
     computed: {
         sideMenuActive() {

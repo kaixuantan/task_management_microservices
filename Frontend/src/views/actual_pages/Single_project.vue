@@ -5,6 +5,7 @@
             <h2 class="mb-0 font-semibold" v-if="selected_project">{{ selected_project.name }}</h2>
             <h2 class="mb-0 font-semibold" v-else>Fetching project...</h2>
             <Dropdown
+                v-if = "role === 'user'"
                 v-model="selected_project"
                 :options="user_projects"
                 optionLabel="name"
@@ -39,9 +40,9 @@
                                     {{ task.description }}
                                 </div>
                                 <div class="mb-2">
-                                    <span class="font-semibold">Due: </span
+                                    <span class="font-semibold">Due On: </span
                                     ><span>{{
-                                        this.formatDate(task.dueDateTime)
+                                        formatDate(task.dueDateTime)
                                     }}</span>
                                 </div>
                                 <div class="mb-3">
@@ -53,8 +54,8 @@
                                     
                                 </div>
                                 <div class="flex justify-content-end">
-                                    <Button
-                                        label="View"
+                                    <Button @click="edittask(task)"
+                                        label="Edit"
                                         icon="pi pi-pencil"
                                         outlined
                                     />
@@ -84,9 +85,9 @@
                                     {{ task.description }}
                                 </div>
                                 <div class="mb-2">
-                                    <span class="font-semibold">Due: </span
+                                    <span class="font-semibold">Due On: </span
                                     ><span>{{
-                                        this.formatDate(task.dueDateTime)
+                                        formatDate(task.dueDateTime)
                                     }}</span>
                                 </div>
                                 <div class="mb-3">
@@ -100,7 +101,7 @@
                                 </div>
                                 <div class="flex justify-content-end">
                                     <Button
-                                        label="View"
+                                        label="Edit"
                                         icon="pi pi-pencil"
                                         outlined
                                     />
@@ -127,9 +128,9 @@
                                     {{ task.description }}
                                 </div>
                                 <div class="mb-2">
-                                    <span class="font-semibold">Due: </span
+                                    <span class="font-semibold">Due On: </span
                                     ><span>{{
-                                        this.formatDate(task.dueDateTime)
+                                        formatDate(task.dueDateTime)
                                     }}</span>
                                 </div>
                                 <div class="mb-3">
@@ -143,7 +144,7 @@
                                 </div>
                                 <div class="flex justify-content-end">
                                     <Button
-                                        label="View"
+                                        label="Edit"
                                         icon="pi pi-pencil"
                                         outlined
                                     />
@@ -193,7 +194,7 @@
                     class="flex justify-content-between align-items-center mb-3"
                 >
                     <h3 class="font-semibold m-0">About</h3>
-                    <Button text rounded>
+                    <Button text rounded @click="editproject">
                         <i class="pi pi-pencil text-500 text-xl"></i>
                     </Button>
                 </div>
@@ -214,6 +215,92 @@
         </div>
         <!-- 3 cards at the top of the screen -->
     </div>
+
+    <Dialog v-model:visible="editDialog" :style="{ width: '450px' }" header="Edit Community" :modal="true" class="p-fluid">
+        <div class="field">
+            <label for="name">Task Name</label>
+            <InputText id="name" v-model.trim="task.name" :required="true" autofocus :disabled="!isCreatedByUser" />
+        </div>
+        <div class="field">
+            <label for="description">Task Description</label>
+            <Textarea id="description" v-model="task.description" :required="true" rows="3" cols="20" :disabled="!isCreatedByUser" />
+        </div>
+        <div class="field">
+            <label for="assignedUsers">Assigned Members</label>
+            <MultiSelect
+                v-model="selectedMembers"
+                :options="projectMembers"
+                optionLabel="username"
+                placeholder="Select Members"
+                :filter="true"
+                class="w-full"
+                :required="true"
+            >
+                <template #value="slotProps">
+                    <div
+                    class="inline-flex align-items-center py-1 px-2 bg-primary text-primary border-round mr-2"
+                    v-for="member in slotProps.value"
+                    :key="member.userId"
+                    >
+                    <div>{{ member.username}}</div>
+                    </div>
+                    <template v-if="!slotProps.value || slotProps.value.length === 0">
+                    <div class="p-1">Select Members</div>
+                    </template>
+                </template>
+                <template #option="slotProps">
+                    <div class="flex align-items-center">
+                    <div>{{ slotProps.option.username }}</div>
+                    </div>
+                </template>
+            </MultiSelect>
+            <div class="field my-3">
+                <label for="status">Status</label>
+                <Dropdown
+                    id="status"
+                    v-model="task.status"
+                    :options="statusOptions"
+                    optionLabel="label"
+                    optionValue="value"
+                    placeholder="Select Status"
+                    class="w-full"
+                />
+            </div>
+            <div>
+                <div class="datetime">
+                    <label for="date">Due Date</label>
+                    <div class="w49 mb-3" id="date">
+                        <Calendar v-model="dueDate" :inputStyle="{ width: '100%' }" :showIcon="true" class="w-full" />
+                    </div>
+                    <label for="inputTime">Due Time</label>
+                    <input type="time" id="inputTime" class="p-inputtext p-component w49" v-model="dueTime">
+                </div>
+            </div>
+        </div>
+        <template #footer>
+            <Button label="Cancel" icon="pi pi-times" text @click="editDialog = false" />
+            <Button label="Save" icon="pi pi-check" text @click="savetask" />
+        </template>
+    </Dialog>
+
+    <Dialog v-model:visible="editprojDialog" :style="{ width: '450px' }" header="Edit Project" :modal="true" class="p-fluid">
+        <div class="field">
+            <label for="name">Project Name</label>
+            <InputText id="name" v-model.trim="newname" :required="true" autofocus />
+        </div>
+        <div class="field">
+            <label for="description">Description</label>
+            <Textarea id="description" v-model="newdesc" :required="true" rows="3" cols="20" />
+        </div>
+        <div class="field">
+            <label for="capacity">Capacity</label>
+            <InputText type="number" id="capacity" v-model="newcapacity" :required="true" rows="3" cols="20" />
+        </div>
+        <template #footer>
+            <Button label="Cancel" icon="pi pi-times" text @click="editprojDialog = false" />
+            <Button label="Save" icon="pi pi-check" text @click="saveproject" />
+        </template>
+    </Dialog>
 </template>
 
 <script>
@@ -226,6 +313,8 @@ export default {
     mixins: [sharedMixin],
     data() {
         return {
+            dueDate: new Date(),
+            dueTime: "00:00",
             selected_project: null,
             enrolled: false,
             loading: true,
@@ -234,8 +323,29 @@ export default {
             tasks_new: [],
             tasks_completed: [],
             gemini_response: "",
+            editDialog: false,
+            task: {},
+            selectedMembers: [],
+            projectMembers: [],
+            selectedStatus: null,
+            newname: "",
+            newdesc: "",
+            newcapacity: "",
+            projtoedit:null,
+            statusOptions: [
+            { label: 'New', value: 'New' },
+            { label: 'In Progress', value: 'In Progress' },
+            { label: 'Completed', value: 'Completed' },
+        ],
+            editprojDialog: false,
+
         };
     },
+    mounted() {
+        window.scrollTo(0, 0);
+
+    },
+    
     methods: {
         async fetchProjectTasks(subGroupId) {
             try {
@@ -249,10 +359,29 @@ export default {
                     }
                 );
                 this.proj_tasks = response.data.TaskAPI;
-                // console.log(this.projects);
+                console.log(this.proj_tasks);
             } catch (error) {
                 console.error(error);
             }
+        },
+        formatDate(dateString) {
+            // Convert the input date string to a Date object
+            const inputDate = new Date(dateString);
+
+            // Format the date in the desired format
+            const options = {
+                day: '2-digit',
+                month: 'long',
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit',
+                hour12: true,
+                timeZone: 'Asia/Singapore' // Specify the time zone
+            };
+            const timeZoneOffset = -8 * 60; // Convert hours to minutes
+            const adjustedDate = new Date(inputDate.getTime() + timeZoneOffset * 60 * 1000);
+
+            return adjustedDate.toLocaleString('en-SG', options);
         },
         redirectToCreateTask(subGroupId) {
             this.$router.push({
@@ -306,7 +435,7 @@ export default {
         async uploadFile(base64String) {
             const data = {
                 document: base64String,
-                subGroupId: this.$route.query.subGroupId,
+                subGroupId: parseInt(this.$route.query.subGroupId),
                 type: "pdf",
             };
             try {
@@ -353,20 +482,223 @@ export default {
             } catch (error) {
                 console.error(error);
             }
+        },
+        edittask(task) {
+            this.task = { ...task };
+            this.task.createdById = task.createdById;
+            const currentTime = new Date(task.dueDateTime);
+            const options = {
+                hour: '2-digit',
+                minute: '2-digit',
+                hour12: false, // Use 24-hour format
+                timeZone: 'Asia/Singapore' // Specify the time zone
+            };
+            const timeZoneOffset = -8 * 60; // Convert hours to minutes
+            const adjustedDate = new Date(currentTime.getTime() + timeZoneOffset * 60 * 1000);
+            const formattedTime = adjustedDate.toLocaleString('en-US', options);
+            console.log(`Time: ${formattedTime}`);
+            this.dueTime = formattedTime;
+            this.editDialog = true;
+            // this.selectedMembers = task.assignedUsers;
+            console.log(this.task)
+            // if (task.status === 'New') {
+            //     this.task.status = 'new';
+            // } else if (task.status === 'In Progress') {
+            //     this.task.status = 'in_progress';
+            // } else if (task.status === 'Completed') {
+            //     this.task.status = 'completed';
+            // }
+        },
+         editproject(project) {
+            this.projtoedit = { ...project };
+            this.newname = this.selected_project.name;
+            this.newdesc = this.selected_project.description;
+            this.newcapacity = this.selected_project.size;
+            this.editprojDialog = true;
+        },
+        
+        
+        async saveproject() {
+    try {
+        // Update the project
+        if(this.newname === "" || this.newdesc === "" || this.newcapacity === "") {
+            this.$toast.add({ severity: 'error', summary: 'Error', detail: 'Please fill in all fields', life: 3000 });
+            return;
         }
+        console.log(this.newname, this.newdesc, this.newcapacity)
+        console.log(this.selected_project.groupId)
+        console.log(this.selected_project.subGroupId)
+        console.log(this.selected_project.subGroupUsers)
+        if(this.newcapacity<1 || this.projectMembers.length>this.newcapacity){
+            this.$toast.add({ severity: 'error', summary: 'Error', detail: 'Capacity cannot be less than number of existing members or 0', life: 3000 });
+            return;
+        }
+        let response = await axios.put(
+            `${env.BASE_URL}/SubGroupAPI_REST/rest/v1/subgroup/${this.selected_project.subGroupId}`,
+            {
+                name: this.newname,
+                groupId: this.selected_project.groupId,
+                description: this.newdesc,
+                size: this.newcapacity,
+                subGroupUsers: this.selected_project.subGroupUsers,
+            },
+            {
+                headers: {
+                    "X-SubGroup-AppId": env.X_SubGroup_AppId,
+                    "X-SubGroup-Key": env.X_SubGroup_Key,
+                },
+            }
+        );
+        console.log(response.data);
+
+        // Close the edit dialog
+        this.editprojDialog = false;
+
+        // Refresh the project details
+    
+        if (this.role === "user") {
+                    await this.fetchUserProjects();
+                    for (const proj of this.user_projects) {
+                        if (proj.subGroupId == this.selected_project.subGroupId) {
+                            this.selected_project = proj;
+                            this.projectMembers= this.selected_project.subGroupUsers;
+                            console.log(this.selected_project);
+                            console.log(this.selected_project.subGroupUsers)
+                            break;
+                        }
+                    }
+                }
+       
+        else{
+            this.fetchProject();}
+
+        // Show a success toast message
+        this.$toast.add({ severity: 'success', summary: 'Successful', detail: 'Project updated', life: 3000 });
+    } catch (error) {
+        console.error('Error updating project:', error);
+        // Show an error toast message
+        this.$toast.add({ severity: 'error', summary: 'Error', detail: 'Failed to update project', life: 3000 });
+    }
+},
+       async savetask(){
+            try {
+                if(this.task.name === "" || this.task.description === "" || this.task.status === "" || this.task.dueDateTime === "" || this.selectedMembers.length === 0) {
+                    this.$toast.add({ severity: 'error', summary: 'Error', detail: 'Please fill in all fields', life: 3000 });
+                    return;
+                }
+                this.task.assignedUsers = this.selectedMembers;
+                console.log(this.task.createdById)
+                const user_id = parseInt(sessionStorage.getItem('userid'));
+                const username = sessionStorage.getItem('username');
+                const selectedDateTime = new Date(this.dueDate);
+                const selectedTime = this.dueTime.split(':');
+                selectedDateTime.setHours(selectedTime[0]);
+                selectedDateTime.setMinutes(selectedTime[1]);
+                selectedDateTime.setSeconds(0); 
+                selectedDateTime.setMilliseconds(0); 
+                console.log(selectedDateTime)
+                const utcDateTime = new Date(selectedDateTime.getTime() - (selectedDateTime.getTimezoneOffset() * 60000));
+                console.log(utcDateTime)
+                const dueDateTime = utcDateTime.toISOString();
+                console.log(dueDateTime)
+
+                const currentDateTime = new Date();
+                const utcCurrentDateTime = new Date(currentDateTime.getTime() - (currentDateTime.getTimezoneOffset() * 60000));
+                const lastUpdatedDateTime = utcCurrentDateTime.toISOString();
+                console.log(lastUpdatedDateTime);
+
+                console.log('Submitting task edit:' , this.task.taskId, this.task.name, this.task.description, this.task.subGroupId, this.task.createdById, this.task.createdByUsername, this.task.createdDateTime, this.task.lastUpdatedDateTime, this.task.lastUpdatedById, this.task.lastUpdatedUsername, this.task.dueDateTime, this.task.status, this.selectedMembers)
+
+                let response = await axios.put(
+                    `http://localhost:5000/task/${this.task.taskId}`,
+                    {   
+                        taskId: this.task.taskId,
+                        taskName: this.task.name,
+                        taskDesc: this.task.description,
+                        subGroupId: this.task.subGroupId,
+                        SubGroupName: '',
+                        createdById: this.task.createdById,
+                        createdByUsername: this.task.createdByUsername,
+                        assignorUserId: user_id,
+                        assignorUsername: username,
+                        createdDateTime: this.task.createdDateTime,
+                        lastUpdatedDateTime: lastUpdatedDateTime,
+                        lastUpdatedById: user_id,
+                        lastUpdatedUsername: username, 
+                        dueDateTime: dueDateTime,
+                        status: this.task.status,
+                        assignedTo: this.selectedMembers,
+                    },
+                    {
+                        headers: {
+                            "X-Task-AppId": env.X_Task_AppId,
+                            "X-Task-Key": env.X_Task_Key,
+                        },
+                    }
+                );
+                console.log(response.data);
+                
+                // Close the edit dialog
+                this.editDialog = false;
+                
+                // Refresh the list of tasks
+                await this.fetchProjectTasks(this.$route.query.subGroupId);
+                
+                // Show a success toast message
+                this.$toast.add({ severity: 'success', summary: 'Successful', detail: 'Task updated', life: 3000 });
+            } 
+            catch (error) {
+                console.error('Error updating task:', error);
+                // Show an error toast message
+                this.$toast.add({ severity: 'error', summary: 'Error', detail: 'Failed to update task', life: 3000 });
+            }
+        },
+        async fetchProject() {
+            try {
+                let response = await axios.get(
+                    `${env.BASE_URL}/SubGroupAPI_REST/rest/v1/subgroup/${this.$route.query.subGroupId}`,
+                    {
+                        headers: {
+                            "X-SubGroup-AppId": env.X_SubGroup_AppId,
+                            "X-SubGroup-Key": env.X_SubGroup_Key,
+                        },
+                    }
+                );
+                if (response.data.Result.Success !== true) {
+                    console.error("Error fetching project");
+                } else {
+                    this.selected_project = response.data.SubGroup
+                }
+            } catch (error) {
+                console.error(error);
+            }
+        },
     },
+    computed: {
+    isCreatedByUser() {
+        return this.task.createdById === parseInt(sessionStorage.getItem('userid'));
+    },
+},
     watch: {
         "$route.query.subGroupId": {
             immediate: true,
             async handler(newVal) {
                 this.loading = true;
-                await this.fetchUserProjects();
-                for (const proj of this.user_projects) {
-                    if (proj.subGroupId == newVal) {
-                        this.selected_project = proj;
-                        break;
+                if (this.role === "user") {
+                    await this.fetchUserProjects();
+                    for (const proj of this.user_projects) {
+                        if (proj.subGroupId == newVal) {
+                            this.selected_project = proj;
+                            this.projectMembers= this.selected_project.subGroupUsers;
+                            console.log(this.selected_project);
+                            console.log(this.selected_project.subGroupUsers)
+                            break;
+                        }
                     }
+                } else if (this.role === "admin") {
+                    await this.fetchProject();
                 }
+                
                 await this.fetchProjectTasks(this.$route.query.subGroupId);
                 await this.fetch_gemini_response();
                 this.tasks_in_progress = [];
@@ -375,7 +707,7 @@ export default {
                 this.sortTasksByStatus(this.proj_tasks);
                 this.loading = false;
                 // console.log(this.selected_project);
-                console.log(this.user_projects);
+                // console.log(this.user_projects);
             },
         },
         selected_project: {

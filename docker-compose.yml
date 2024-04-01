@@ -87,12 +87,12 @@ services:
     restart: on-failure
   
   create-task:
-    build: ./ComplexMicroservices/CreateTask
-    image: esd-project/createtask
+    build: ./ComplexMicroservices/CreateEditTask
+    image: esd-project/createedittask
     ports:
       - "5003:5000"
     env_file:
-      - ./ComplexMicroservices/CreateTask/.env
+      - ./ComplexMicroservices/CreateEditTask/.env
     depends_on:
       - rabbitmq
       - amqp

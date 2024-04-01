@@ -20,15 +20,16 @@ import AppMenuItem from "./AppMenuItem.vue";
 <script>
 import AppMenuItem from "./AppMenuItem.vue";
 import sharedMixin from "@/sharedMixin";
+import { mapState } from "vuex";
 
 export default {
     mixins: [sharedMixin],
     data() {
         return {
-            first_user_project: null,
         }
     },
     computed: {
+        ...mapState(['first_user_project']),
         model() {
             return [
                 {
@@ -52,13 +53,15 @@ export default {
         },
     },
     async created() {
-        await this.fetchUserProjects();
-        if (this.user_projects && this.user_projects.length > 0) {
-            this.first_user_project = this.user_projects[0].subGroupId;
-        } else {
-            console.log('No user projects found');
+        if (this.role === 'user') {
+            await this.fetchUserProjects();
+            if (this.user_projects && this.user_projects.length > 0) {
+                const first_user_project = this.user_projects[0].subGroupId;
+                this.$store.commit('setFirstUserProject', first_user_project);
+            } else {
+                console.log('No user projects found');
+            }
         }
-        
     }
 }
 </script>

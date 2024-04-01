@@ -18,4 +18,4 @@ RUN chmod +x ./wait-for-it.sh
 EXPOSE 5000
 
 # Start the Node.js application
-CMD ["./wait-for-it.sh", "rabbitmq-mgmt:5672", "--", "node", "create-task.js"]
+CMD ["./wait-for-it.sh", "rabbitmq-mgmt:5672", "--", "node", "create-edit-task.js"]
