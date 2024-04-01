@@ -168,18 +168,7 @@ Base url: https://personal-rc7vnnm9.outsystemscloud.com
   - [PUT] 		Update document	        	
     - /doc/{docId}
   - [DELETE] 	Delete document 			
-    - /doc/{docId}
-- Comment (https://personal-rc7vnnm9.outsystemscloud.com/CommentAPI_REST/rest/v1/)
-  - [GET] 		Get all comments			
-    - /comment
-  - [GET]		Get all comments in a task	
-    - /comment/task/{taskId}
-  - [POST] 		Add comment				
-    - /comment
-  - [PUT] 		Update comment			
-    - /comment/{commentId}
-  - [DELETE] 	Delete comment			
-    - /comment/{commentId}
+    - /doc/{docId}		
 
 ## Database schema
 - User
@@ -252,12 +241,3 @@ Base url: https://personal-rc7vnnm9.outsystemscloud.com
   - [PK] DocId (bigint) (auto increment)
   - [FK] subGroupId (bigint)
   - document (binary data)
-- Comment
-  - `Comment table`
-  - [PK] commentId (bigint) (auto increment)
-  - [FK] taskId (bigint)
-  - [FK] userId (bigint)
-  - username (varchar)
-  - createdDateTime (datetime)
-  - comment (varchar)
-  - picture (binary data)
