@@ -610,7 +610,7 @@ export default {
                 console.log('Submitting task edit:' , this.task.taskId, this.task.name, this.task.description, this.task.subGroupId, this.task.createdById, this.task.createdByUsername, this.task.createdDateTime, this.task.lastUpdatedDateTime, this.task.lastUpdatedById, this.task.lastUpdatedUsername, this.task.dueDateTime, this.task.status, this.selectedMembers)
 
                 let response = await axios.put(
-                    `http://localhost:5000/task/${this.task.taskId}`,
+                    `http://localhost:5003/task/${this.task.taskId}`,
                     {   
                         taskId: this.task.taskId,
                         taskName: this.task.name,

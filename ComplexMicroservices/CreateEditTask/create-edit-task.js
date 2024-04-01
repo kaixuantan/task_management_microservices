@@ -103,7 +103,7 @@ app.post('/task', async (req, res) => {
         res.status(201).json({ message: 'Task created successfully', taskId });
 
         await sendLogMessage(channel, req.body, taskId, 'Create Task', 'A task has been created');
-        await sendNotifications(channel, req.body, taskId);
+        await sendNotifications(channel, req.body, taskId, 'New Task', 'A task has been created');
     } catch (error) {
         console.log(error)
         if (error.code === 'ERR_BAD_RESPONSE') {
@@ -167,7 +167,7 @@ app.put('/task/:taskId', async (req, res) => {
         res.status(200).json({ message: 'Task updated successfully', taskId });
 
         await sendLogMessage(channel, req.body, taskId, 'Edit Task', 'A task has been updated');
-        await sendNotifications(channel, req.body, taskId);
+        await sendNotifications(channel, req.body, taskId, 'Task Updated', 'A task has been updated');
     } catch (error) {
         console.log(error)
         if (error.code === 'ERR_BAD_RESPONSE') {
@@ -250,19 +250,22 @@ async function sendLogMessage(channel, reqBody, taskId, type, description) {
     }
 }
 
-async function sendNotifications(channel, reqBody, taskId) {
+async function sendNotifications(channel, reqBody, taskId, subject, desc) {
     try {
+        console.log(taskId);
+        console.log(reqBody);
         const formattedDate = formatDate(reqBody.dueDateTime);
         const taskURL = `http://localhost:5173/task/${taskId}`;
 
         for (i = 0; i < reqBody.assignedTo.length; i++) {
+            console.log(reqBody.assignedTo[i].assigneeEmail)
             const notifMsg = {
                 recipient: reqBody.assignedTo[i].assigneeEmail,
-                subject: '[TaskMaster] New Task Alert',
+                subject: `[TaskMaster] ${subject}`,
                 body: `
                     Hello ${reqBody.assignedTo[i].assigneeUsername}!
 
-                    A new task has been created by ${reqBody.username}:
+                    ${desc} by ${reqBody.assignorUsername}:
                     Task Name: ${reqBody.taskName}
                     Description: ${reqBody.taskDesc}
                     Due On: ${formattedDate}
@@ -274,6 +277,8 @@ async function sendNotifications(channel, reqBody, taskId) {
                     TaskMaster
                 `
             };
+
+            console.log(notifMsg)
 
             await channel.publish(rabbitmq_exchange, rabbitmq_notif_routing_key, Buffer.from(JSON.stringify(notifMsg)), { persistent: true });
             console.log(`Message sent to RabbitMQ exchange '${rabbitmq_exchange}' with routing key '${rabbitmq_notif_routing_key}'.`);
