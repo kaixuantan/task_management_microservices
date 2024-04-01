@@ -316,7 +316,6 @@ export default {
         window.scrollTo(0, 0);
         await this.fetchUserGroups();
         await this.fetchUserTasks();
-        await this.fetchUserData();
         this.sortTasksByStatus(this.tasks);
         // console.log(this.tasks_in_progress);
         // console.log(this.tasks_new);
