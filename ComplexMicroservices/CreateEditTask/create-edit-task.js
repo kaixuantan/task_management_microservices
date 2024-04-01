@@ -135,7 +135,6 @@ app.put('/task/:taskId', async (req, res) => {
 
     try {
         const taskId = req.params.taskId;
-        console.log(req.body)
         await axios.put(
             `https://personal-rc7vnnm9.outsystemscloud.com/TaskAPI_REST/rest/v1/task/${taskId}`,
             {
@@ -161,8 +160,19 @@ app.put('/task/:taskId', async (req, res) => {
             }
         );
 
-        console.log(req.body.assignedTo)
-        await assignTask(taskId, req.body.assignedTo, req.body.assignorUserId, req.body.assignorUsername);
+        const assignees = req.body.assignedTo;
+        
+        assignees.forEach(obj => {
+            obj.taskId = taskId;
+            obj.assigneeUserId = obj.userId;
+            obj.assigneeUsername = obj.username;
+            obj.assigneeEmail = obj.email;
+            delete obj.subGroupId; 
+            delete obj.userId; 
+            delete obj.username;
+            delete obj.email;
+        });
+        await assignTask(taskId, assignees, req.body.assignorUserId, req.body.assignorUsername);
 
         res.status(200).json({ message: 'Task updated successfully', taskId });
 
@@ -213,15 +223,15 @@ async function assignTask(taskId, assignedTo, userId, username) {
     try {
         await axios.put(
             `https://personal-rc7vnnm9.outsystemscloud.com/TaskAPI_REST/rest/v1/task/assign/${taskId}`,
-        assignedTo,
-        {
-            headers: {
-                'X-Task-AppId': TaskAppId,
-                'X-Task-Key': TaskKey,
-                'assignorId': userId,
-                'assignorUsername': username,
+            assignedTo,
+            {
+                headers: {
+                    'X-Task-AppId': TaskAppId,
+                    'X-Task-Key': TaskKey,
+                    'assignorId': userId,
+                    'assignorUsername': username,
+                }
             }
-        }
         );
     } catch (error) {
         console.log(error);

@@ -100,7 +100,7 @@
                                     
                                 </div>
                                 <div class="flex justify-content-end">
-                                    <Button
+                                    <Button @click="edittask(task)"
                                         label="Edit"
                                         icon="pi pi-pencil"
                                         outlined
@@ -143,7 +143,7 @@
                                     
                                 </div>
                                 <div class="flex justify-content-end">
-                                    <Button
+                                    <Button @click="edittask(task)"
                                         label="Edit"
                                         icon="pi pi-pencil"
                                         outlined
