@@ -163,8 +163,8 @@ class Enrollment(Resource):
 
             # Defining message 
             message = {
-                "log type": "Users enrolled", 
-                "description": "All users in group have been enrolled"
+                "log type": "User enrolled", 
+                "description": f"{user_id} has been enrolled in subgroup {subgroup_id}",
             }
 
             # Send message to exchange
