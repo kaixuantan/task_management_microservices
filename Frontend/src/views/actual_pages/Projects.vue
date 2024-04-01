@@ -105,7 +105,6 @@
                     </div>
 
                     <div class="flex gap-3 mt-1" v-if="isUserEnrolled(project) && userrole !== 'admin'">
-                        <Button label="Leave" severity="secondary" outlined class="w-full" @click="leaveproject(project.subGroupId)" />
                         <Button label="View" class="w-full" @click="viewProject(project.subGroupId)" />
                     </div>
 
@@ -258,6 +257,7 @@ export default {
             `https://personal-rc7vnnm9.outsystemscloud.com/SubGroupAPI_REST/rest/v1/subgroup/unenrol/${subGroupId}`,
             {
                 headers: {
+                    'Content-Type': 'application/json',
                     "X-SubGroup-AppId": env.X_SubGroup_AppId,
                     "X-SubGroup-Key": env.X_SubGroup_Key,
                     "userId":userId
