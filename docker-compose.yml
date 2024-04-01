@@ -17,6 +17,8 @@ services:
       - "8000:8000"
     depends_on:
       - rabbitmq
+    environment:
+      PYTHONUNBUFFERED: 1
   
   log:
     build: ./SimpleMicroservices/log
@@ -29,6 +31,8 @@ services:
       - rabbitmq
       - amqp
     restart: on-failure
+    environment:
+      PYTHONUNBUFFERED: 1
 
   notification:
     build: ./SimpleMicroservices/notification
@@ -42,6 +46,8 @@ services:
       - amqp
       - log
     restart: on-failure
+    environment:
+      PYTHONUNBUFFERED: 1
 
   # Complex Microservices
   generate-idea:
@@ -57,6 +63,8 @@ services:
       - log
       - notification
     restart: on-failure
+    environment:
+      PYTHONUNBUFFERED: 1
 
   group-creation:
     build: ./ComplexMicroservices/GroupCreation
@@ -71,6 +79,8 @@ services:
       - log
       - notification
     restart: on-failure
+    environment:
+      PYTHONUNBUFFERED: 1
 
   enrollment:
     build: ./ComplexMicroservices/enrollment
@@ -85,6 +95,8 @@ services:
       - log
       - notification
     restart: on-failure
+    environment:
+      PYTHONUNBUFFERED: 1
   
   create-task:
     build: ./ComplexMicroservices/CreateEditTask
@@ -99,3 +111,5 @@ services:
       - log
       - notification
     restart: on-failure
+    environment:
+      PYTHONUNBUFFERED: 1
