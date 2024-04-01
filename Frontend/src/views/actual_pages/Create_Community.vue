@@ -330,7 +330,7 @@ fetchUsers();
 
 
                 <!--Create SubGroup Dialog-->
-                <Dialog v-model:visible="subgrp_popup" :style="{ width: '450px' }" header="Subgroup Details"
+                <Dialog v-model:visible="subgrp_popup" :style="{ width: '450px' }" header="Project Details"
                     :modal="true" class="p-fluid">
                     <div class="field">
                         <label for="name">Project Name</label>
