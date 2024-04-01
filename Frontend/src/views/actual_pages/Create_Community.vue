@@ -305,9 +305,9 @@ fetchUsers();
         <!--CODE FOR SUBGROUP TABLE-->
         <div class="col-12 md:col-6">
             <div class="card">
-                <Button label="New Subgroup" icon="pi pi-plus" class="mr-2 mb-4" severity="success" @click="openNew" />
+                <Button label="New Project" icon="pi pi-plus" class="mr-2 mb-4" severity="success" @click="openNew" />
                 <div class="card">
-                    <h5>Existing Subgroups</h5>
+                    <h5>Existing Projects</h5>
                     <DataTable :value="subgroup_submit">
                         <Column field="name" header="Name"></Column>
                         <Column field="description" header="Description"></Column>
@@ -333,10 +333,10 @@ fetchUsers();
                 <Dialog v-model:visible="subgrp_popup" :style="{ width: '450px' }" header="Subgroup Details"
                     :modal="true" class="p-fluid">
                     <div class="field">
-                        <label for="name">Subgroup Name</label>
+                        <label for="name">Project Name</label>
                         <InputText id="name" v-model.trim="subgrp.name" required="true" autofocus
                             :invalid="subsubmitted && !subgrp.name" />
-                        <small class="p-invalid" v-if="subsubmitted && !subgrp.name">Name is required.</small>
+                        <small class="p-invalid" v-if="subsubmitted && !subgrp.name">Project Name is required.</small>
                     </div>
                     <div class="field">
                         <label for="description">Description</label>
@@ -347,7 +347,7 @@ fetchUsers();
 
 
                     <div class="field">
-                        <label for="capacity">Subgroup Capacity</label>
+                        <label for="capacity">Project Capacity</label>
                         <InputNumber id="capacity" v-model="subgrp.capacity" integeronly required="True" />
                         <small class="p-invalid"style="color:red"  v-if="subsubmitted & subgrp.capacity>comsize">Subgroup Capacity cannot exceed Community Size.</small>
                         <small class="p-invalid"style="color:red"  v-if="subsubmitted & !subgrp.capacity">Subgroup Capacity is required.</small>
