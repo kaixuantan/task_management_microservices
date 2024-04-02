@@ -35,3 +35,6 @@ Please note: This documentation is only accessible once the Docker containers ar
 
 ### Use case Diagrams
 https://drive.google.com/file/d/1PpDNxZTYQc-BbD_FvhH3TqepAS8cPTnp/view?usp=sharing
+
+### Video demo
+https://youtu.be/GXQHg51Abq8
