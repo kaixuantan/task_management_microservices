@@ -58,6 +58,7 @@
                                         label="Edit"
                                         icon="pi pi-pencil"
                                         outlined
+                                        v-if="this.userId === task.createdById || UserAssignedToTask(task.assignedUsers)"
                                     />
                                 </div>
                             </div>
@@ -104,6 +105,7 @@
                                         label="Edit"
                                         icon="pi pi-pencil"
                                         outlined
+                                        v-if="this.userId === task.createdById || UserAssignedToTask(task.assignedUsers)"
                                     />
                                 </div>
                             </div>
@@ -142,13 +144,7 @@
                                     </span>
                                     
                                 </div>
-                                <div class="flex justify-content-end">
-                                    <Button @click="edittask(task)"
-                                        label="Edit"
-                                        icon="pi pi-pencil"
-                                        outlined
-                                    />
-                                </div>
+                                
                             </div>
                         </div>
                     </div>
@@ -515,6 +511,14 @@ export default {
             this.newdesc = this.selected_project.description;
             this.newcapacity = this.selected_project.size;
             this.editprojDialog = true;
+        },
+        UserAssignedToTask(assignedUsers) {
+            for (const user of assignedUsers) {
+                if (user.assigneeUserId == this.userId) {
+                    return true;
+                }
+            }
+            return false;
         },
         
         
