@@ -216,7 +216,7 @@
         <!-- 3 cards at the top of the screen -->
     </div>
 
-    <Dialog v-model:visible="editDialog" :style="{ width: '450px' }" header="Edit Community" :modal="true" class="p-fluid">
+    <Dialog v-model:visible="editDialog" :style="{ width: '450px' }" header="Edit Task" :modal="true" class="p-fluid">
         <div class="field">
             <label for="name">Task Name</label>
             <InputText id="name" v-model.trim="task.name" :required="true" autofocus :disabled="!isCreatedByUser" />
@@ -643,6 +643,10 @@ export default {
                 
                 // Refresh the list of tasks
                 await this.fetchProjectTasks(this.$route.query.subGroupId);
+                this.tasks_in_progress = [];
+                this.tasks_new = [];
+                this.tasks_completed = [];
+                this.sortTasksByStatus(this.proj_tasks);
                 
                 // Show a success toast message
                 this.$toast.add({ severity: 'success', summary: 'Successful', detail: 'Task updated', life: 3000 });
