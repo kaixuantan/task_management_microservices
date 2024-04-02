@@ -330,7 +330,7 @@ export default {
 };
 </script>
 
-<style>
+<style scoped>
 .p-timeline-event-opposite {
     flex: 0;
 }
