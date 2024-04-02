@@ -102,6 +102,7 @@ const calAttributes = ref([
                             <div
                                 v-for="task in tasks_in_progress.slice(0,3)"
                                 class="card shadow-1 flex align-items-center justify-content-between"
+                                @click="projgrp(task.subGroupId)"
                             >
                                 <div class="flex">
                                     <Avatar
@@ -127,6 +128,7 @@ const calAttributes = ref([
                             <div
                                 v-for="task in tasks_new.slice(0,3)"
                                 class="card shadow-1 flex align-items-center justify-content-between"
+                                @click="projgrp(task.subGroupId)"
                             >
                                 <div class="flex">
                                     <Avatar
@@ -152,6 +154,7 @@ const calAttributes = ref([
                             <div
                                 v-for="task in tasks_completed.slice(0,3)"
                                 class="card shadow-1 flex align-items-center justify-content-between"
+                                @click="projgrp(task.subGroupId)"
                             >
                                 <div class="flex">
                                     <Avatar
@@ -302,6 +305,9 @@ export default {
     methods: {
         communitygrp(grpid) {
             this.$router.push({ name: 'projects', query: { groupId: grpid } });
+        },
+        projgrp(sgid) {
+            this.$router.push({ name: 'project', query: { subGroupId: sgid } });
         }
     },
     computed: {
@@ -327,5 +333,17 @@ export default {
 <style>
 .p-timeline-event-opposite {
     flex: 0;
+}
+
+.card:hover {
+    background-color: #f1f5f9;
+    color: #3B82F6 !important;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.card:hover h5 {
+    color: #3B82F6;
+    transition: 0.2s;
 }
 </style>
