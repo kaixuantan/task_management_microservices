@@ -189,6 +189,7 @@ Base url: https://personal-rc7vnnm9.outsystemscloud.com
   - [FK] groupId (bigint)
   - [FK] userId (bigint)
   - username (varchar)
+  - email (varchar)
 - SubGroup
   - `SubGroup table`
   - [PK] subGroupId (bigint) (auto increment)
@@ -201,6 +202,7 @@ Base url: https://personal-rc7vnnm9.outsystemscloud.com
   - [FK] subGroupId (bigint)
   - [FK] userId (bigint)
   - username (varchar)
+  - email (varchar)
 - Task
   - `Task table`
   - [PK] taskId (bigint) (auto increment)
@@ -222,6 +224,8 @@ Base url: https://personal-rc7vnnm9.outsystemscloud.com
   - [FK] taskId (bigint)
   - [FK] assigneeUserId (bigint)
   - assigneeUsername (varchar)
+  - assigneeEmail (varchar)
+
 - Log
   - `Log table`
   - [PK] LogId (bigint) (auto increment)
