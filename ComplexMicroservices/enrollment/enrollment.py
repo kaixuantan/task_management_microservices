@@ -18,16 +18,7 @@ api = Api(app, version='1.0', title='Enrollment API',
     description='API to enrol users into projects (subgrps). Notifies admin when all users in a group have been enrolled. Performs logging functions.',
 )
 
-# Credentials for calling microservices
-sub_group_credentials = { 
-    "sub_group_app_id": "dPgLc9FzdypatRXjVJl1", 
-    "sub_group_api_key": "jRysav78rLvL7hgfSBGG1MuRuDjMaU" 
-} 
 
-group_credentials = {
-    "group_app_id": "fAzGk6o724ynKLjKyM9a",
-    "group_api_key": "vODi2UJpYrUMcPRFK4156o2LoR9qSp"
-}
 
 # URLs for simple microservices 
 subgroup_microservice_base_url = "https://personal-rc7vnnm9.outsystemscloud.com/SubGroupAPI_REST/rest/v1/subgroup" 
@@ -72,14 +63,14 @@ class Enrollment(Resource):
                 group_id = request.json.get('groupId')
 
                 # 1. Call [GET] get user's groups API from group microservice to get user groups
-                user_groups_response = requests.get(f'{group_microservice_base_url}/usergroup/{user_id}', headers={"X-Group-AppId": group_credentials["group_app_id"], "X-Group-Key": group_credentials["group_api_key"]})
+                user_groups_response = requests.get(f'{group_microservice_base_url}/usergroup/{user_id}', headers={"X-Group-AppId": os.getenv("X_Group_AppId"), "X-Group-Key": os.getenv("X_Group_Key")})
                 user_groups = user_groups_response.json()["UserGroup"]["groups"]
 
                 # 2. For each group user is in, call [GET] get group's subgroup API from subgroup microservice to get subgroups of the group
                 subgroups = []
                 for group in user_groups:
                     group_id = group['groupId']
-                    subgroup_response = requests.get(f'{subgroup_microservice_base_url}/groupsubgroup/{group_id}', headers={"X-SubGroup-AppId": sub_group_credentials["sub_group_app_id"], "X-SubGroup-Key": sub_group_credentials["sub_group_api_key"]})
+                    subgroup_response = requests.get(f'{subgroup_microservice_base_url}/groupsubgroup/{group_id}', headers={"X-SubGroup-AppId": os.getenv("X_SubGroup_AppId"), "X-SubGroup-Key": os.getenv("X_SubGroup_Key")})
                     subgroups_of_group = subgroup_response.json()["GroupSubGroup"]["subGroups"]
                     subgroups.extend(subgroups_of_group)
 
@@ -142,14 +133,14 @@ class Enrollment(Resource):
 
         # 1. Call [GET] subgroup API from subgroup microservice to check if there is space in the subgroup
         try:
-            subgroup_response = requests.get(f'{subgroup_microservice_base_url}/{subgroup_id}', headers={"X-SubGroup-AppId": sub_group_credentials["sub_group_app_id"], "X-SubGroup-Key": sub_group_credentials["sub_group_api_key"]})
+            subgroup_response = requests.get(f'{subgroup_microservice_base_url}/{subgroup_id}', headers={"X-SubGroup-AppId": os.getenv("X_SubGroup_AppId"), "X-SubGroup-Key": os.getenv("X_SubGroup_Key")})
             if subgroup_response.json()['SubGroup']['size'] == len(subgroup_response.json()['SubGroup']['subGroupUsers']):
                 return {'message': 'Subgroup is full'}, 400
 
             groupId = subgroup_response.json()['SubGroup']['groupId']
 
             # 2. Call [PUT] update subgroup API from subgroup microservice to add user into the subgroup
-            update_subgroup_response = requests.put(f'{subgroup_microservice_base_url}/enrol/{subgroup_id}', json={'userId': user_id, 'subGroupId':subgroup_id, 'username': username, 'email': email}, headers={"X-SubGroup-AppId": sub_group_credentials["sub_group_app_id"], "X-SubGroup-Key": sub_group_credentials["sub_group_api_key"]})
+            update_subgroup_response = requests.put(f'{subgroup_microservice_base_url}/enrol/{subgroup_id}', json={'userId': user_id, 'subGroupId':subgroup_id, 'username': username, 'email': email}, headers={"X-SubGroup-AppId": os.getenv("X_SubGroup_AppId"), "X-SubGroup-Key": os.getenv("X_SubGroup_Key")})
 
 
 
@@ -184,7 +175,7 @@ class Enrollment(Resource):
             # 4. If all users in group have been enrolled, publish all user enrollment event to email_queue
             # if all(user['enrolled'] for user in update_subgroup_response.json()['users']):
             count = 0
-            group_subgroup_response = requests.get(f'{subgroup_microservice_base_url}/groupsubgroup/{groupId}', headers={"X-SubGroup-AppId": sub_group_credentials["sub_group_app_id"], "X-SubGroup-Key": sub_group_credentials["sub_group_api_key"]})
+            group_subgroup_response = requests.get(f'{subgroup_microservice_base_url}/groupsubgroup/{groupId}', headers={"X-SubGroup-AppId": os.getenv("X_SubGroup_AppId"), "X-SubGroup-Key": os.getenv("X_SubGroup_Key")})
             for subgroup in group_subgroup_response.json()['GroupSubGroup']['subGroups']:
                 if subgroup['size'] == len(subgroup['subGroupUsers']):
                     count += 1
@@ -222,7 +213,7 @@ class Enrollment(Resource):
                 connection.close()
 
             # 5. If the subgroup is now full after the user has been added, return a message to the user
-            updated_subgroup_response = requests.get(f'{subgroup_microservice_base_url}/{subgroup_id}', headers={"X-SubGroup-AppId": sub_group_credentials["sub_group_app_id"], "X-SubGroup-Key": sub_group_credentials["sub_group_api_key"]})
+            updated_subgroup_response = requests.get(f'{subgroup_microservice_base_url}/{subgroup_id}', headers={"X-SubGroup-AppId": os.getenv("X_SubGroup_AppId"), "X-SubGroup-Key": os.getenv("X_SubGroup_Key")})
             if updated_subgroup_response.json()['SubGroup']['size'] == len(updated_subgroup_response.json()['SubGroup']['subGroupUsers']) :
                 return {'message': f'Subgroup {subgroup_id} is now full'}, 200
 
