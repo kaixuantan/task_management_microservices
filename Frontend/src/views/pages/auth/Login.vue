@@ -59,17 +59,20 @@ const handleSubmit = async () => {
 
     
     // Handle the response
-    if(response.data.Result.Success === false){
+    if (response.data.Result.Success === false) {
         alert(response.data.Result.ErrorMessage)
     }
 
-    else{
-    const user_id=response.data.UserId;
-    sessionStorage.setItem('userid', user_id);
-    sessionStorage.setItem('username', username.value);
-    sessionStorage.setItem('yourKey', env.JWT_SECRET);
-    await fetchUserData(user_id);
-    router.push('/'); 
+    else {
+        const user_id = response.data['User']['userId'];
+        const email = response.data['User']['email'];
+        const role = response.data['User']['role'];
+        sessionStorage.setItem('userid', user_id);
+        sessionStorage.setItem('username', username.value);
+        sessionStorage.setItem('yourKey', env.JWT_SECRET);
+        sessionStorage.setItem('email', email);
+        sessionStorage.setItem('role', role);
+        router.push('/'); 
     }
 
   } catch (error) {
