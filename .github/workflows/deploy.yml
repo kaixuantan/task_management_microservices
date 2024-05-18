@@ -42,6 +42,7 @@ jobs:
         run: |
           cd Frontend
           npm ci
+          ls
       - name: Build
         run: npm run build
       - name: Setup Pages
