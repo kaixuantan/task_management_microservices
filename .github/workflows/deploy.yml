@@ -34,15 +34,15 @@ jobs:
           sparse-checkout: |
             .github
             Frontend
+      - name: change directory
+        run: cd Frontend
       - name: Set up Node
         uses: actions/setup-node@v4
         with:
           node-version: 20
           cache: 'npm'
       - name: Install dependencies
-        run: |
-          cd Frontend
-          npm ci
+        run: npm ci
       - name: Build
         run: npm run build
       - name: Setup Pages
