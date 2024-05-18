@@ -15,5 +15,6 @@ export default defineConfig({
   },
   define: {
     'env': process.env
-  }
+  },
+  base: '/task_management_microservices/'
 })
