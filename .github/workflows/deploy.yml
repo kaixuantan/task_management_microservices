@@ -12,10 +12,12 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          path: ./Frontend
 
       - name: Install dependencies and build
         run: |
-          cd frontend
+          cd Frontend
           npm install
           npm run build
 
